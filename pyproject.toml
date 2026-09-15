@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "selfhost-models"
+version = "0.1.0"
+requires-python = ">=3.11,<3.14"
+dependencies = ["httpx==0.28.1", "pydantic==2.11.7", "uvicorn==0.35.0", "huggingface-hub==0.34.4", "Pillow==11.3.0"]
+
+[project.optional-dependencies]
+test = ["pytest==8.4.1", "pytest-asyncio==1.1.0"]
+
+[project.scripts]
+modelctl = "selfhost_models.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["selfhost_models*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

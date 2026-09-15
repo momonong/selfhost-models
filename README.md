@@ -1,1 +1,38 @@
 # selfhost-models
+
+共用模型推論與 Docker 部署管理。提供固定 HF revision 的模型管理與 vLLM serving，業務 prompt、工具執行與產品規則留在各產品。
+
+## 開始使用
+
+Python 3.11–3.13、Docker Compose、可用的 NVIDIA GPU container 環境：
+
+```bash
+python -m pip install -r requirements.lock
+python -m pip install --no-deps -e .
+modelctl doctor
+modelctl register Qwen/Qwen3.5-4B --path D:/hf_models/Qwen3.5-4B
+modelctl inspect Qwen/Qwen3.5-4B
+modelctl serve Qwen/Qwen3.5-4B
+```
+
+路徑依 host 調整。Linux MODEL_ROOT 預設 `/srv/selfhost-models/models`，Windows 為 `D:/hf_models`。先完成 register 或獨立 fetch；serve 不下載權重。
+
+API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/api-key` 的 Bearer token 呼叫 `/v1/models`、`/v1/chat/completions`。支援一般與 SSE、嚴格輸入限制、有界 admission 與可追蹤的取消／逾時。
+
+## 文件與驗證
+
+- [架構與生命週期](docs/architecture.md)
+- [API 支援範圍與限制](docs/api.md)
+- [資產管理、Windows／Linux 部署](docs/deployment.md)
+- [可重跑驗收與證據](docs/acceptance.md)
+- [Backend 契約與 Transformers 交接](docs/backend.md)
+- [模型候選與 GPU 盤點](docs/model-selection.md)
+
+目前已通過契約、API container 與 CUDA runtime 檢查；**真實模型推論驗收仍待選定模型**，詳見驗收文件。
+
+```bash
+python -m pytest -q
+python scripts/acceptance.py --faults
+```
+
+第二個指令需要已 ready 的真實服務，會對本專案容器作受控 pause/restart。契約測試不取代 GPU 驗收。
