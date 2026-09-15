@@ -13,13 +13,14 @@
 - 一個 uvicorn process、一個 vLLM frontend／engine、一個指定模型。
 - API 最多 32 個已授權 HTTP handler；body 最多 2 MiB、讀取最多 10 秒。推論預設最多 2 個 lease，等待佇列長度 **0**；超出立即 429 + Retry-After。
 - vLLM 的 max-num-seqs 與 admission 上限一致。vLLM 自行管理 batching、KV cache；API 不實作 GPU scheduler。
+- lease 釋放表示該請求已終止、可接收下一個請求，不表示模型權重或整個 KV 記憶體池已還給作業系統。服務常駐時 vLLM 仍保留配置的 VRAM；需要讓其他工作使用這些 VRAM 時，由管理命令停止 worker。
 - deadline 預設 30 秒，涵蓋 body 接收、worker 執行、下游寫出。有限 body/輸出/token 上限避免無界累积。
 - 一般回應完整且含 finish_reason，或 SSE 收到 `[DONE]` 才算協定層的終止確認。400/404/422 的 worker 驗證拒絕也可釋放 lease。5xx、傳輸中斷、格式錯誤都視為不確定。
 - 客戶端斷線／deadline：停止交付，producer 繼續接收直到終止。**本版沒有立即 GPU abort 能力**；最多追蹤到 drain deadline（預設從 dispatch 起 120 秒）。drain 到期會關閉連線並標為不確定，不宣稱 GPU 已停。
 - SSE 16 個 chunk buffer；客戶端過慢就 detach，繼續 drain worker。已送 HTTP 200 後的失敗用 SSE `error` 物件，結束且不補 `[DONE]`。
 - 發送前 fsync lease journal；API crash/restart 後同 worker epoch 的未決 lease 使服務不 ready。只有新 worker epoch 加上成功 warmup 可清除舊 epoch 的未決工作。不要刪 state volume 來繞過此保護。
 - worker identity 是純 ASGI middleware，每個 frontend process 產生隨機 epoch。此保證依賴單 frontend 與其 engine 一起啟停，禁止多 frontend 或外接可獨立生存的 engine。
-- readiness 每 2 秒 probe；新 engine 必須通過真實一 token warmup。暫時失聯後同 epoch 恢復時沿用已完成的 warmup。不健康／未決時回 503。
+- readiness 每 2 秒 probe；新 engine 必須通過 4 token 的 prefill＋decode、設定容量的併發暖機，以及視覺 profile 的合成單圖暖機。初始化暖機總上限 180 秒，獨立於 client deadline；整段 warmup 有持久化 lease。暫時失聯後同 epoch 恢復時沿用已完成的 warmup。不健康／未決時回 503。這不保證所有未見過的輸入形狀都沒有 JIT latency。
 
 ## 安全與紀錄
 

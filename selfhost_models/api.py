@@ -77,7 +77,8 @@ class Gateway:
         if self.state_file.exists():
             self.leases = json.loads(self.state_file.read_text())["leases"]
         if self.backend is None:
-            self.backend = VLLMBackend(os.getenv("WORKER_URL", "http://worker:8000"), self.capacity + 2)
+            self.backend = VLLMBackend(os.getenv("WORKER_URL", "http://worker:8000"), self.capacity + 2,
+                                       profile=self.profile, capacity=self.capacity)
         self.monitor = asyncio.create_task(self.watch())
 
     async def watch(self):

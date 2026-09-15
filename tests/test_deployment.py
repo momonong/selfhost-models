@@ -16,3 +16,6 @@ def test_deployment_isolation_contract():
     assert "docker.sock" not in str(api)
     assert "HF_TOKEN" not in str(config)
     assert "--no-enable-log-requests" in worker["command"]
+    assert worker["environment"]["VLLM_USE_V2_MODEL_RUNNER"] == "${VLLM_USE_V2_MODEL_RUNNER:-0}"
+    assert set(api["networks"]) == {"ingress", "inference"}
+    assert worker["networks"] == ["inference"]

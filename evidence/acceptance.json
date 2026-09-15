@@ -1,0 +1,145 @@
+{
+  "environment": "real-service",
+  "url": "http://127.0.0.1:18080",
+  "faults": true,
+  "results": [
+    {
+      "check": "models",
+      "at": "2026-09-15T09:27:44.625080+00:00",
+      "model": {
+        "id": "Qwen/Qwen3.5-4B",
+        "object": "model",
+        "created": 0,
+        "owned_by": "selfhost",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+      }
+    },
+    {
+      "check": "non_stream",
+      "at": "2026-09-15T09:27:44.764954+00:00",
+      "status": 200,
+      "request_id": "cec23f1a6c0a404684b6d3a353604a40",
+      "usage": {
+        "prompt_tokens": 18,
+        "total_tokens": 20,
+        "completion_tokens": 2,
+        "prompt_tokens_details": null,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      }
+    },
+    {
+      "check": "stream",
+      "at": "2026-09-15T09:27:45.054821+00:00",
+      "chunks": 4,
+      "done": true
+    },
+    {
+      "check": "unsupported_parameter",
+      "at": "2026-09-15T09:27:45.058734+00:00",
+      "status": 400
+    },
+    {
+      "check": "bad_tokens",
+      "at": "2026-09-15T09:27:45.062549+00:00",
+      "status": 400
+    },
+    {
+      "check": "unknown_model",
+      "at": "2026-09-15T09:27:45.066187+00:00",
+      "status": 404
+    },
+    {
+      "check": "context_limit",
+      "at": "2026-09-15T09:27:45.109932+00:00",
+      "status": 400
+    },
+    {
+      "check": "authentication",
+      "at": "2026-09-15T09:27:45.114454+00:00",
+      "status": 401
+    },
+    {
+      "check": "body_limit",
+      "at": "2026-09-15T09:27:45.127354+00:00",
+      "status": 413
+    },
+    {
+      "check": "overload_and_deadline",
+      "at": "2026-09-15T09:27:46.889128+00:00",
+      "statuses": [
+        504,
+        504,
+        429,
+        429,
+        429,
+        429,
+        429,
+        429
+      ],
+      "retained": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "bc2b8d67486f44d68b12c42e2d79047c",
+        "inflight": 2,
+        "detached": 2,
+        "uncertain": 0
+      }
+    },
+    {
+      "check": "drain_completed",
+      "at": "2026-09-15T09:27:47.276567+00:00",
+      "health": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "bc2b8d67486f44d68b12c42e2d79047c",
+        "inflight": 0,
+        "detached": 0,
+        "uncertain": 0
+      }
+    },
+    {
+      "check": "client_cancel_retains_lease",
+      "at": "2026-09-15T09:27:47.892241+00:00",
+      "health": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "bc2b8d67486f44d68b12c42e2d79047c",
+        "inflight": 1,
+        "detached": 1,
+        "uncertain": 0
+      }
+    },
+    {
+      "check": "api_restart_quarantines",
+      "at": "2026-09-15T09:27:49.237714+00:00",
+      "health": {
+        "ready": false,
+        "version": "0.1.0",
+        "worker_epoch": null,
+        "inflight": 1,
+        "detached": 0,
+        "uncertain": 1
+      }
+    },
+    {
+      "check": "worker_unavailable",
+      "at": "2026-09-15T09:27:50.612158+00:00",
+      "status": 503
+    },
+    {
+      "check": "worker_restart_recovery",
+      "at": "2026-09-15T09:29:37.421286+00:00",
+      "status": 200,
+      "health": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "8fc9a6678ec548bab9387b7f6f841732",
+        "inflight": 0,
+        "detached": 0,
+        "uncertain": 0
+      }
+    }
+  ]
+}

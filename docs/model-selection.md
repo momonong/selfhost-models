@@ -13,6 +13,12 @@
 
 目前建議以既有 Qwen3.5-4B 取得完整服務驗收，再對較大新版模型設計量化、context 與能力比較。這是部署與驗收成本取捨，不是宣稱 Qwen3.5-4B 為所有任務 SOTA。
 
+## 本次選擇
+
+使用者同意 3.8 若不適合目前 VRAM 就採用 3.5。重新盤點時可用 VRAM 為 20,268 MiB（19.8 GiB）。NVIDIA Qwen3.8-27B-NVFP4 的三個權重 shard 約 21.9 GB（20.4 GiB），已超過當時可用 VRAM，還未計 KV cache、視覺 activation 與 CUDA workspace；因此不下載此版本，改用既有 **Qwen/Qwen3.5-4B**，固定 revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`。
+
+這不是宣稱所有 Qwen3.8 量化都不能在 24 GB 上運行。更低位元量化或 CPU offload 需另驗證相容性、速度、context 與視覺／工具品質；不將原始參數量或檔案大小直接當成完整 VRAM 實測。
+
 來源（於本次調查讀取官方頁面）：
 
 - https://huggingface.co/Qwen/Qwen3.5-4B

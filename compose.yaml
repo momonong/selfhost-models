@@ -43,6 +43,8 @@ services:
       dockerfile: docker/worker.Dockerfile
     environment:
       MODEL_PROFILE: ${MODEL_PROFILE:-text}
+      # V2 runner requires UVA unavailable on the validated WSL2 host.
+      VLLM_USE_V2_MODEL_RUNNER: ${VLLM_USE_V2_MODEL_RUNNER:-0}
     command:
       - /models/current
       - --served-model-name

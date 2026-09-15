@@ -48,7 +48,7 @@ async def main(args):
         async def post(**overrides):
             return await client.post("/v1/chat/completions", json={**payload, **overrides})
 
-        await wait_for(lambda h: h["ready"])
+        await wait_for(lambda h: h["ready"], 600)
         models = await client.get("/v1/models")
         assert models.status_code == 200
         model = models.json()["data"][0]

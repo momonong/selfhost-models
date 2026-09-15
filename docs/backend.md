@@ -7,7 +7,7 @@
 | Operation | 語義 |
 |---|---|
 | `identity()` | 健康且可回應的 worker 之 engine epoch；失敗拋例外。epoch 必須隨 engine 整體重啟改變。 |
-| `warmup(model, epoch)` | 對指定模型真實生成，檢查完整結果與相同 epoch；不得在此下載模型。 |
+| `warmup(model, epoch)` | 對指定模型真實生成，涵蓋多 token decode、批次與已啟用視覺能力；檢查完整結果與相同 epoch。總上限 180 秒，不得在此下載模型。 |
 | `generate(payload, request_id)` | async context manager，回 HTTP response 與有界可讀內容；含 x-worker-epoch。 |
 | `close()` | 關閉傳輸。關閉不等於 GPU abort。 |
 

@@ -47,3 +47,22 @@
 錯誤包含 `error.message/type/code/request_id`，不附回原始 prompt 或完整 worker exception。429/503 有 Retry-After。HTTP SSE 開始後錯誤無法改 status；改送 `data: {"error":...}` 並結束，不送 `[DONE]`。客戶端應同時檢查 error 與 `[DONE]`，不可將中途斷線當成功。
 
 deadline 與取消不是立即 GPU abort；完整語義見 architecture.md。
+
+## 最小 client（從 repo 根目錄執行）
+
+```python
+from pathlib import Path
+import httpx
+
+key = Path('.state/api-key').read_text().strip()
+with httpx.Client(base_url='http://127.0.0.1:18080',
+                  headers={'Authorization': f'Bearer {key}'}, timeout=35) as client:
+    payload = {'model': 'Qwen/Qwen3.5-4B',
+               'messages': [{'role': 'user', 'content': 'Reply OK.'}],
+               'max_tokens': 32, 'temperature': 0}
+    response = client.post('/v1/chat/completions', json=payload)
+    response.raise_for_status()
+    print(response.json()['choices'][0]['message']['content'])
+```
+
+SSE 將 payload 加上 `stream: true`，使用 `client.stream(...)` 與 `response.iter_lines()` 讀取；應驗證結尾 `[DONE]` 並處理 error frame。圖片及完整工具往返 client 見 `scripts/multimodal_smoke.py`。

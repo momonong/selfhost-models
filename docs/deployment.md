@@ -55,3 +55,9 @@ docker compose --env-file .state/compose.env restart worker
 serve 在既有 selfhost-models 容器運行或 port 已用時拒絕接管。restart 明確重啟本專案 worker 與 API；worker-only restart 也由 API 自動偵測新 epoch、暖機並恢復。需要更改部署參數時先 stop，再 serve。stop 不刪除容器、資產或 state。
 
 固定 runtime 版本與實際 image digest、CUDA/PyTorch 組合見驗收紀錄。eager mode、短 context、小併發先建立可預期基準，後續另做 throughput、CUDA graphs 與記憶體調校；不以此次 smoke test 宣稱產品品質或 Linux 實機驗證。
+
+### WSL2 runner 設定
+
+官方 vLLM 0.29.0 的 V2 model runner 在此 WSL2／Blackwell host 因 `UVA is not available` 無法初始化。Compose 明確預設 `VLLM_USE_V2_MODEL_RUNNER=0`，使用同版本內的 V1 runner；不替換 CUDA/PyTorch、不自動改引擎。Linux 若另驗證 V2，可顯式覆寫環境變數後重建 worker；目前 Linux 未實測。
+
+上游對應問題：https://github.com/vllm-project/vllm/issues/50239
