@@ -12,6 +12,7 @@ services:
       MODEL_ID: ${MODEL_ID:?Use modelctl serve}
       MODEL_REVISION: ${MODEL_REVISION:?Use modelctl serve}
       MODEL_PROFILE: ${MODEL_PROFILE:-text}
+      BACKEND: ${BACKEND:-vllm}
       WORKER_URL: http://worker:8000
       API_KEY_FILE: /run/secrets/api_key
       STATE_FILE: /state/leases.json

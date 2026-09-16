@@ -59,3 +59,26 @@ class VLLMBackend:
 
     async def close(self):
         await self.client.aclose()
+
+
+class TransformersBackend(VLLMBackend):
+    """Same transport/terminal contract, with a text-only fixed-length warmup."""
+
+    async def warmup(self, model: str, epoch: str):
+        async with asyncio.timeout(180):
+            response = await self.client.post("/internal/warmup", json={"model": model}, timeout=180)
+            response.raise_for_status()
+            result = response.json()
+            if (response.headers.get("x-worker-epoch") != epoch or
+                    not result.get("choices") or
+                    any(c.get("finish_reason") is None for c in result["choices"]) or
+                    result.get("usage", {}).get("completion_tokens", 0) < 4):
+                raise RuntimeError("warmup identity or terminal result mismatch")
+
+
+def create_backend(name, *args, **kwargs):
+    if name == "vllm":
+        return VLLMBackend(*args, **kwargs)
+    if name == "transformers":
+        return TransformersBackend(*args, **kwargs)
+    raise ValueError("unsupported backend")

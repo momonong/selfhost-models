@@ -1,0 +1,16 @@
+# Explicit override, selected by modelctl from the persisted BACKEND setting.
+services:
+  worker:
+    image: selfhost-models-transformers:0.1.0
+    build:
+      dockerfile: docker/transformers.Dockerfile
+    command: [python, -m, uvicorn, "worker.transformers_app:app", --host, "0.0.0.0", --port, "8000", --workers, "1", --no-access-log, --timeout-graceful-shutdown, "5"]
+    environment:
+      MODEL_ID: ${MODEL_ID:?Use modelctl serve}
+      MODEL_REVISION: ${MODEL_REVISION:?Use modelctl serve}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-2048}
+      MAX_INFLIGHT: "1"
+      GPU_MEMORY_UTILIZATION: ${GPU_MEMORY_UTILIZATION:-0.60}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]

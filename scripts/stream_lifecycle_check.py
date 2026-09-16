@@ -8,13 +8,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
+from selfhost_models.cli import compose_command
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 async def main(output):
     state = ROOT / ".state"
-    compose = ["docker", "compose", "--env-file", str(state / "compose.env"), "-f", str(ROOT / "compose.yaml")]
+    compose = compose_command(state)
     worker = subprocess.check_output([*compose, "ps", "-q", "worker"], text=True).strip()
     info = json.loads(subprocess.check_output(["docker", "inspect", worker], text=True))[0]
     assert info["Config"]["Labels"]["com.docker.compose.project"] == "selfhost-models"
