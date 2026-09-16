@@ -1,0 +1,1321 @@
+{
+  "at": "2026-09-16T09:44:06.046051+00:00",
+  "mode": "gpu",
+  "source": "synthetic presampled frames; MP4 decode is a separate acceptance requirement",
+  "cases": [
+    {
+      "duration": 2,
+      "frames": 4,
+      "edge": 256,
+      "metadata": {
+        "fps": 30.0,
+        "total_num_frames": 60,
+        "duration": 2,
+        "frames_indices": [
+          0,
+          20,
+          39,
+          59
+        ],
+        "do_sample_frames": false
+      },
+      "sample_timestamps_seconds": [
+        0.0,
+        0.6666666666666666,
+        1.3,
+        1.9666666666666666
+      ],
+      "terminal_confirmed": true,
+      "result": {
+        "status": 200,
+        "seconds": 16.317565325000032,
+        "body": {
+          "id": "chatcmpl-8f8465b49f5ed709",
+          "object": "chat.completion",
+          "created": 1789551860,
+          "model": "Qwen/Qwen3.5-4B",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Here are the background colors listed in chronological order with their approximate time ranges:\n\n- **Red**: 0.0s - 1.0s\n- **Green**: 1.0s - 2.0s",
+                "refusal": null,
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
+                "reasoning": null
+              },
+              "logprobs": null,
+              "finish_reason": "stop",
+              "stop_reason": null,
+              "token_ids": null,
+              "routed_experts": null
+            }
+          ],
+          "service_tier": null,
+          "system_fingerprint": "vllm-0.29.0-74e5e40e",
+          "usage": {
+            "prompt_tokens": 170,
+            "total_tokens": 218,
+            "completion_tokens": 48,
+            "prompt_tokens_details": null,
+            "completion_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          "prompt_logprobs": null,
+          "prompt_token_ids": null,
+          "prompt_text": null,
+          "kv_transfer_params": null,
+          "ec_transfer_params": null,
+          "metrics": null
+        }
+      },
+      "gpu_samples": [
+        {
+          "monotonic": 83578.0,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83578.312,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83578.625,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83578.921,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83579.234,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83579.531,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83579.828,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83580.125,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83580.437,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83580.75,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83581.046,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83581.343,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83581.656,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83581.953,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83582.25,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83582.562,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83582.859,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83583.156,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83583.468,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83583.781,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83584.093,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83584.406,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83584.703,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83585.0,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83585.312,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83585.625,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83585.921,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83586.218,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83586.515,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83586.828,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83587.125,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83587.421,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83587.734,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83588.046,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83588.359,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83588.671,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83588.968,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83589.265,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83589.562,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83589.89,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83590.187,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83590.5,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83590.812,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83591.109,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83591.421,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83591.718,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83592.031,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83592.328,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83592.64,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83592.937,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83593.25,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83593.562,
+          "values": "15591, 8461, 43"
+        },
+        {
+          "monotonic": 83593.859,
+          "values": "15591, 8461, 43"
+        },
+        {
+          "monotonic": 83594.156,
+          "values": "15591, 8461, 43"
+        },
+        {
+          "monotonic": 83594.453,
+          "values": "15591, 8461, 39"
+        }
+      ],
+      "gpu_sample_scope": "host-wide nvidia-smi memory.used MiB, memory.free MiB, utilization percent; not allocator attribution",
+      "gpu_after": "15591 MiB, 8461 MiB, 39 %"
+    },
+    {
+      "duration": 10,
+      "frames": 20,
+      "edge": 256,
+      "metadata": {
+        "fps": 30.0,
+        "total_num_frames": 300,
+        "duration": 10,
+        "frames_indices": [
+          0,
+          16,
+          31,
+          47,
+          63,
+          79,
+          94,
+          110,
+          126,
+          142,
+          157,
+          173,
+          189,
+          205,
+          220,
+          236,
+          252,
+          268,
+          283,
+          299
+        ],
+        "do_sample_frames": false
+      },
+      "sample_timestamps_seconds": [
+        0.0,
+        0.5333333333333333,
+        1.0333333333333334,
+        1.5666666666666667,
+        2.1,
+        2.6333333333333333,
+        3.1333333333333333,
+        3.6666666666666665,
+        4.2,
+        4.733333333333333,
+        5.233333333333333,
+        5.766666666666667,
+        6.3,
+        6.833333333333333,
+        7.333333333333333,
+        7.866666666666666,
+        8.4,
+        8.933333333333334,
+        9.433333333333334,
+        9.966666666666667
+      ],
+      "terminal_confirmed": true,
+      "result": {
+        "status": 200,
+        "seconds": 3.0053101269986655,
+        "body": {
+          "id": "chatcmpl-bc680a952083d2fa",
+          "object": "chat.completion",
+          "created": 1789551863,
+          "model": "Qwen/Qwen3.5-4B",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Based on the provided images, here are the background colors listed in chronological order with their approximate time ranges:\n\n- **Red:** From approximately 0.00s to 3.97s.\n- **Green:** From approximately 4.20s to 6.80s.\n- **Blue:** From approximately 7.03s to 9.47s.",
+                "refusal": null,
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
+                "reasoning": null
+              },
+              "logprobs": null,
+              "finish_reason": "stop",
+              "stop_reason": null,
+              "token_ids": null,
+              "routed_experts": null
+            }
+          ],
+          "service_tier": null,
+          "system_fingerprint": "vllm-0.29.0-74e5e40e",
+          "usage": {
+            "prompt_tokens": 746,
+            "total_tokens": 831,
+            "completion_tokens": 85,
+            "prompt_tokens_details": null,
+            "completion_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          "prompt_logprobs": null,
+          "prompt_token_ids": null,
+          "prompt_text": null,
+          "kv_transfer_params": null,
+          "ec_transfer_params": null,
+          "metrics": null
+        }
+      },
+      "gpu_samples": [
+        {
+          "monotonic": 83594.796,
+          "values": "15591, 8461, 39"
+        },
+        {
+          "monotonic": 83595.093,
+          "values": "15591, 8461, 39"
+        },
+        {
+          "monotonic": 83595.406,
+          "values": "15591, 8461, 39"
+        },
+        {
+          "monotonic": 83595.703,
+          "values": "15591, 8461, 62"
+        },
+        {
+          "monotonic": 83596.0,
+          "values": "15591, 8461, 62"
+        },
+        {
+          "monotonic": 83596.312,
+          "values": "15591, 8461, 62"
+        },
+        {
+          "monotonic": 83596.609,
+          "values": "15591, 8461, 54"
+        },
+        {
+          "monotonic": 83596.921,
+          "values": "15591, 8461, 54"
+        },
+        {
+          "monotonic": 83597.218,
+          "values": "15591, 8461, 54"
+        },
+        {
+          "monotonic": 83597.531,
+          "values": "15591, 8461, 45"
+        },
+        {
+          "monotonic": 83597.843,
+          "values": "15591, 8461, 45"
+        },
+        {
+          "monotonic": 83598.156,
+          "values": "15591, 8461, 45"
+        }
+      ],
+      "gpu_sample_scope": "host-wide nvidia-smi memory.used MiB, memory.free MiB, utilization percent; not allocator attribution",
+      "gpu_after": "15591 MiB, 8461 MiB, 45 %"
+    },
+    {
+      "duration": 30,
+      "frames": 60,
+      "edge": 256,
+      "metadata": {
+        "fps": 30.0,
+        "total_num_frames": 900,
+        "duration": 30,
+        "frames_indices": [
+          0,
+          15,
+          30,
+          46,
+          61,
+          76,
+          91,
+          107,
+          122,
+          137,
+          152,
+          168,
+          183,
+          198,
+          213,
+          229,
+          244,
+          259,
+          274,
+          290,
+          305,
+          320,
+          335,
+          350,
+          366,
+          381,
+          396,
+          411,
+          427,
+          442,
+          457,
+          472,
+          488,
+          503,
+          518,
+          533,
+          549,
+          564,
+          579,
+          594,
+          609,
+          625,
+          640,
+          655,
+          670,
+          686,
+          701,
+          716,
+          731,
+          747,
+          762,
+          777,
+          792,
+          808,
+          823,
+          838,
+          853,
+          869,
+          884,
+          899
+        ],
+        "do_sample_frames": false
+      },
+      "sample_timestamps_seconds": [
+        0.0,
+        0.5,
+        1.0,
+        1.5333333333333334,
+        2.033333333333333,
+        2.533333333333333,
+        3.033333333333333,
+        3.566666666666667,
+        4.066666666666666,
+        4.566666666666666,
+        5.066666666666666,
+        5.6,
+        6.1,
+        6.6,
+        7.1,
+        7.633333333333334,
+        8.133333333333333,
+        8.633333333333333,
+        9.133333333333333,
+        9.666666666666666,
+        10.166666666666666,
+        10.666666666666666,
+        11.166666666666666,
+        11.666666666666666,
+        12.2,
+        12.7,
+        13.2,
+        13.7,
+        14.233333333333333,
+        14.733333333333333,
+        15.233333333333333,
+        15.733333333333333,
+        16.266666666666666,
+        16.766666666666666,
+        17.266666666666666,
+        17.766666666666666,
+        18.3,
+        18.8,
+        19.3,
+        19.8,
+        20.3,
+        20.833333333333332,
+        21.333333333333332,
+        21.833333333333332,
+        22.333333333333332,
+        22.866666666666667,
+        23.366666666666667,
+        23.866666666666667,
+        24.366666666666667,
+        24.9,
+        25.4,
+        25.9,
+        26.4,
+        26.933333333333334,
+        27.433333333333334,
+        27.933333333333334,
+        28.433333333333334,
+        28.966666666666665,
+        29.466666666666665,
+        29.966666666666665
+      ],
+      "terminal_confirmed": true,
+      "result": {
+        "status": 200,
+        "seconds": 3.8759905629995046,
+        "body": {
+          "id": "chatcmpl-98b9fe34bebbd6f3",
+          "object": "chat.completion",
+          "created": 1789551866,
+          "model": "Qwen/Qwen3.5-4B",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Here is a list of the background colors in chronological order with their approximate time ranges:\n\n1. **Red**\n   - Time Range: 0.00s - 10.00s\n\n2. **Green**\n   - Time Range: 10.00s - 20.00s\n\n3. **Blue**\n   - Time Range: 20.00s - 30.00",
+                "refusal": null,
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
+                "reasoning": null
+              },
+              "logprobs": null,
+              "finish_reason": "length",
+              "stop_reason": null,
+              "token_ids": null,
+              "routed_experts": null
+            }
+          ],
+          "service_tier": null,
+          "system_fingerprint": "vllm-0.29.0-74e5e40e",
+          "usage": {
+            "prompt_tokens": 2206,
+            "total_tokens": 2302,
+            "completion_tokens": 96,
+            "prompt_tokens_details": null,
+            "completion_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          "prompt_logprobs": null,
+          "prompt_token_ids": null,
+          "prompt_text": null,
+          "kv_transfer_params": null,
+          "ec_transfer_params": null,
+          "metrics": null
+        }
+      },
+      "gpu_samples": [
+        {
+          "monotonic": 83598.281,
+          "values": "15591, 8461, 45"
+        },
+        {
+          "monotonic": 83598.593,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83598.906,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83599.218,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83599.531,
+          "values": "15591, 8461, 47"
+        },
+        {
+          "monotonic": 83599.843,
+          "values": "15591, 8461, 47"
+        },
+        {
+          "monotonic": 83600.171,
+          "values": "15591, 8461, 47"
+        },
+        {
+          "monotonic": 83600.468,
+          "values": "15591, 8461, 43"
+        },
+        {
+          "monotonic": 83600.781,
+          "values": "15591, 8461, 43"
+        },
+        {
+          "monotonic": 83601.078,
+          "values": "15591, 8461, 43"
+        },
+        {
+          "monotonic": 83601.375,
+          "values": "15591, 8461, 43"
+        },
+        {
+          "monotonic": 83601.687,
+          "values": "15591, 8461, 50"
+        },
+        {
+          "monotonic": 83601.984,
+          "values": "15591, 8461, 50"
+        },
+        {
+          "monotonic": 83602.281,
+          "values": "15591, 8461, 50"
+        }
+      ],
+      "gpu_sample_scope": "host-wide nvidia-smi memory.used MiB, memory.free MiB, utilization percent; not allocator attribution",
+      "gpu_after": "15591 MiB, 8461 MiB, 42 %"
+    },
+    {
+      "duration": 60,
+      "frames": 120,
+      "edge": 256,
+      "metadata": {
+        "fps": 30.0,
+        "total_num_frames": 1800,
+        "duration": 60,
+        "frames_indices": [
+          0,
+          15,
+          30,
+          45,
+          60,
+          76,
+          91,
+          106,
+          121,
+          136,
+          151,
+          166,
+          181,
+          197,
+          212,
+          227,
+          242,
+          257,
+          272,
+          287,
+          302,
+          317,
+          333,
+          348,
+          363,
+          378,
+          393,
+          408,
+          423,
+          438,
+          454,
+          469,
+          484,
+          499,
+          514,
+          529,
+          544,
+          559,
+          574,
+          590,
+          605,
+          620,
+          635,
+          650,
+          665,
+          680,
+          695,
+          711,
+          726,
+          741,
+          756,
+          771,
+          786,
+          801,
+          816,
+          831,
+          847,
+          862,
+          877,
+          892,
+          907,
+          922,
+          937,
+          952,
+          968,
+          983,
+          998,
+          1013,
+          1028,
+          1043,
+          1058,
+          1073,
+          1088,
+          1104,
+          1119,
+          1134,
+          1149,
+          1164,
+          1179,
+          1194,
+          1209,
+          1225,
+          1240,
+          1255,
+          1270,
+          1285,
+          1300,
+          1315,
+          1330,
+          1345,
+          1361,
+          1376,
+          1391,
+          1406,
+          1421,
+          1436,
+          1451,
+          1466,
+          1482,
+          1497,
+          1512,
+          1527,
+          1542,
+          1557,
+          1572,
+          1587,
+          1602,
+          1618,
+          1633,
+          1648,
+          1663,
+          1678,
+          1693,
+          1708,
+          1723,
+          1739,
+          1754,
+          1769,
+          1784,
+          1799
+        ],
+        "do_sample_frames": false
+      },
+      "sample_timestamps_seconds": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        2.533333333333333,
+        3.033333333333333,
+        3.533333333333333,
+        4.033333333333333,
+        4.533333333333333,
+        5.033333333333333,
+        5.533333333333333,
+        6.033333333333333,
+        6.566666666666666,
+        7.066666666666666,
+        7.566666666666666,
+        8.066666666666666,
+        8.566666666666666,
+        9.066666666666666,
+        9.566666666666666,
+        10.066666666666666,
+        10.566666666666666,
+        11.1,
+        11.6,
+        12.1,
+        12.6,
+        13.1,
+        13.6,
+        14.1,
+        14.6,
+        15.133333333333333,
+        15.633333333333333,
+        16.133333333333333,
+        16.633333333333333,
+        17.133333333333333,
+        17.633333333333333,
+        18.133333333333333,
+        18.633333333333333,
+        19.133333333333333,
+        19.666666666666668,
+        20.166666666666668,
+        20.666666666666668,
+        21.166666666666668,
+        21.666666666666668,
+        22.166666666666668,
+        22.666666666666668,
+        23.166666666666668,
+        23.7,
+        24.2,
+        24.7,
+        25.2,
+        25.7,
+        26.2,
+        26.7,
+        27.2,
+        27.7,
+        28.233333333333334,
+        28.733333333333334,
+        29.233333333333334,
+        29.733333333333334,
+        30.233333333333334,
+        30.733333333333334,
+        31.233333333333334,
+        31.733333333333334,
+        32.266666666666666,
+        32.766666666666666,
+        33.266666666666666,
+        33.766666666666666,
+        34.266666666666666,
+        34.766666666666666,
+        35.266666666666666,
+        35.766666666666666,
+        36.266666666666666,
+        36.8,
+        37.3,
+        37.8,
+        38.3,
+        38.8,
+        39.3,
+        39.8,
+        40.3,
+        40.833333333333336,
+        41.333333333333336,
+        41.833333333333336,
+        42.333333333333336,
+        42.833333333333336,
+        43.333333333333336,
+        43.833333333333336,
+        44.333333333333336,
+        44.833333333333336,
+        45.36666666666667,
+        45.86666666666667,
+        46.36666666666667,
+        46.86666666666667,
+        47.36666666666667,
+        47.86666666666667,
+        48.36666666666667,
+        48.86666666666667,
+        49.4,
+        49.9,
+        50.4,
+        50.9,
+        51.4,
+        51.9,
+        52.4,
+        52.9,
+        53.4,
+        53.93333333333333,
+        54.43333333333333,
+        54.93333333333333,
+        55.43333333333333,
+        55.93333333333333,
+        56.43333333333333,
+        56.93333333333333,
+        57.43333333333333,
+        57.96666666666667,
+        58.46666666666667,
+        58.96666666666667,
+        59.46666666666667,
+        59.96666666666667
+      ],
+      "terminal_confirmed": true,
+      "result": {
+        "status": 400,
+        "seconds": 0.4078596239996841,
+        "body": {
+          "error": {
+            "message": "The decoder prompt contains a(n) video item with 3840 embedding tokens, which exceeds the pre-allocated encoder cache size 2048. Please reduce the input size or increase the encoder cache size by setting --limit-mm-per-prompt at startup.",
+            "type": "BadRequestError",
+            "param": null,
+            "code": 400
+          }
+        }
+      },
+      "gpu_samples": [
+        {
+          "monotonic": 83602.671,
+          "values": "15591, 8461, 42"
+        },
+        {
+          "monotonic": 83602.968,
+          "values": "15591, 8461, 42"
+        },
+        {
+          "monotonic": 83603.281,
+          "values": "15591, 8461, 42"
+        }
+      ],
+      "gpu_sample_scope": "host-wide nvidia-smi memory.used MiB, memory.free MiB, utilization percent; not allocator attribution",
+      "gpu_after": "15591 MiB, 8461 MiB, 0 %"
+    },
+    {
+      "duration": 60,
+      "frames": 32,
+      "edge": 256,
+      "metadata": {
+        "fps": 30.0,
+        "total_num_frames": 1800,
+        "duration": 60,
+        "frames_indices": [
+          0,
+          58,
+          116,
+          174,
+          232,
+          290,
+          348,
+          406,
+          464,
+          522,
+          580,
+          638,
+          696,
+          754,
+          812,
+          870,
+          929,
+          987,
+          1045,
+          1103,
+          1161,
+          1219,
+          1277,
+          1335,
+          1393,
+          1451,
+          1509,
+          1567,
+          1625,
+          1683,
+          1741,
+          1799
+        ],
+        "do_sample_frames": false
+      },
+      "sample_timestamps_seconds": [
+        0.0,
+        1.9333333333333333,
+        3.8666666666666667,
+        5.8,
+        7.733333333333333,
+        9.666666666666666,
+        11.6,
+        13.533333333333333,
+        15.466666666666667,
+        17.4,
+        19.333333333333332,
+        21.266666666666666,
+        23.2,
+        25.133333333333333,
+        27.066666666666666,
+        29.0,
+        30.966666666666665,
+        32.9,
+        34.833333333333336,
+        36.766666666666666,
+        38.7,
+        40.63333333333333,
+        42.56666666666667,
+        44.5,
+        46.43333333333333,
+        48.36666666666667,
+        50.3,
+        52.233333333333334,
+        54.166666666666664,
+        56.1,
+        58.03333333333333,
+        59.96666666666667
+      ],
+      "terminal_confirmed": true,
+      "result": {
+        "status": 200,
+        "seconds": 5.092490920997079,
+        "body": {
+          "id": "chatcmpl-aea5899536dc3122",
+          "object": "chat.completion",
+          "created": 1789551872,
+          "model": "Qwen/Qwen3.5-4B",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Based on the provided video frames, here are the background colors listed in chronological order with their approximate time ranges:\n\n- **Red:** From approximately `0.00s` to `21.97s`.\n- **Green:** From approximately `22.00s` to `40.70s`.\n- **Blue:** From approximately `40.70s` to `59.07s`.",
+                "refusal": null,
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
+                "reasoning": null
+              },
+              "logprobs": null,
+              "finish_reason": "stop",
+              "stop_reason": null,
+              "token_ids": null,
+              "routed_experts": null
+            }
+          ],
+          "service_tier": null,
+          "system_fingerprint": "vllm-0.29.0-74e5e40e",
+          "usage": {
+            "prompt_tokens": 1191,
+            "total_tokens": 1285,
+            "completion_tokens": 94,
+            "prompt_tokens_details": null,
+            "completion_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          "prompt_logprobs": null,
+          "prompt_token_ids": null,
+          "prompt_text": null,
+          "kv_transfer_params": null,
+          "ec_transfer_params": null,
+          "metrics": null
+        }
+      },
+      "gpu_samples": [
+        {
+          "monotonic": 83603.562,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83603.859,
+          "values": "15591, 8461, 0"
+        },
+        {
+          "monotonic": 83604.171,
+          "values": "15593, 8459, 0"
+        },
+        {
+          "monotonic": 83604.5,
+          "values": "15593, 8459, 39"
+        },
+        {
+          "monotonic": 83604.843,
+          "values": "15593, 8459, 39"
+        },
+        {
+          "monotonic": 83605.156,
+          "values": "15593, 8459, 39"
+        },
+        {
+          "monotonic": 83605.453,
+          "values": "15593, 8459, 54"
+        },
+        {
+          "monotonic": 83606.156,
+          "values": "15593, 8459, 54"
+        },
+        {
+          "monotonic": 83606.703,
+          "values": "15593, 8459, 3"
+        },
+        {
+          "monotonic": 83607.015,
+          "values": "15593, 8459, 3"
+        },
+        {
+          "monotonic": 83607.328,
+          "values": "15593, 8459, 3"
+        },
+        {
+          "monotonic": 83607.64,
+          "values": "15593, 8459, 49"
+        },
+        {
+          "monotonic": 83607.937,
+          "values": "15593, 8459, 49"
+        },
+        {
+          "monotonic": 83608.25,
+          "values": "15593, 8459, 49"
+        },
+        {
+          "monotonic": 83608.562,
+          "values": "15593, 8459, 50"
+        },
+        {
+          "monotonic": 83608.875,
+          "values": "15593, 8459, 50"
+        }
+      ],
+      "gpu_sample_scope": "host-wide nvidia-smi memory.used MiB, memory.free MiB, utilization percent; not allocator attribution",
+      "gpu_after": "15593 MiB, 8459 MiB, 50 %"
+    },
+    {
+      "duration": 60,
+      "frames": 16,
+      "edge": 384,
+      "metadata": {
+        "fps": 30.0,
+        "total_num_frames": 1800,
+        "duration": 60,
+        "frames_indices": [
+          0,
+          120,
+          240,
+          360,
+          480,
+          600,
+          720,
+          840,
+          959,
+          1079,
+          1199,
+          1319,
+          1439,
+          1559,
+          1679,
+          1799
+        ],
+        "do_sample_frames": false
+      },
+      "sample_timestamps_seconds": [
+        0.0,
+        4.0,
+        8.0,
+        12.0,
+        16.0,
+        20.0,
+        24.0,
+        28.0,
+        31.966666666666665,
+        35.96666666666667,
+        39.96666666666667,
+        43.96666666666667,
+        47.96666666666667,
+        51.96666666666667,
+        55.96666666666667,
+        59.96666666666667
+      ],
+      "terminal_confirmed": true,
+      "result": {
+        "status": 200,
+        "seconds": 3.283972706998611,
+        "body": {
+          "id": "chatcmpl-a378657ecdf639ff",
+          "object": "chat.completion",
+          "created": 1789551877,
+          "model": "Qwen/Qwen3.5-4B",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Based on the provided video frames, here are the background colors listed in chronological order with their approximate time ranges:\n\n- **Red:** From approximately 0.00s to 20.00s.\n- **Green:** From approximately 20.00s to 47.97s.\n- **Blue:** From approximately 47.97s to 56.97s.",
+                "refusal": null,
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
+                "reasoning": null
+              },
+              "logprobs": null,
+              "finish_reason": "stop",
+              "stop_reason": null,
+              "token_ids": null,
+              "routed_experts": null
+            }
+          ],
+          "service_tier": null,
+          "system_fingerprint": "vllm-0.29.0-74e5e40e",
+          "usage": {
+            "prompt_tokens": 1249,
+            "total_tokens": 1340,
+            "completion_tokens": 91,
+            "prompt_tokens_details": null,
+            "completion_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          "prompt_logprobs": null,
+          "prompt_token_ids": null,
+          "prompt_text": null,
+          "kv_transfer_params": null,
+          "ec_transfer_params": null,
+          "metrics": null
+        }
+      },
+      "gpu_samples": [
+        {
+          "monotonic": 83609.156,
+          "values": "15593, 8459, 50"
+        },
+        {
+          "monotonic": 83609.468,
+          "values": "15593, 8459, 0"
+        },
+        {
+          "monotonic": 83609.781,
+          "values": "15593, 8459, 0"
+        },
+        {
+          "monotonic": 83610.093,
+          "values": "15593, 8459, 0"
+        },
+        {
+          "monotonic": 83610.406,
+          "values": "15593, 8459, 0"
+        },
+        {
+          "monotonic": 83610.703,
+          "values": "15593, 8459, 59"
+        },
+        {
+          "monotonic": 83611.015,
+          "values": "15593, 8459, 59"
+        },
+        {
+          "monotonic": 83611.312,
+          "values": "15593, 8459, 59"
+        },
+        {
+          "monotonic": 83611.609,
+          "values": "15593, 8459, 52"
+        },
+        {
+          "monotonic": 83611.906,
+          "values": "15593, 8459, 52"
+        },
+        {
+          "monotonic": 83612.218,
+          "values": "15593, 8459, 52"
+        },
+        {
+          "monotonic": 83612.515,
+          "values": "15593, 8459, 41"
+        }
+      ],
+      "gpu_sample_scope": "host-wide nvidia-smi memory.used MiB, memory.free MiB, utilization percent; not allocator attribution",
+      "gpu_after": "15593 MiB, 8459 MiB, 41 %"
+    }
+  ]
+}

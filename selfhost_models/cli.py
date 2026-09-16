@@ -59,7 +59,10 @@ def serve(assets, args):
     record = assets.inspect(args.repo)
     model_type = json.loads((Path(record["path"]) / "config.json").read_text())["model_type"]
     profile = model_type if model_type in ("qwen3_5", "gemma4") else "text"
-    caps = capabilities(args.backend, profile)
+    caps = capabilities(args.backend, profile, args.video)
+    if args.video and (record["repo_id"] != "Qwen/Qwen3.5-4B" or
+            record["revision"] != "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a" or args.context != 8192):
+        raise ValueError("video requires the validated Qwen3.5-4B revision and --context 8192")
     if args.max_inflight is None:
         args.max_inflight = 1 if args.backend == "transformers" else 2
     if args.max_inflight > caps["max_inflight_limit"]:
@@ -94,6 +97,8 @@ def serve(assets, args):
               "MODEL_PATH": Path(record["path"]).as_posix(), "API_KEY_PATH": keyfile.resolve().as_posix(),
               "API_PORT": str(args.port), "GPU_MEMORY_UTILIZATION": str(args.gpu_memory),
               "MAX_INFLIGHT": str(args.max_inflight), "MAX_MODEL_LEN": str(args.context),
+              "VIDEO_ENABLED": "1" if args.video else "0",
+              "API_MEMORY_LIMIT": "2g" if args.video else "512m",
               "DEADLINE_SECONDS": str(args.deadline), "DRAIN_SECONDS": str(args.drain)}
     if not 1 <= args.max_inflight <= 16 or not 0 < args.deadline <= args.drain <= 600:
         raise ValueError("invalid capacity or deadlines")
@@ -122,6 +127,7 @@ def main():
             s.add_argument("--revision")
         elif command == "serve":
             s.add_argument("--backend", choices=("vllm", "transformers"), default="vllm")
+            s.add_argument("--video", action="store_true", help="enable bounded video on the validated vLLM model (requires --context 8192)")
             s.add_argument("--port", type=int, default=18080)
             s.add_argument("--gpu-memory", type=float, default=0.60)
             s.add_argument("--max-inflight", type=int)

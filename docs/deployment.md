@@ -1,5 +1,17 @@
 # 模型資產與部署
 
+## 影片 opt-in 部署
+
+先協調共用服務的使用時段、確認既有 lease 歸零。停止現有部署後才執行：
+
+```powershell
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 8192 --max-inflight 2 --gpu-memory 0.60
+```
+
+只允許固定 revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`，context 必須 8192、最多 2 個名額；不自動改設定或 fallback。`modelctl` 在私有 compose.env 寫 `VIDEO_ENABLED=1`／`API_MEMORY_LIMIT=2g`；未啟用仍關閉影片，API memory 預設 512m。兩種配置的 API 都有 2 CPU、64 pids、128 MiB `/tmp` tmpfs。影像 budget 與影片總 budget 在 gateway 到 worker 邊界分開，沒有更換 vLLM runtime。
+
+只有 `/health/ready` 成功且 `/v1/models` 宣告 videos 才能送影片；暖機包含最大影片形狀。新建容器的 JIT 可能較久，不因等待而刪除 lease state。初始化失敗／未知工作仍須保留日誌，按既有新 worker epoch 恢復流程處理。完整 API 限制與重跑證據見 [API](api.md)、[驗收](acceptance.md)。本機建置不等於 Docker Hub 已發布；本次影片 image 未發布。
+
 ## Host
 
 - Windows：NVIDIA driver + Docker Desktop WSL2 backend；模型根目錄預設 `D:/hf_models`。

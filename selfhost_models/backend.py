@@ -7,8 +7,9 @@ import httpx
 
 
 class VLLMBackend:
-    def __init__(self, url: str, max_connections: int, profile="text", capacity=2):
+    def __init__(self, url: str, max_connections: int, profile="text", capacity=2, video_enabled=False):
         self.profile, self.capacity = profile, capacity
+        self.video_enabled = video_enabled
         self.client = httpx.AsyncClient(
             base_url=url, trust_env=False,
             limits=httpx.Limits(max_connections=max_connections, max_keepalive_connections=max_connections),
@@ -32,6 +33,8 @@ class VLLMBackend:
             payload["chat_template_kwargs"] = {"enable_thinking": False}
 
         async def generate(body):
+            if self.video_enabled:
+                body = {"mm_processor_kwargs": {"max_pixels": 1048576}, **body}
             r = await self.client.post("/v1/chat/completions", json=body, timeout=180)
             r.raise_for_status()
             result = r.json()
@@ -55,8 +58,28 @@ class VLLMBackend:
                     {"type": "image_url", "image_url": {"url": "data:image/png;base64," +
                      base64.b64encode(png.getvalue()).decode()}}]}]}
                 await generate(visual)
+            if self.video_enabled:
+                # Two distinct clips cover actual maximum video encoder work,
+                # independent of upstream dummy-shape profiling heuristics.
+                from .video import VIDEO_PIXELS
+                def clip(color):
+                    buffer = io.BytesIO()
+                    Image.new("RGB", (256, 256), color).save(buffer, format="JPEG", quality=85)
+                    frame = base64.b64encode(buffer.getvalue()).decode()
+                    return {**payload, "messages": [{"role": "user", "content": [
+                        {"type": "text", "text": "Describe the color."},
+                        {"type": "video_url", "video_url": {"url": "data:video/jpeg;base64," + ",".join([frame] * 120)}}]}],
+                        "media_io_kwargs": {"video": {"num_frames": 120, "fps": 2.0,
+                            "total_num_frames": 120, "frames_indices": list(range(120)),
+                            "duration": 60.0, "do_sample_frames": False}},
+                        "mm_processor_kwargs": {"max_pixels": VIDEO_PIXELS, "do_sample_frames": False}}
+                await asyncio.gather(*(generate(clip(color)) for color in ("red", "blue")[:self.capacity]))
 
     def generate(self, payload, request_id):
+        if self.video_enabled:
+            # Preserve the original single-image processor budget. Video
+            # preparation installs its separate, bounded total pixel budget.
+            payload = {"mm_processor_kwargs": {"max_pixels": 1048576}, **payload}
         return self.client.stream("POST", "/v1/chat/completions", json=payload,
                                   headers={"x-request-id": request_id})
 

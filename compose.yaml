@@ -13,6 +13,8 @@ services:
       MODEL_REVISION: ${MODEL_REVISION:?Use modelctl serve}
       MODEL_PROFILE: ${MODEL_PROFILE:-text}
       BACKEND: ${BACKEND:-vllm}
+      VIDEO_ENABLED: ${VIDEO_ENABLED:-0}
+      MAX_MODEL_LEN: ${MAX_MODEL_LEN:-2048}
       WORKER_URL: http://worker:8000
       API_KEY_FILE: /run/secrets/api_key
       STATE_FILE: /state/leases.json
@@ -27,7 +29,10 @@ services:
         bind:
           create_host_path: false
     read_only: true
-    tmpfs: [/tmp]
+    tmpfs: ["/tmp:rw,noexec,nosuid,nodev,size=128m"]
+    mem_limit: ${API_MEMORY_LIMIT:-512m}
+    cpus: 2
+    pids_limit: 64
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     networks: [ingress, inference]
@@ -44,6 +49,7 @@ services:
       dockerfile: docker/worker.Dockerfile
     environment:
       MODEL_PROFILE: ${MODEL_PROFILE:-text}
+      VIDEO_ENABLED: ${VIDEO_ENABLED:-0}
       # V2 runner requires UVA unavailable on the validated WSL2 host.
       VLLM_USE_V2_MODEL_RUNNER: ${VLLM_USE_V2_MODEL_RUNNER:-0}
     command:

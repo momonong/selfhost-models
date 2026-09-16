@@ -1,6 +1,7 @@
 """Bounded faults after real SSE headers: deadline and disconnected consumer."""
 import argparse
 import asyncio
+import base64
 import json
 import subprocess
 import time
@@ -38,12 +39,16 @@ async def main(args):
         payload = {"model": model, "messages": [{"role": "user", "content":
             "Write a long numbered list of 100 different common objects, one per line. Continue until item 100."}],
             "max_tokens": 256, "stream": True, "temperature": 0}
+        if args.video:
+            payload["messages"][0]["content"] = [
+                {"type": "text", "text": "Describe the video, then write a long numbered list of 100 common objects."},
+                {"type": "video_url", "video_url": {"url": "data:video/mp4;base64," + base64.b64encode(args.video.read_bytes()).decode()}}]
         for mode in ("deadline", "disconnect"):
             await wait_health(lambda h: h["ready"] and h["inflight"] == 0)
             paused, saw_error, saw_done = False, False, False
             try:
                 async with client.stream("POST", "/v1/chat/completions", json=payload,
-                                         headers={"X-Request-Timeout-Ms": "3000"}) as response:
+                                         headers={"X-Request-Timeout-Ms": "10000" if args.video else "3000"}) as response:
                     assert response.status_code == 200
                     async for line in response.aiter_lines():
                         if not line.startswith("data:"):
@@ -70,6 +75,7 @@ async def main(args):
                 record = {"mode": mode, "at": datetime.now(timezone.utc).isoformat(),
                           "headers_status": 200, "generated_content_before_fault": True,
                           "url": args.url, "backend": settings.get("BACKEND", "vllm"),
+                          "input": "video" if args.video else "text",
                           "worker_id": worker, "error_frame": saw_error,
                           "done_frame": saw_done, "retained": h}
                 records.append(record)
@@ -89,4 +95,5 @@ if __name__ == "__main__":
     parser.add_argument("--url", default="http://127.0.0.1:18080")
     parser.add_argument("--state", type=Path, default=ROOT / ".state")
     parser.add_argument("--output", type=Path, default=ROOT / "evidence/stream-lifecycle.json")
+    parser.add_argument("--video", type=Path, help="authorized local synthetic MP4 for video lifecycle acceptance")
     asyncio.run(main(parser.parse_args()))

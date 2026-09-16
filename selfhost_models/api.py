@@ -17,6 +17,7 @@ from .backend import create_backend
 from .capabilities import capabilities, validate_capabilities
 from .schema import Chat
 from .storage import atomic_json
+from .video import VideoError, find_video, prepare_video
 
 log = logging.getLogger("selfhost")
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -43,6 +44,8 @@ class Job:
     detached: bool = False
     failure: Failure | None = None
     result: bytes = b""
+    deadline_at: float = float("inf")
+    video: dict | None = None
 
 
 class Gateway:
@@ -53,14 +56,22 @@ class Gateway:
         self.model = os.getenv("MODEL_ID", "unconfigured/model")
         self.profile = os.getenv("MODEL_PROFILE", "text")
         self.backend_name = os.getenv("BACKEND", "vllm")
-        self.capabilities = capabilities(self.backend_name, self.profile)
+        self.video_enabled = os.getenv("VIDEO_ENABLED", "0") == "1"
+        self.capabilities = capabilities(self.backend_name, self.profile, self.video_enabled)
         self.revision = os.getenv("MODEL_REVISION", "unknown")
+        self.context = int(os.getenv("MAX_MODEL_LEN", "2048"))
+        if self.video_enabled and (self.model != "Qwen/Qwen3.5-4B" or
+                self.revision != "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a" or
+                self.context != 8192):
+            raise ValueError("video requires the validated fixed model and context 8192")
         self.capacity = int(os.getenv("MAX_INFLIGHT", "2"))
         if self.capacity > self.capabilities["max_inflight_limit"]:
             raise ValueError("capacity exceeds backend limit")
         self.deadline = float(os.getenv("DEADLINE_SECONDS", "30"))
         self.drain = float(os.getenv("DRAIN_SECONDS", "120"))
-        self.max_body = int(os.getenv("MAX_BODY_BYTES", "2097152"))
+        self.max_body = 24 * 1024**2 if self.video_enabled else int(os.getenv("MAX_BODY_BYTES", "2097152"))
+        self.receiving_bytes = 0
+        self.receive_budget = 64 * 1024**2
         if not 1 <= self.capacity <= 16 or not 0 < self.deadline <= self.drain <= 600:
             raise ValueError("invalid admission/deadline settings")
         self.ready = False
@@ -75,6 +86,9 @@ class Gateway:
         atomic_json(self.state_file, {"leases": self.leases})
 
     async def startup(self):
+        from .video import LINUX_DECODER
+        if self.video_enabled and not LINUX_DECODER:
+            raise ValueError("video requires the Linux decoder resource limits")
         if self.key is None:
             self.key = Path(os.environ["API_KEY_FILE"]).read_text().strip()
         if len(self.key) < 24:
@@ -83,7 +97,7 @@ class Gateway:
             self.leases = json.loads(self.state_file.read_text())["leases"]
         if self.backend is None:
             self.backend = create_backend(self.backend_name, os.getenv("WORKER_URL", "http://worker:8000"), self.capacity + 2,
-                                       profile=self.profile, capacity=self.capacity)
+                                       profile=self.profile, capacity=self.capacity, video_enabled=self.video_enabled)
         self.monitor = asyncio.create_task(self.watch())
 
     async def watch(self):
@@ -122,6 +136,17 @@ class Gateway:
         terminal = False
         started = time.monotonic()
         try:
+            if find_video(payload):
+                try:
+                    job.video = await prepare_video(payload)
+                except VideoError as exc:
+                    terminal = True  # Decoder has terminated and cleaned up; no GPU dispatch.
+                    raise Failure(exc.status, exc.code) from None
+                if job.detached or time.monotonic() >= job.deadline_at:
+                    terminal = True
+                    raise Failure(504, "deadline_exceeded")
+            # Preserve the original GPU drain budget from dispatch. CPU decode
+            # has its own process wall/CPU limits; it must not consume this budget.
             async with asyncio.timeout(self.drain):
                 async with self.backend.generate(payload, job.rid) as response:
                     if response.headers.get("x-worker-epoch") != job.epoch:
@@ -132,6 +157,7 @@ class Gateway:
                         raise Failure(400 if terminal else 502, "worker_rejected" if terminal else "worker_failed")
                     if job.stream:
                         job.started.set()
+                        metadata_sent = False
                         async for line in response.aiter_lines():
                             if not line.startswith("data:"):
                                 continue
@@ -144,6 +170,10 @@ class Gateway:
                                 chunk = json.loads(data)
                                 if "error" in chunk:
                                     raise Failure(502, "worker_stream_failed")
+                                if job.video and not metadata_sent:
+                                    chunk["video"] = job.video
+                                    line = "data: " + json.dumps(chunk)
+                                    metadata_sent = True
                             if not job.detached:
                                 try:
                                     job.queue.put_nowait((line + "\n\n").encode())
@@ -165,6 +195,9 @@ class Gateway:
                         data = json.loads(job.result)
                         if not data.get("choices") or any(c.get("finish_reason") is None for c in data["choices"]):
                             raise Failure(502, "worker_response_incomplete")
+                        if job.video:
+                            data["video"] = job.video
+                            job.result = json.dumps(data).encode()
                         terminal = True
         except asyncio.CancelledError:
             job.failure = Failure(503, "gateway_shutdown")
@@ -245,25 +278,32 @@ class Gateway:
         if headers.get(b"content-type", b"").split(b";", 1)[0].lower() != b"application/json":
             raise Failure(415, "json_required")
         body = bytearray()
-        async with asyncio.timeout(min(10, deadline)):
-            while True:
-                event = await receive()
-                if event["type"] == "http.disconnect":
-                    return
-                body.extend(event.get("body", b""))
-                if len(body) > self.max_body:
-                    raise Failure(413, "body_too_large")
-                if not event.get("more_body", False):
-                    break
         try:
+            async with asyncio.timeout(min(10, deadline)):
+                while True:
+                    event = await receive()
+                    if event["type"] == "http.disconnect":
+                        return
+                    chunk = event.get("body", b"")
+                    if len(body) + len(chunk) > self.max_body:
+                        raise Failure(413, "body_too_large")
+                    if self.receiving_bytes + len(chunk) > self.receive_budget:
+                        raise Failure(429, "receive_budget_exceeded")
+                    body.extend(chunk)
+                    self.receiving_bytes += len(chunk)
+                    if not event.get("more_body", False):
+                        break
             # Validate Python objects so strict integers/bools do not get coerced.
             payload = Chat.model_validate(json.loads(body)).model_dump(exclude_none=True)
         except (ValidationError, ValueError, UnicodeError, RecursionError):
             raise Failure(400, "invalid_request") from None
+        finally:
+            self.receiving_bytes -= len(body)
+        del body
         if payload["model"] != self.model:
             raise Failure(404, "model_not_served")
         try:
-            validate_capabilities(payload, self.backend_name, self.profile)
+            validate_capabilities(payload, self.backend_name, self.profile, self.video_enabled)
         except ValueError as exc:
             raise Failure(400, str(exc)) from None
         if self.profile == "qwen3_5":
@@ -273,6 +313,7 @@ class Gateway:
         if len(self.leases) >= self.capacity:
             raise Failure(429, "overloaded")
         job = Job(rid, self.epoch, payload["stream"])
+        job.deadline_at = started + deadline
         self.leases[rid] = job.epoch
         self.save()  # Must be durable BEFORE sending to worker.
         self.jobs[rid] = job
@@ -343,7 +384,8 @@ class Gateway:
                     await self.json_response(send, 200, {"object": "list", "data": [{
                         "id": self.model, "object": "model", "created": 0, "owned_by": "selfhost",
                         "revision": self.revision, "backend": self.backend_name,
-                        "capabilities": self.capabilities, "max_inflight": self.capacity}]}, rid)
+                        "capabilities": self.capabilities, "max_inflight": self.capacity,
+                        "max_model_len": self.context, "max_body_bytes": self.max_body}]}, rid)
                 elif path == "/v1/chat/completions" and method == "POST":
                     await self.chat(receive, send, headers, rid, started)
                 else:

@@ -1,0 +1,29 @@
+{
+  "starting_commit": "5a077e3883b3b2b6a0e817ff91f209ace6b15bd9",
+  "branch": "feat/video-inference",
+  "api_source_matches_checkout": true,
+  "worker_source_matches_checkout": true,
+  "protected_containers_unchanged": [
+    "/kaching-portable-test-mcp-read-api-1",
+    "/kaching-portable-test-mcp-1",
+    "/kaching-portable-test-web-1",
+    "/kaching-portable-test-api-1"
+  ],
+  "model_inventory_unchanged": true,
+  "model_inventory_scope": "size/mtime and recorded small-file hashes; not full weight byte comparison",
+  "health": {
+    "ready": true,
+    "version": "0.1.0",
+    "worker_epoch": "590e0c4917c04fde94dd3e8d0bff8138",
+    "inflight": 0,
+    "detached": 0,
+    "uncertain": 0
+  },
+  "api_image_id": "sha256:04c47cc62471c2a101bda23f911f0f00a78b6081803cadee09b4c98e2888101f",
+  "worker_image_id": "sha256:d209ab188d96f9bce180cf59fffefb3fe021de71e34c85dd8d0893800736491c",
+  "secret_scan_passed": true,
+  "no_new_worktree": true,
+  "service_left_running": true,
+  "table_tennis_human_quality_assessed": false,
+  "runtime_evidence_sha256": "0d85737279469fdc9b94be146f9858e8c2524bb570cf14fcb08a94c49bbe3231"
+}

@@ -19,6 +19,8 @@ def test_deployment_isolation_contract():
     assert worker["environment"]["VLLM_USE_V2_MODEL_RUNNER"] == "${VLLM_USE_V2_MODEL_RUNNER:-0}"
     assert set(api["networks"]) == {"ingress", "inference"}
     assert worker["networks"] == ["inference"]
+    assert api["tmpfs"] == ["/tmp:rw,noexec,nosuid,nodev,size=128m"]
+    assert api["pids_limit"] == 64 and api["cpus"] == 2
 
 
 def test_transformers_override_keeps_runtime_isolated_and_bounds_kernel_cache():

@@ -3,6 +3,7 @@ import io
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
+from .video import MAX_URI, PREFIX
 
 
 class StrictModel(BaseModel):
@@ -42,6 +43,23 @@ class ImagePart(StrictModel):
     image_url: ImageURL
 
 
+class VideoURL(StrictModel):
+    url: Annotated[str, Field(max_length=MAX_URI)]
+
+    @field_validator("url")
+    @classmethod
+    def inline_only(cls, value):
+        # No base64 decoding, media probing, or subprocess before admission.
+        if not value.startswith(PREFIX) or len(value) == len(PREFIX):
+            raise ValueError("only inline MP4 video is supported")
+        return value
+
+
+class VideoPart(StrictModel):
+    type: Literal["video_url"]
+    video_url: VideoURL
+
+
 class FunctionCall(StrictModel):
     name: Annotated[str, Field(pattern=r"^[a-zA-Z_][a-zA-Z0-9_-]{0,63}$")]
     arguments: Annotated[str, Field(max_length=32768)]
@@ -55,7 +73,7 @@ class ToolCall(StrictModel):
 
 class Message(StrictModel):
     role: Literal["system", "user", "assistant", "tool"]
-    content: Annotated[str, Field(min_length=1, max_length=32768)] | Annotated[list[Annotated[TextPart | ImagePart, Field(discriminator="type")]], Field(min_length=1, max_length=8)] | None = None
+    content: Annotated[str, Field(min_length=1, max_length=32768)] | Annotated[list[Annotated[TextPart | ImagePart | VideoPart, Field(discriminator="type")]], Field(min_length=1, max_length=8)] | None = None
     tool_calls: Annotated[list[ToolCall], Field(min_length=1, max_length=8)] | None = None
     tool_call_id: Annotated[str, Field(min_length=1, max_length=200)] | None = None
 
@@ -116,6 +134,9 @@ class Chat(StrictModel):
         images = sum(isinstance(p, ImagePart) for m in self.messages if isinstance(m.content, list) for p in m.content)
         if images > 1:
             raise ValueError("only one image per request")
+        videos = sum(isinstance(p, VideoPart) for m in self.messages if isinstance(m.content, list) for p in m.content)
+        if videos > 1 or (videos and images):
+            raise ValueError("one video per request, mutually exclusive with images")
         pending = set()
         for message in self.messages:
             if message.tool_call_id:

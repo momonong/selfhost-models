@@ -27,6 +27,8 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 
 ## 文件與驗證
 
+影片以 `--video --context 8192` 明確啟用，只支援固定 Qwen3.5-4B／vLLM。接受 1–60 秒 inline H.264 MP4（≤16 MiB、CFR、≤720p60），有界解碼後約 2fps／最多 120 幀、256²，音軌不處理；Transformers 不支援影片。這是通用影片輸入能力，桌球精彩程度與快速攻防品質尚未驗收。使用方式見 [API](docs/api.md)、[可行性與取捨](docs/video-feasibility.md)、[可重跑驗收](docs/acceptance.md)。
+
 - [架構與生命週期](docs/architecture.md)
 - [其他專案 Client 接入指南](docs/client-integration.md)
 - [API 支援範圍與限制](docs/api.md)

@@ -1,0 +1,63 @@
+{
+  "at": "2026-09-16T14:32:40.936900+00:00",
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "object": "model",
+    "created": 0,
+    "owned_by": "selfhost",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "backend": "vllm",
+    "capabilities": {
+      "text": true,
+      "stream": true,
+      "images": true,
+      "tools": true,
+      "videos": true,
+      "video_limits": {
+        "container": "mp4",
+        "codec": "h264",
+        "max_bytes": 16777216,
+        "min_duration_seconds": 1,
+        "max_duration_seconds": 60,
+        "max_width": 1280,
+        "max_height": 720,
+        "max_fps": 60,
+        "constant_frame_rate_required": true,
+        "max_source_frames": 3600,
+        "max_sampled_frames": 120,
+        "frame_width": 256,
+        "frame_height": 256,
+        "sampling": "uniform_endpoints_2x_ceil_duration_even_v1",
+        "audio": false
+      },
+      "thinking": true,
+      "cancellation": "drain_to_terminal",
+      "queue_capacity": 0,
+      "max_inflight_limit": 2,
+      "unsupported_parameters": []
+    },
+    "max_inflight": 2,
+    "max_model_len": 8192,
+    "max_body_bytes": 25165824
+  },
+  "synthetic_image": {
+    "size": [
+      224,
+      224
+    ],
+    "expected": "red",
+    "actual": " Red",
+    "request_id": "d4354c2ddf5d4d7ea8941ec0c854497d"
+  },
+  "tool_call": {
+    "name": "lookup_synthetic_code",
+    "arguments_valid": true,
+    "request_id": "65634eb72d4e4869b5f929a8743250fd"
+  },
+  "tool_result_roundtrip": {
+    "expected": "731",
+    "actual": "The returned code is 731.",
+    "request_id": "84334b9f439047d6ade293ed11c12bff"
+  },
+  "claim": "synthetic smoke only; not an agentic quality benchmark"
+}

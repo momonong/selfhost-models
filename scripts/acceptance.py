@@ -84,7 +84,7 @@ async def main(args):
             ("unsupported_parameter", {**payload, "logprobs": True}, 400),
             ("bad_tokens", {**payload, "max_tokens": 0}, 400),
             ("unknown_model", {**payload, "model": "unknown/model"}, 404),
-            ("context_limit", {**payload, "messages": [{"role": "user", "content": "test " * 6000}]}, 400),
+            ("context_limit", {**payload, "messages": [{"role": "user", "content": "x " * (model.get("max_model_len", 2048) + 1024)}]}, 400),
         ]:
             r = await client.post("/v1/chat/completions", json=data)
             assert r.status_code == expected, (name, r.status_code, r.text)
@@ -92,7 +92,7 @@ async def main(args):
         r = await client.get("/v1/models", headers={"Authorization": "Bearer wrong"})
         assert r.status_code == 401
         record("authentication", status=r.status_code)
-        r = await client.post("/v1/chat/completions", content=b"x" * (2097152 + 1),
+        r = await client.post("/v1/chat/completions", content=b"x" * (model.get("max_body_bytes", 2097152) + 1),
                               headers={"Content-Type": "application/json"})
         assert r.status_code == 413
         record("body_limit", status=r.status_code)

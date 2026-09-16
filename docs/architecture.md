@@ -23,6 +23,12 @@
 - worker identity 是純 ASGI middleware，每個 frontend process 產生隨機 epoch。此保證依賴單 frontend 與其 engine 一起啟停，禁止多 frontend 或外接可獨立生存的 engine。
 - readiness 每 2 秒 probe；新 engine 必須通過 4 token 的 prefill＋decode、設定容量的併發暖機，以及視覺 profile 的合成單圖暖機。初始化暖機總上限 180 秒，獨立於 client deadline；整段 warmup 有持久化 lease。暫時失聯後同 epoch 恢復時沿用已完成的 warmup。不健康／未決時回 503。這不保證所有未見過的輸入形狀都沒有 JIT latency。
 
+## 影片部署的有界前處理
+
+`--video --context 8192` 明確啟用固定 Qwen3.5-4B 的影片能力，預設關閉。此部署 HTTP body 上限改為 24 MiB；全部正在接收的 body 合計 64 MiB，仍只有 32 handlers。兩個 durable lease 同時涵蓋 CPU 解碼與後續 GPU；base64／解碼不放在 admission 前。正式路徑為 `admit + journal → 有界 Linux 子程序 → wait + 清理 → vLLM → terminal`。
+
+API container 使用 2 GiB memory、2 CPU、64 pids、128 MiB tmpfs；非影片預設 512 MiB memory。子程序額外限制 CPU、address space、檔案與資料量。Client 取消時保留工作所有權；前處理完成才釋放，或 dispatch 後繼續 drain。完整媒體邊界與時間戳語義見 [API](api.md)，子程序與 crash 邊界見 [backend](backend.md)。
+
 ## 安全與紀錄
 
 API 綁定 127.0.0.1；worker 無 published port，僅內部 Docker network。API 使用 Bearer secret（管理工具建立本機 key file，由 Compose secret 掛載），health endpoints 不要求 key。沒有雲端 fallback、執行工具、任意模型路徑或外部 URL 抓取。

@@ -41,11 +41,11 @@
 - `capabilities`：每次程序啟動、ready epoch 變更或收到能力相關 400 後重新查詢。
 - `max_inflight`：部署容量資訊，不是鼓勵 client 同時填滿容量；產品仍應有自己的有界併發。
 
-功能只在對應 capability 為 `true` 時啟用：`text`、`stream`、`images`、`tools`、`thinking`。`queue_capacity` 目前為 0；服務不替產品排無界工作。`cancellation: "drain_to_terminal"` 表示取消 client 等待後，底層工作仍可能繼續。`unsupported_parameters` 是 backend 額外禁止的欄位清單，但不是完整 API schema；完整限制仍看 [API 文件](api.md)。
+功能只在對應 capability 為 `true` 時啟用：`text`、`stream`、`images`、`videos`、`tools`、`thinking`。`queue_capacity` 目前為 0；服務不替產品排無界工作。`cancellation: "drain_to_terminal"` 表示取消 client 等待後，底層工作仍可能繼續。`unsupported_parameters` 是 backend 額外禁止的欄位清單，但不是完整 API schema；完整限制仍看 [API 文件](api.md)。
 
 ### 3. 呼叫 Chat Completions
 
-使用 `POST /v1/chat/completions`、`Content-Type: application/json` 與 Bearer key。這是 OpenAI Chat Completions 的嚴格子集，**不是完整 OpenAI API 相容層**：未知欄位與不支援參數會回 400，不會靜默忽略。已支援欄位、範圍與預設值見 [Chat 欄位](api.md#chat-欄位)；沒有 Responses API、embeddings、audio/video、JSON schema constrained decoding、LoRA 或自動選模。
+使用 `POST /v1/chat/completions`、`Content-Type: application/json` 與 Bearer key。這是 OpenAI Chat Completions 的嚴格子集，**不是完整 OpenAI API 相容層**：未知欄位與不支援參數會回 400，不會靜默忽略。已支援欄位、範圍與預設值見 [Chat 欄位](api.md#chat-欄位)；沒有 Responses API、embeddings、audio、JSON schema constrained decoding、LoRA 或自動選模。
 
 一般回應是單一 JSON。SSE request 設定 `stream: true`；逐行處理 `data:` frame，收到 `{"error": ...}` 即失敗，只有收到 `data: [DONE]` 才算完整成功。HTTP 200、已顯示部分文字或 socket 正常關閉都不能取代 `[DONE]`。若使用 `stream_options: {"include_usage": true}`，仍須容許只有部分 chunk 帶 usage。
 
@@ -115,6 +115,20 @@ SSE 中斷後，不要把已顯示文字提交成完整 assistant message，也�
 | Linux 實體桌機 | 部署流程已有文件，但實機接入仍未驗證；完成 [Linux 桌機驗收](acceptance.md#linux-桌機實機驗收待執行) 前不可標為已支援環境 |
 
 若其他容器或遠端產品確實需要接入，應另立部署／安全任務，明確設計認證、TLS、網路 ACL、secret distribution、rate limit、觀測與驗收；這不是 client 更換 hostname 就能完成的事項。
+
+## 影片接入（畫面限定）
+
+先確認 `capabilities.videos=true`，再依回傳的 `video_limits`、`max_body_bytes`、`max_model_len` 準備輸入。影片只有服務擁有者用 `--video --context 8192` 啟用後才可用；接入產品不能自行重啟共用服務。Transformers 明確不支援。
+
+產品負責來源授權、回合切分、精彩程度 prompt／評分、跨段整合、人工品質驗收；服務只做通用有界影片推論。把一段本機已授權 MP4 的 bytes 編成 base64，放在 user content 的 `{"type":"video_url","video_url":{"url":"data:video/mp4;base64,..."}}`；這是 JSON extension，不接受真正的 URL 或 host path。每 request 一段，不能和圖片混用。
+
+目前固定上限 1–60 秒、16 MiB、H.264 MP4、CFR ≤60fps、1280×720、3600 source frames；VFR／旋轉 metadata／其他 codec 要由產品先做明確轉換，服務不偷偷修正。服務約 2fps、最多 120 幀，縮放並黑邊補成 256²；不處理音軌。短片取樣數為 `2×ceil(duration)`，受來源幀數及偶數限制。完整規格見 [影片 API](api.md)。
+
+一般 response 的頂層 `video` 提供實際取樣與模型 pair-average 時間戳；SSE 第一個模型 chunk 會附加 `video` 欄位，client 讀取後繼續照原規則處理 choices/usage/error／`[DONE]`。metadata、HTTP 200、部分文字均不表示成功。`finish_reason=length` 表示服務正常終止但文字已截斷；產品不能把截斷 JSON 或未完整回答當作有效候選。
+
+收到 400/413 請修正輸入；429 可有限退避；504、取消或不完整 SSE 不自動重送。解碼期間也可能仍持有 lease；client 斷線不會立刻釋放 CPU/GPU 名額。不要傳 client 自選的 `media_io_kwargs`／`mm_processor_kwargs`，這些不是公開契約。
+
+60 秒合成影片成功只代表可接收、取樣與推論。2fps、256² 會遺失小球、快速擊球與細部姿態；桌球內容、精彩程度與人類評分一致性仍需產品使用已授權代表素材另驗收，不能從服務 GPU smoke 推導。
 
 ## 可執行範例
 

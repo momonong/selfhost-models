@@ -1,6 +1,54 @@
 # 驗收方式
 
+## 有界影片（2026-09-16，工作分支驗收）
+
+起點 `main@5a077e3883b3b2b6a0e817ff91f209ace6b15bd9`，`feat/video-inference`，沿用主要工作目錄，沒有額外 worktree。已和 PixelReceipt 接入任務協調排他維護，僅操作本專案 API/worker；不並載 backend、不改模型、不發布 image。[可行性與失敗紀錄](video-feasibility.md)；證據集中於 `evidence/2026-09-16-video/`。
+
+重跑需已協調服務使用時段；以下會重建本專案容器及受控 pause/restart，不能對正在給其他產品使用的服務直接執行。每次改用新的 evidence 目錄保留失敗結果。
+
+| 驗收層級 | 結果與證據 |
+|---|---|
+| CPU API／decoder 契約 | [113 passed](../evidence/2026-09-16-video/cpu-tests.txt)，uv lock check 通過 |
+| 真實 GPU／MP4 一般與 SSE | [最終影片 API](../evidence/2026-09-16-video/api-video-delivery.json)：2/10/30/60 秒、SSE/usage/DONE、格式與超限、解碼 deadline、2×504＋2×429 超載、disconnect 與 cleanup 通過 |
+| GPU 已輸出後取消／逾時 | [最終串流](../evidence/2026-09-16-video/video-stream-delivery.json)：先確認非空文字再 pause；error 無 DONE、保留 lease，恢復後歸零 |
+| Linux 真實解碼子程序 | [最終 decoder](../evidence/2026-09-16-video/linux-decoder-delivery.json)：720p60/3600 幀約 2.08 秒；512MiB/10 CPU 秒等 OS limits 已讀回，timeout/cancel 後 child 與 tempfile 都清乾淨 |
+| 共用重啟恢復 | [故障驗收](../evidence/2026-09-16-video/general-faults.json)：一般文字/SSE、context/認證/body、6×429＋2×504、API restart quarantine、worker 503、新 epoch 恢復通過 |
+| 原有單圖／工具 | [回歸](../evidence/2026-09-16-video/image-tools.json)：紅色 PNG、function call 與工具回送 731 通過 |
+| 實際來源／runtime | [runtime](../evidence/2026-09-16-video/runtime.json)：API／worker 來源與擷取時 checkout 逐位元一致；固定 vLLM/torch/processor 未換版 |
+| 交付狀態 | [交付核對](../evidence/2026-09-16-video/delivery-checks.json)、[前](../evidence/2026-09-16-video/before.json)／[後](../evidence/2026-09-16-video/after.json)快照：ready、零 lease；四個 KaChing 容器 ID/started_at/狀態與模型 inventory 不變 |
+
+最終 60 秒合成 API request 為 120×256²、4,399 input tokens；一般回應 4.567 秒、SSE 3.747 秒，finish_reason=stop；前一輪相同案例一般回應為 7.761 秒。這是暖機後、有 cache 重用可能的個別觀測，不是 SLA 或冷啟動 benchmark。可行性 worker 探測取樣到的 host VRAM 最高 16,063 MiB（約15.7 GiB），不能當作單一 request 的 allocator 增量。
+
+共用重啟驗收先完成；其後只修正「影片 CPU 準備不消耗 GPU dispatch 後 drain 預算」，新增契約測試並在最終 image 重跑影片一般/SSE、串流故障、Linux decoder、圖片與工具。文字重啟路徑未變，沒有重跑不受影響的完整 restart 流程。runtime 的 git_head 是提交前的起點，git_status 與所有實際來源 SHA256 同時保存；不可只讀 git_head 誤認部署仍是起點程式。
+
+交付時影片部署保持在 `127.0.0.1:18080` 運行，不再維持排他維護。臨時 Linux CPU 驗證容器已自動移除；沒有新 worktree。忽略的 `.state/video-fixtures/` 合成素材、實驗 Compose override 與本機 `selfhost-models-api:video-candidate` image 保留供重跑／核對，候選 image 沒有運行中的容器；正式部署使用一般 Compose 設定。沒有合併 main、推送或發布 image。
+
+```powershell
+uv sync --locked
+uv run --locked pytest -q
+uv run --locked python scripts/service_snapshot.py --output evidence/<run>/before.json
+# 確認 inflight/detached/uncertain=0 並已交接使用需求，再停目前部署。
+uv run --locked modelctl stop
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --video --context 8192 --max-inflight 2 --gpu-memory 0.60
+uv run --locked python scripts/video_decode_probe.py --stress --output evidence/<run>/decode-probe.json
+uv run --locked python scripts/video_decoder_check.py --output evidence/<run>/linux-decoder.json
+uv run --locked python scripts/video_acceptance.py --output evidence/<run>/api-video.json
+uv run --locked python scripts/stream_lifecycle_check.py --video .state/video-fixtures/synthetic-60s.mp4 --output evidence/<run>/video-stream-lifecycle.json
+uv run --locked python scripts/acceptance.py --faults --output evidence/<run>/general-faults.json
+uv run --locked python scripts/multimodal_smoke.py --output evidence/<run>/image-tools.json
+uv run --locked python scripts/capture_runtime.py --output evidence/<run>/runtime.json
+```
+
+影片驗收使用合成 H.264：2/10/30/60 秒的 JSON、60 秒 SSE＋usage＋DONE、實際首尾 PTS/幀數、壞檔、16MiB／60 秒上限、解碼階段 deadline、drain 及 API tmpfs 清理。CPU 契約另覆蓋 AAC 音軌不處理、VFR/codec/dimensions/fps 拒絕、接收總預算、pre-admission 不解碼、解碼子程序 kill/wait、取消與錯誤清理。Linux decoder 證據包含真實 720p60/3600 幀，以及真實 OS 子程序逾時／取消／無剩餘 child／空暫存。
+
+串流故障在收到非空生成文字後才 pause 本專案 worker，驗證 deadline error/無 DONE 與斷線後持有 lease，unpause 後 drain。共用故障入口另測超載、API restart quarantine、worker unavailable 503 與新 epoch 恢復；影片路徑沿用同一 journal。普通、單圖、工具的回歸分開保留。
+
+固定模型 revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`、vLLM 0.29.0、Transformers processor 5.16.1、PyAV 16.0.1、context 8192、max_inflight 2、GPU fraction 0.60。60 秒是本次合成服務輸入上限；不能解讀為已驗證任意編碼檔案、Linux 實體桌機或桌球內容品質。未提供代表性桌球片段，精彩程度與快速攻防均未人工評估。
+
+本次先前失敗也保留：圖片用的總像素預算讓影片降解析度；完整 120 幀被 2048 encoder cache 拒絕；巢狀 size 引發 upstream duplicate-key；首次 Compose tmpfs flow sequence 未加引號造成 `invalid mount path: 'nodev'`，已修正並加契約檢查。沒有以降低取樣、換模型或重設 journal 繞過。
+
 ## 筆電可用部署（2026-09-16）
+
 
 本次從 `d971dab` 建立 `feat/local-service-delivery`，新增日常 client 與使用／桌機驗收文件；沒有修改 serving、依賴鎖檔、模型或 runtime 配套。透過一般 `modelctl serve` 路徑重建 API／worker，新的實際 image ID 與來源比對見本次 runtime JSON，不以舊 image ID 代表此次部署。
 

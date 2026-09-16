@@ -103,7 +103,7 @@ def hashes(p):
             'lf_sha256': hashlib.sha256(data.replace(b'\\r\\n', b'\\n')).hexdigest()}
 print(json.dumps({'python': sys.version.split()[0], 'prefix': sys.prefix,
     'pytest_present': importlib.util.find_spec('pytest') is not None,
-    'packages': {p: m.version(p) for p in ('selfhost-models', 'httpx', 'pydantic', 'uvicorn', 'huggingface-hub', 'pillow')},
+    'packages': {p: m.version(p) for p in ('selfhost-models', 'httpx', 'pydantic', 'uvicorn', 'huggingface-hub', 'pillow', 'av')},
     'source_sha256': {p.relative_to('/app').as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in files},
     'source_hashes': {p.relative_to('/app').as_posix(): hashes(p) for p in files}}))
 """

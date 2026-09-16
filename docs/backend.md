@@ -31,6 +31,18 @@ Gateway 持有 durable lease，backend 不得默默切模型、fallback 或無�
 - worker 能力不同時明確拒絕不支援參數；不得宣稱所有 OpenAI endpoint、模態、工具格式都通用。
 - 重用契約測試，另外提供合成輸入的真實 GPU 證據。host、Windows Docker、Linux 實體部署結果分別報告。
 
+## vLLM 影片準備與生命週期
+
+影片是 `VIDEO_ENABLED=1` 的明確部署能力；只允許已驗證固定 Qwen3.5-4B revision、8192 context、最多兩個 lease。API 使用 PyAV 16.0.1 的獨立 CPU 子程序；vLLM runtime／PyTorch 組合不變，Transformers 不支援影片。
+
+Gateway 在 fsync lease 後才進行 base64、私有暫存與解碼。子程序限制 address space/CPU/file size/fd，另有 parent 15 秒 wall timeout，並在容器 2 GiB memory／2 CPU／64 pids／128 MiB tmpfs 內執行。只讀服務建立的 MP4 path；FFmpeg 限 MP4 demux、H.264 video、禁止外部 protocol/drefs，不解碼 audio。這些是資源邊界，不宣稱抵禦任意 native decoder 漏洞的完整安全 sandbox。
+
+取樣為 endpoint-inclusive ordinal，核對全部解碼幀的 PTS/CFR、尺寸、數量與像素預算，不能只相信容器 duration。`prepare_video` 擁有子程序：逾時或 gateway shutdown 要 kill＋wait，再刪 tempfile；正常或拒絕也要 wait。CPU 解碼不扣除既有的 GPU dispatch 後 drain 預算。Client disconnect 不取消 producer；若解碼結束時 client 已 detached／deadline 已過，清理並釋放 lease，不送 GPU。解碼本機拒絕可確認未 dispatch；其他未知例外仍保守 quarantine。容器重建移除 tmpfs；API crash 的 journal 不因猜測 CPU/GPU 階段而自動清除。
+
+解碼輸出轉為內部 `data:video/jpeg` 序列，傳真實 source fps／frame ordinals／duration，固定 `do_sample_frames=false`。Client 不得傳這個內部格式或覆寫 processor。影片 max_pixels=7,864,320；非影片請求固定原 1,048,576 budget，保留單圖行為。Worker profiling 設有限 image/video dimensions，encoder batch/cache budget 8192。固定 runtime 的巢狀 `videos_kwargs.size` 有 duplicate-key 問題，使用經實測平面參數，沒有 patch upstream。
+
+Readiness 除原有文字、併發、單圖暖機外，加入與部署容量相同數量、各 120×256²、內容不同的合成影片生成。這補足 upstream dummy profiling 只估兩幀的 heuristic，真正以最大影片形狀 prefill＋decode 後才 ready。全部暖機仍在同一 durable warmup lease／180 秒總預算內，未知結果仍需新 worker epoch 恢復。
+
 ## Transformers worker
 
 `worker/transformers_app.py` 為單 ASGI process；`worker/transformers_engine.py` 是固定 Qwen3.5 adapter。只接受 `qwen3_5` / `Qwen3_5ForConditionalGeneration` 非量化 checkpoint，以 BF16 載入完整權重到 CUDA 0，使用 SDPA；不使用 `device_map=auto`、CPU offload、自訂 HF code 或量化 fallback。載入呼叫均 `local_files_only=True`、`trust_remote_code=False`，模型唯讀且 worker 無對外網路。
