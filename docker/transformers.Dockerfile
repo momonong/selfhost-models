@@ -1,4 +1,8 @@
 FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime@sha256:db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407
+ARG SOURCE_REVISION=unknown
+LABEL org.opencontainers.image.version="0.2.0" \
+      org.opencontainers.image.revision=$SOURCE_REVISION \
+      org.opencontainers.image.source="https://github.com/momonong/selfhost-models"
 COPY --from=ghcr.io/astral-sh/uv:0.12.15@sha256:62f8c047d0a0e9ece6b53fc63df902585a67a47a7f318ddec4a37db586edc8e3 /uv /usr/local/bin/uv
 WORKDIR /app
 ENV UV_PYTHON_DOWNLOADS=never UV_LINK_MODE=copy PATH="/app/.venv/bin:$PATH"

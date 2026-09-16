@@ -1,7 +1,7 @@
 # Explicit override, selected by modelctl from the persisted BACKEND setting.
 services:
   worker:
-    image: selfhost-models-transformers:0.1.0
+    image: momonong/selfhost-models-transformers:0.2.0
     stop_grace_period: 30s
     build:
       dockerfile: docker/transformers.Dockerfile

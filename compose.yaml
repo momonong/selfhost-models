@@ -1,7 +1,7 @@
 name: selfhost-models
 services:
   api:
-    image: selfhost-models-api:0.1.0
+    image: momonong/selfhost-models-api:0.2.0
     user: "${API_UID:-10001}:${API_GID:-10001}"
     build:
       context: .
@@ -43,7 +43,7 @@ services:
       retries: 3
       start_period: 5m
   worker:
-    image: selfhost-models-vllm:0.29.0
+    image: momonong/selfhost-models-vllm:0.2.0
     build:
       context: .
       dockerfile: docker/worker.Dockerfile

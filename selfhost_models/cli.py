@@ -106,7 +106,7 @@ def serve(assets, args):
         if any(c in value for c in "\n\r'$"):
             raise ValueError("unsupported character in Compose setting")
     (assets.state / "compose.env").write_text("".join(f"{k}='{v}'\n" for k, v in values.items()), encoding="utf-8")
-    compose(assets.state, ["up", "-d", "--build"])
+    compose(assets.state, ["up", "-d", *(["--no-build", "--pull", "never"] if args.no_build else ["--build"])])
     print(f"API http://127.0.0.1:{args.port}; key file: {keyfile}; poll /health/ready")
 
 
@@ -127,6 +127,7 @@ def main():
             s.add_argument("--revision")
         elif command == "serve":
             s.add_argument("--backend", choices=("vllm", "transformers"), default="vllm")
+            s.add_argument("--no-build", action="store_true", help="use already pulled release images; never build or pull implicitly")
             s.add_argument("--video", action="store_true", help="enable bounded video on the validated vLLM model (requires --context 8192)")
             s.add_argument("--port", type=int, default=18080)
             s.add_argument("--gpu-memory", type=float, default=0.60)
