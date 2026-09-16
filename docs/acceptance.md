@@ -1,5 +1,58 @@
 # 驗收方式
 
+## 筆電 Ubuntu WSL2 複驗（2026-09-16）
+
+依本次安排，在既有 Windows 筆電的 Ubuntu 24.04.3 WSL2 執行 Linux CLI 與真實 GPU 驗收。**這不是 Linux 實體桌機驗收**；daemon 仍為 Docker Desktop 4.50.0／Engine 28.5.1，kernel 為 `6.6.87.2-microsoft-standard-WSL2`，RTX 5090 Laptop 24 GB／Windows driver 581.57。
+
+來源為 `fe3b5ba0c4159ef57a26da82819367cd95364d1c`，分支 `test/linux-vllm-acceptance`。因 Transformers 任務同時使用主要目錄，本次使用獨立 worktree `.worktrees/linux-vllm-acceptance` 並先協調 GPU 使用時段。此輪修改兩支驗收腳本的 `--url`／`--state`、runtime 證據欄位及來源換行比對，新增來源漂移回歸測試；共用 API、Compose、worker、uv.lock 皆維持基線。
+
+使用與先前 Windows 證據**完全相同的應用程式 image**，以 digest override、`--no-build --pull never` 啟動：
+
+| 項目 | 固定值 |
+|---|---|
+| API image ID／RepoDigest SHA | `sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e` |
+| vLLM image ID／RepoDigest SHA | `sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173` |
+| 官方 vLLM 基底 | `v0.29.0@sha256:c2914767605584b6d8f45686b82de173ecc99e781897aa3d0a66dacd72c51ae1` |
+| 模型 | Qwen/Qwen3.5-4B，revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` |
+| Host 設定 | GPU 0、loopback port 18081、UID/GID 1000、原生 WSL state、key mode 600／runtime dir 700 |
+| 推論設定 | BF16、context 2048、capacity 2、queue 0、GPU utilization 0.60、deadline 30s／drain 120s、V1 runner |
+
+模型唯讀接入 `/mnt/d/hf_models/Qwen3.5-4B`，既有 HF local metadata 一致；沒有下載、移動、替換模型。啟動方式見 [固定 image 複驗](deployment.md#wsl2-路徑權限與固定-image-複驗)。本次 state 位於 `/home/morris/.local/state/selfhost-models/vllm-acceptance-20260916`。
+
+可重跑指令（請使用新的 evidence 目錄，避免覆蓋本次結果；先完成前置盤點與服務啟動）：
+
+```bash
+STATE_DIR="$HOME/.local/state/selfhost-models/vllm-acceptance-20260916"
+EVIDENCE_DIR="evidence/$(date -u +%Y%m%dT%H%M%SZ)-wsl2"
+uv sync --locked
+uv run --locked pytest -q
+uv run --locked python scripts/acceptance.py --url http://127.0.0.1:18081 --state "$STATE_DIR" --faults --output "$EVIDENCE_DIR/acceptance.json"
+uv run --locked python scripts/multimodal_smoke.py --url http://127.0.0.1:18081 --state "$STATE_DIR" --output "$EVIDENCE_DIR/multimodal.json"
+uv run --locked python scripts/stream_lifecycle_check.py --url http://127.0.0.1:18081 --state "$STATE_DIR" --output "$EVIDENCE_DIR/stream-lifecycle.json"
+uv run --locked python scripts/capture_runtime.py --url http://127.0.0.1:18081 --state "$STATE_DIR" --output "$EVIDENCE_DIR/runtime.json"
+docker compose --env-file "$STATE_DIR/compose.env" -f compose.yaml -f "$STATE_DIR/images.json" stop
+```
+
+任何腳本失敗也需執行停機與最終狀態確認。故障注入腳本對其 pause 的 worker 使用 finally unpause；不要中斷整個執行程序或停止 Docker daemon。WSL 與 Windows 使用獨立 `.venv`，鎖檔未變；Windows 回歸設定 `UV_PROJECT_ENVIRONMENT=.venv-windows`。既有 Windows 證據保留於 `evidence/2026-09-16/`。
+
+本次發現的來源比對問題：Windows Git 新建 worktree 使用 CRLF，而既有 image 的 `pyproject.toml`／`uv.lock` 使用 LF。初次 runtime 擷取因此非零退出，已保留 [原始命令結果](../evidence/2026-09-16-wsl2/commands.json) 及 [該輪停機狀態](../evidence/2026-09-16-wsl2/final-state.json)，不把初次擷取標成成功。
+
+修正後仍保存 raw SHA256，另計算**僅將 CRLF 轉 LF**的 hash；`api_source_matches_checkout` 表示逐位元相同，`api_source_text_matches_checkout` 表示上述換行正規化後相同，差異檔名記錄在 `api_source_newline_only_differences`。不忽略 BOM、空白、最後換行、程式內容或來源檔案集合差異；這些仍非零退出。Windows／WSL 的 34 項回歸皆通過，詳見 [契約驗證](../evidence/2026-09-16-wsl2/contract-checks.json)。
+
+| 本次驗證 | 結果與獨立證據 |
+|---|---|
+| 前置盤點、原 image、模型及權限 | [preflight.json](../evidence/2026-09-16-wsl2/preflight.json)；既有資產、不 build／pull，key 600、runtime dir 700 |
+| 一般／SSE、錯誤參數／認證／body 上限 | 通過，[acceptance.json](../evidence/2026-09-16-wsl2/acceptance.json) |
+| 超載、deadline、取消、API／worker 重啟 | 6×429 + 2×504；未完成 lease 保留、drain 歸零、API 重啟隔離、worker 缺席 503、新 epoch 暖機後 200 |
+| 圖片與工具往返 | 合成紅色圖片、工具參數與回傳 731 通過，[multimodal.json](../evidence/2026-09-16-wsl2/multimodal.json) |
+| SSE 200 後的 deadline／斷線 | error frame／無 DONE、保留 lease 到 terminal，通過 [stream-lifecycle.json](../evidence/2026-09-16-wsl2/stream-lifecycle.json) |
+| 修正後 runtime 擷取 | [WSL](../evidence/2026-09-16-wsl2/runtime.json) 與 [Windows](../evidence/2026-09-16-wsl2/windows-runtime.json) 均通過；raw match=false、text match=true，9 個檔案僅 CRLF/LF 差異，原始 hash 全部保留 |
+| 最終停機 | [recapture-final-state.json](../evidence/2026-09-16-wsl2/recapture-final-state.json)：API／worker exit 0、未 paused、18081 關閉、leases 空、模型 inventory 與其他容器未變；GPU 426 MiB used／23626 MiB free |
+
+完整 GPU 功能組合完成於 05:02–05:04 UTC。來源比對修正後只補做所需的暖機與 WSL／Windows runtime 擷取，沒有以重跑覆蓋初次失敗。原始 logs 保存在 Git 忽略的 `evidence/raw/2026-09-16-wsl2/`，原始 preflight 及日誌 hash 見對應摘要。本次模型檢查為大小、mtime 與小檔 hash，並非完整權重逐位元驗證。GPU 已歸還後，後續任務可能重建同名 Compose 容器；以各次證據的 container ID、時間與 image digest 識別。
+
+與 Transformers 分支整合時，需保留腳本 URL/state 選項及這組 raw／text 證據語義，再接入該分支的 Compose backend 選擇。該分支另將串流 pause 時點改為收到非空 `delta.content`，整合時需保留並驗證；本次串流結果仍是基線「首個 data frame 後 pause」語義。此輪沒有修改 backend 契約或 serving image；Windows 的新增來源回歸、CLI 與 runtime 擷取已補驗，沒有新增 serving image 的待補回歸。Linux 原生桌機、獨立 NVIDIA Container Toolkit 安裝、不同 GPU／driver 組合仍待實機驗收。
+
 ## 最新交付複驗（2026-09-16）
 
 **最新 uv 版 API 與固定 vLLM worker 已通過完整真實 GPU 複驗，驗收後兩個服務均正常停止（exit 0）。** 本次交付程式起點為 `cea1d4a3dfb26edf2bf1b5a68bdc3dbac33dcb1d`；未修改 serving 程式、模型、Compose 設定或官方 worker 配套，僅補強證據腳本的輸出路徑及容器來源比對。
@@ -58,7 +111,7 @@ uv run --locked python scripts/capture_runtime.py
 
 使用合成、非敏感文字；驗證模型列表、一般／SSE、錯誤參數、未知模型、context、認證、body 上限。`--faults` 只對經 Compose label 核對的 selfhost-models worker 做 pause/unpause，確認 429、deadline 504、斷線 lease 不提前釋放；再重啟 API 驗證未決工作保留，重啟 worker 驗證新 epoch 暖機恢復。finally 會 unpause worker，不刻意耗盡 GPU。
 
-四個腳本皆可使用 `--output <path>`，複驗時使用新的日期目錄保留舊證據。`capture_runtime.py` 會比對容器內 API 原始碼／鎖檔與目前 checkout 的 SHA256，不一致時非零退出，不能拿舊 image 的結果代表新版本。
+四個腳本皆可使用 `--url`、`--state` 與 `--output <path>`，複驗時使用新的日期目錄保留舊證據。`capture_runtime.py` 保留容器內 API 原始碼／鎖檔與 checkout 的原始 SHA256，僅容許 CRLF／LF 轉換且明列差異；其他來源差異仍非零退出，不能拿舊 image 的結果代表新版本。
 
 測試成功只表示服務協定與受控生命週期成功，不是產品效能、agent 成功率或領域模型品質。若任何 assertion 失敗，命令非零退出，不得把部分結果當全部通過。
 

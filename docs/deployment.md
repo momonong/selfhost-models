@@ -87,6 +87,68 @@ serve 在既有 selfhost-models 容器運行或 port 已用時拒絕接管。res
 
 固定 runtime 版本與實際 image digest、CUDA/PyTorch 組合見驗收紀錄。eager mode、短 context、小併發先建立可預期基準，後續另做 throughput、CUDA graphs 與記憶體調校；不以此次 smoke test 宣稱產品品質或 Linux 實機驗證。
 
+## WSL2 路徑、權限與固定 image 複驗
+
+Ubuntu WSL2 可用 Linux CLI 連到 Docker Desktop，但仍屬 Windows 筆電驗證；Linux 桌機的 Engine、driver 與 NVIDIA Container Toolkit 要另外驗收。2026-09-16 WSL2 複驗使用既有 `/mnt/d/hf_models/Qwen3.5-4B`，沒有複製或下載模型。
+
+模型可放在既有 Windows 磁碟掛載，secret 與可寫 state 則放在 WSL 原生檔案系統，例如 `$HOME/.local/state/selfhost-models/vllm-acceptance-20260916`。一般未啟用 metadata 的 `/mnt/d` 不具完整 Linux chmod 語義，不應由 chmod 成功就宣稱 key 已受 mode 600 保護。每個作業系統使用各自的 uv 環境；本次 WSL 使用 worktree 的 `.venv`，Windows 使用 `UV_PROJECT_ENVIRONMENT=.venv-windows`。
+
+Windows Git 建立的 worktree，其 `.git` 可能含 `D:/...` 絕對路徑。若直接從 WSL 操作該 worktree，先在當次 shell 設定對應 Linux 路徑，不修改其他任務的 Git 設定：
+
+```bash
+export GIT_DIR=/mnt/d/projects/selfhost-models/.git/worktrees/linux-vllm-acceptance
+export GIT_WORK_TREE=/mnt/d/projects/selfhost-models/.worktrees/linux-vllm-acceptance
+# 僅在既有 Windows checkout 使用 CRLF 時對齊 Windows Git 的判斷。
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=true
+cd "$GIT_WORK_TREE"
+```
+
+原生 Linux clone 不需要以上轉換。切勿讓 Windows 與 WSL 同時操作同一 worktree 的 index。
+
+`modelctl serve` 預設會 build。若要重用已驗證的**完全相同 image**，先確認本機 `docker image inspect` 的 ID／RepoDigests，再以 host 專用 Compose override 加上 `--no-build --pull never` 啟動。僅有 Dockerfile 固定基底 digest，不代表重新 build 的應用程式 image 相同。
+
+以下為本次主機設定範例；在 repo 根目錄執行，並先確認沒有另一個 `selfhost-models` 部署運行、GPU 時段已協調且 port 18081 可用。`STATE_DIR` 必須是已確認的本次專用目錄，勿覆寫其他部署的設定。首次登錄後應 inspect 並核對 revision 為 `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`：
+
+```bash
+STATE_DIR="$HOME/.local/state/selfhost-models/vllm-acceptance-20260916"
+uv run --locked modelctl --state "$STATE_DIR" register Qwen/Qwen3.5-4B --path /mnt/d/hf_models/Qwen3.5-4B
+uv run --locked modelctl --state "$STATE_DIR" inspect Qwen/Qwen3.5-4B
+# 首次建立 key，不覆寫既有 key；內容不可輸出至日誌。
+umask 077
+mkdir -p "$STATE_DIR/runtime"
+chmod 700 "$STATE_DIR" "$STATE_DIR/runtime"
+if [ ! -e "$STATE_DIR/api-key" ]; then
+  uv run --locked python -c 'import secrets; print(secrets.token_urlsafe(32))' > "$STATE_DIR/api-key"
+fi
+chmod 600 "$STATE_DIR/api-key"
+cat > "$STATE_DIR/compose.env" <<EOF
+MODEL_ID=Qwen/Qwen3.5-4B
+MODEL_REVISION=851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+MODEL_PROFILE=qwen3_5
+MODEL_PATH=/mnt/d/hf_models/Qwen3.5-4B
+API_KEY_PATH=$STATE_DIR/api-key
+API_STATE_PATH=$STATE_DIR/runtime
+API_UID=$(id -u)
+API_GID=$(id -g)
+API_PORT=18081
+GPU_DEVICE=0
+GPU_MEMORY_UTILIZATION=0.60
+MAX_MODEL_LEN=2048
+MAX_INFLIGHT=2
+DEADLINE_SECONDS=30
+DRAIN_SECONDS=120
+VLLM_USE_V2_MODEL_RUNNER=0
+EOF
+cat > "$STATE_DIR/images.json" <<'EOF'
+{"services":{"api":{"image":"selfhost-models-api@sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e"},"worker":{"image":"selfhost-models-vllm@sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173"}}}
+EOF
+docker compose --env-file "$STATE_DIR/compose.env" -f compose.yaml -f "$STATE_DIR/images.json" up -d --no-build --pull never
+```
+
+以上應用程式 image 是本機驗證資產，未宣稱已發布至 registry。其他主機若沒有該 digest，應先安排 image 移轉或記錄重建差異，不移除 digest 來隱性改用新 image。`GPU_DEVICE` 與 `API_PORT` 由 host 設定；Linux 原生模型路徑依既有資產調整，預設根目錄仍為 `/srv/selfhost-models/models`。
+
+依驗收文件跑完後，以同一組 `--env-file`／`-f` 參數執行 `stop`，確認 exit code、未 paused、port 關閉、lease 清空及其他容器未變。保留模型與 state。Compose project 名稱仍固定 `selfhost-models`，不同 state、port 或 worktree 都不表示可以同時啟動兩套服務。
+
 ### WSL2 runner 設定
 
 官方 vLLM 0.29.0 的 V2 model runner 在此 WSL2／Blackwell host 因 `UVA is not available` 無法初始化。Compose 明確預設 `VLLM_USE_V2_MODEL_RUNNER=0`，使用同版本內的 V1 runner；不替換 CUDA/PyTorch、不自動改引擎。Linux 若另驗證 V2，可顯式覆寫環境變數後重建 worker；目前 Linux 未實測。

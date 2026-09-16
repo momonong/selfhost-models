@@ -1,0 +1,93 @@
+{
+  "at": "2026-09-16T05:04:42.779902+00:00",
+  "services": {
+    "api": {
+      "id": "3931800d72a2bc718edbf873f2e18502f69c12ee6517faa37c2300a4b0f19b87",
+      "image_id": "sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-09-16T05:02:19.162463972Z",
+        "FinishedAt": "2026-09-16T05:04:41.357413367Z",
+        "Health": {
+          "Status": "unhealthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-09-16T05:04:17.024045682Z",
+              "End": "2026-09-16T05:04:17.173552162Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-09-16T05:04:22.174419397Z",
+              "End": "2026-09-16T05:04:22.293332476Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-09-16T05:04:27.288395406Z",
+              "End": "2026-09-16T05:04:27.410964127Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-09-16T05:04:32.412400068Z",
+              "End": "2026-09-16T05:04:32.527567303Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-09-16T05:04:37.52883891Z",
+              "End": "2026-09-16T05:04:37.650587063Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      }
+    },
+    "worker": {
+      "id": "bc00ac410342cbaacd04fa5661fa36d50a4dc623fa7a549382e865db434bf732",
+      "image_id": "sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-09-16T05:02:21.098254716Z",
+        "FinishedAt": "2026-09-16T05:04:41.757578432Z"
+      }
+    }
+  },
+  "other_services_unchanged": true,
+  "model_inventory_unchanged": true,
+  "model_check": "sizes, mtimes, small-file hashes; not full weight hash",
+  "state_preserved": "/home/morris/.local/state/selfhost-models/vllm-acceptance-20260916",
+  "key_mode": "0o600",
+  "leases": {
+    "leases": {}
+  },
+  "api_port_closed": true,
+  "gpu_after": "Wed Sep 16 13:04:42 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 580.102.01             Driver Version: 581.57         CUDA Version: 13.0     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  NVIDIA GeForce RTX 5090 ...    On  |   00000000:01:00.0 Off |                  N/A |\n| N/A   64C    P5             17W /   90W |     427MiB /  24463MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|  No running processes found                                                             |\n+-----------------------------------------------------------------------------------------+",
+  "raw_hashes": {
+    "acceptance.py.log": "be8441145a8e194a244b05c1768f0bc69e2885f1121522e93c8671251ee579af",
+    "api.log": "0a7e4a7fa0043307ec386db71db087cb7a379e881af54c961c6fbb0189bf279a",
+    "capture_runtime.py.log": "ec6feed3ad0ede8107d51c4e29bcce2e1ff4f3d75bdbce7605ac8e8cec75e218",
+    "multimodal_smoke.py.log": "d785c6345d9d5dda2b50daf4a5a3bb77030b4eeab9f8c8153a91cca20dcf9198",
+    "stream_lifecycle_check.py.log": "11c773cc81a3e92d45d81e1cb4e66ff4505b6dbe03da65e2621341de3bdc521f",
+    "worker.log": "a8fdd65658cc84c7019a6e81aaa9caed1d7864feacfad91ede0533d88333ad64"
+  }
+}

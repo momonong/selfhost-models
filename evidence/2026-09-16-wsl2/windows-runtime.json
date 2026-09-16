@@ -1,0 +1,246 @@
+{
+  "at": "2026-09-16T05:10:44.725684+00:00",
+  "host": "Windows-11-10.0.26200-SP0",
+  "git_head": "fe3b5ba0c4159ef57a26da82819367cd95364d1c",
+  "url": "http://127.0.0.1:18081",
+  "containers": {
+    "api": {
+      "id": "3931800d72a2bc718edbf873f2e18502f69c12ee6517faa37c2300a4b0f19b87",
+      "image": "selfhost-models-api@sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e",
+      "image_id": "sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e",
+      "started_at": "2026-09-16T05:08:53.609381278Z",
+      "running": true,
+      "paused": false,
+      "ports": {
+        "8000/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "18081"
+          }
+        ]
+      },
+      "networks": [
+        "selfhost-models_inference",
+        "selfhost-models_ingress"
+      ],
+      "mounts": [
+        {
+          "destination": "/state",
+          "writable": true
+        },
+        {
+          "destination": "/run/secrets/api_key",
+          "writable": false
+        }
+      ],
+      "repo_digests": [
+        "selfhost-models-api@sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e"
+      ]
+    },
+    "worker": {
+      "id": "bc00ac410342cbaacd04fa5661fa36d50a4dc623fa7a549382e865db434bf732",
+      "image": "selfhost-models-vllm@sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173",
+      "image_id": "sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173",
+      "started_at": "2026-09-16T05:08:53.596994347Z",
+      "running": true,
+      "paused": false,
+      "ports": {},
+      "networks": [
+        "selfhost-models_inference"
+      ],
+      "mounts": [
+        {
+          "destination": "/models/current",
+          "writable": false
+        }
+      ],
+      "repo_digests": [
+        "selfhost-models-vllm@sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173"
+      ]
+    }
+  },
+  "git_status": "M docs/acceptance.md\n M docs/deployment.md\n M scripts/capture_runtime.py\n M scripts/stream_lifecycle_check.py\n?? evidence/2026-09-16-wsl2/\n?? tests/test_runtime_evidence.py",
+  "source_sha256": {
+    ".python-version": "8dfda54ba2f66ab3a8ebab460f4338bbeea1fb1e0f85ce06fe3530aa3c64679b",
+    "compose.yaml": "59865920fde33de18efb1a3f35eaf48c6d39aeefd3bac8247a87dc9d12dcfe10",
+    "docker/api.Dockerfile": "c9d0298d606d16f496d42b11cf7db08bea7c74260bb8d0d3f19f33deb6435a46",
+    "docker/worker.Dockerfile": "9a34a383f3963193ac330507fadadc48a10fa5b3aea0f9590e03555716a4ec4b",
+    "pyproject.toml": "fdff100280ecfd986b93205d633558ee1a26eecc346dcc27509b549af894b235",
+    "scripts/acceptance.py": "d052cf2f2cd189a96449ed5163082c1c03fa4807c8582171d7deec86b662d241",
+    "scripts/api_container_check.py": "82ca908f46132698794fd490bb5045eb63f2db7d1c8ad1cbb621f8366236e8ab",
+    "scripts/capture_runtime.py": "4fd2c610f83ee16fc67e507fcf72d61b70abbbb554032361a21bc35076cd73a2",
+    "scripts/multimodal_smoke.py": "a3a36c3a4dd162cffdcbda7ba7af5fd301b18750df43eaea62e351caccb1c762",
+    "scripts/stream_lifecycle_check.py": "7d45d32441e394c635265cdfd00af6250b97c93d83b3efe7f31249419380cd2e",
+    "selfhost_models/__init__.py": "41362a5ea4931c546433d4c48290c5707bf02dbbea1c3aafa9f43d1225e47003",
+    "selfhost_models/api.py": "118a6ac8ffc3243ce0ba7fe6f26aceaf8fce26a5450ce8646d502a7eee37e50d",
+    "selfhost_models/assets.py": "9cc17ae6f8320afa5dd86ce72864ad201818a8000288033039609bc5e76c8397",
+    "selfhost_models/backend.py": "7f90ac444b6c15489941851634ae2795495ce9ba2b9daa7ed7866156b3b86f10",
+    "selfhost_models/cli.py": "848016aa9014dc76b812b2a6b06c1f763ff48df679d91e74c8101f7abce3a24c",
+    "selfhost_models/schema.py": "48abcc184bb6ad689a92fd0933990a3370551581f1796a9f78335a5534811178",
+    "selfhost_models/storage.py": "9c34169d3d75455c6b8b8e9593148e7cb3daab0c03f5b50d50292beaaa9d9f46",
+    "tests/test_assets.py": "1969d623a87f8736261836761e5563fd87ed23ce4f8f0e80d6680fc2bbc01284",
+    "tests/test_capabilities.py": "50bc99d1b214a448584af22918fc3046f2957d7c0b4b653b69529768e8029833",
+    "tests/test_deployment.py": "e7d821022c4ecb3facf9c833add48bfa9a8e48460eb11383940897c68d85b115",
+    "tests/test_gateway.py": "4afd8ddbaa71d8f07fb1e6bbd3a62161613bddd5c342e24c7829ae4f3da2b942",
+    "tests/test_runtime_evidence.py": "5c9ff685dece1038ce4be3ba4dedd7c776092c86d2050a42a1b4f21cd1696f33",
+    "tests/test_stream.py": "2dcd2a38b7f3ac6684207ff4b24f51974e9776bef973630f9e452f6b6319b4d4",
+    "tests/test_warmup.py": "0dda21fd4d5bb5d2533335e0f72aa674fbac6fb1fc381197d220bf565db1dd9b",
+    "uv.lock": "0362956fab4d9d8324a05a16b8a073145c0a8c007b38f1c557506219e03c1516",
+    "worker/identity.py": "73c19e8ea6ab96930851683d32045ee53677021c510839af99d904dd9e174f66",
+    "worker/launch.py": "0b8ef68d91413006b2e16ffff67b2737bf6c4869aa71ddc90d767c4aad9e75a1"
+  },
+  "runtime": {
+    "vllm": "0.29.0",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "transformers": "5.16.1",
+    "runner_v2": "0"
+  },
+  "api_runtime": {
+    "python": "3.12.14",
+    "prefix": "/app/.venv",
+    "pytest_present": false,
+    "packages": {
+      "selfhost-models": "0.1.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.11.7",
+      "uvicorn": "0.35.0",
+      "huggingface-hub": "0.34.4",
+      "pillow": "11.3.0"
+    },
+    "source_sha256": {
+      "pyproject.toml": "6fa7e08316e6156fe015f5659b43380b4dff239affa364758e20b8ff99b99050",
+      "uv.lock": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3",
+      "selfhost_models/assets.py": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+      "selfhost_models/storage.py": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+      "selfhost_models/__init__.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+      "selfhost_models/backend.py": "34290ef76401ee726e2e09f031f7daf72d247aad1b23ab7cacb61a3ceded0cd9",
+      "selfhost_models/schema.py": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a",
+      "selfhost_models/cli.py": "24af4b2c6c3e338e6906b3aa76c2a467331e226030cdf72fc1b878863398a3c3",
+      "selfhost_models/api.py": "e2b340b605d181530bb192aba7c77616372099ae3a20cfd1ccadd13daaa52ee5"
+    },
+    "source_hashes": {
+      "pyproject.toml": {
+        "sha256": "6fa7e08316e6156fe015f5659b43380b4dff239affa364758e20b8ff99b99050",
+        "lf_sha256": "6fa7e08316e6156fe015f5659b43380b4dff239affa364758e20b8ff99b99050"
+      },
+      "uv.lock": {
+        "sha256": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3",
+        "lf_sha256": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3"
+      },
+      "selfhost_models/assets.py": {
+        "sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+        "lf_sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8"
+      },
+      "selfhost_models/storage.py": {
+        "sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+        "lf_sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4"
+      },
+      "selfhost_models/__init__.py": {
+        "sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+        "lf_sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed"
+      },
+      "selfhost_models/backend.py": {
+        "sha256": "34290ef76401ee726e2e09f031f7daf72d247aad1b23ab7cacb61a3ceded0cd9",
+        "lf_sha256": "34290ef76401ee726e2e09f031f7daf72d247aad1b23ab7cacb61a3ceded0cd9"
+      },
+      "selfhost_models/schema.py": {
+        "sha256": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a",
+        "lf_sha256": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a"
+      },
+      "selfhost_models/cli.py": {
+        "sha256": "24af4b2c6c3e338e6906b3aa76c2a467331e226030cdf72fc1b878863398a3c3",
+        "lf_sha256": "24af4b2c6c3e338e6906b3aa76c2a467331e226030cdf72fc1b878863398a3c3"
+      },
+      "selfhost_models/api.py": {
+        "sha256": "e2b340b605d181530bb192aba7c77616372099ae3a20cfd1ccadd13daaa52ee5",
+        "lf_sha256": "e2b340b605d181530bb192aba7c77616372099ae3a20cfd1ccadd13daaa52ee5"
+      }
+    }
+  },
+  "checkout_api_source_hashes": {
+    "pyproject.toml": {
+      "sha256": "fdff100280ecfd986b93205d633558ee1a26eecc346dcc27509b549af894b235",
+      "lf_sha256": "6fa7e08316e6156fe015f5659b43380b4dff239affa364758e20b8ff99b99050"
+    },
+    "uv.lock": {
+      "sha256": "0362956fab4d9d8324a05a16b8a073145c0a8c007b38f1c557506219e03c1516",
+      "lf_sha256": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3"
+    },
+    "selfhost_models/api.py": {
+      "sha256": "118a6ac8ffc3243ce0ba7fe6f26aceaf8fce26a5450ce8646d502a7eee37e50d",
+      "lf_sha256": "e2b340b605d181530bb192aba7c77616372099ae3a20cfd1ccadd13daaa52ee5"
+    },
+    "selfhost_models/assets.py": {
+      "sha256": "9cc17ae6f8320afa5dd86ce72864ad201818a8000288033039609bc5e76c8397",
+      "lf_sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8"
+    },
+    "selfhost_models/backend.py": {
+      "sha256": "7f90ac444b6c15489941851634ae2795495ce9ba2b9daa7ed7866156b3b86f10",
+      "lf_sha256": "34290ef76401ee726e2e09f031f7daf72d247aad1b23ab7cacb61a3ceded0cd9"
+    },
+    "selfhost_models/cli.py": {
+      "sha256": "848016aa9014dc76b812b2a6b06c1f763ff48df679d91e74c8101f7abce3a24c",
+      "lf_sha256": "24af4b2c6c3e338e6906b3aa76c2a467331e226030cdf72fc1b878863398a3c3"
+    },
+    "selfhost_models/schema.py": {
+      "sha256": "48abcc184bb6ad689a92fd0933990a3370551581f1796a9f78335a5534811178",
+      "lf_sha256": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a"
+    },
+    "selfhost_models/storage.py": {
+      "sha256": "9c34169d3d75455c6b8b8e9593148e7cb3daab0c03f5b50d50292beaaa9d9f46",
+      "lf_sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4"
+    },
+    "selfhost_models/__init__.py": {
+      "sha256": "41362a5ea4931c546433d4c48290c5707bf02dbbea1c3aafa9f43d1225e47003",
+      "lf_sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed"
+    }
+  },
+  "api_source_matches_checkout": false,
+  "api_source_text_matches_checkout": true,
+  "api_source_newline_only_differences": [
+    "pyproject.toml",
+    "selfhost_models/__init__.py",
+    "selfhost_models/api.py",
+    "selfhost_models/assets.py",
+    "selfhost_models/backend.py",
+    "selfhost_models/cli.py",
+    "selfhost_models/schema.py",
+    "selfhost_models/storage.py",
+    "uv.lock"
+  ],
+  "source_comparison": "raw SHA256 retained; text comparison normalizes CRLF to LF only",
+  "gpu": "name, driver_version, memory.total [MiB], memory.used [MiB], memory.free [MiB]\nNVIDIA GeForce RTX 5090 Laptop GPU, 581.57, 24463 MiB, 15409 MiB, 8643 MiB",
+  "health": {
+    "ready": true,
+    "version": "0.1.0",
+    "worker_epoch": "4bfbff3bd9e04e8db0aac908c6940d26",
+    "inflight": 0,
+    "detached": 0,
+    "uncertain": 0
+  },
+  "models": {
+    "object": "list",
+    "data": [
+      {
+        "id": "Qwen/Qwen3.5-4B",
+        "object": "model",
+        "created": 0,
+        "owned_by": "selfhost",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+      }
+    ]
+  },
+  "settings": {
+    "API_UID": "1000",
+    "API_GID": "1000",
+    "API_PORT": "18081",
+    "GPU_DEVICE": "0",
+    "GPU_MEMORY_UTILIZATION": "0.60",
+    "MAX_MODEL_LEN": "2048",
+    "MAX_INFLIGHT": "2",
+    "DEADLINE_SECONDS": "30",
+    "DRAIN_SECONDS": "120",
+    "VLLM_USE_V2_MODEL_RUNNER": "0"
+  }
+}

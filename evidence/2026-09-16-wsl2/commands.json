@@ -1,0 +1,18 @@
+[
+  {
+    "script": "acceptance.py",
+    "exit_code": 0
+  },
+  {
+    "script": "multimodal_smoke.py",
+    "exit_code": 0
+  },
+  {
+    "script": "stream_lifecycle_check.py",
+    "exit_code": 0
+  },
+  {
+    "script": "capture_runtime.py",
+    "exit_code": 1
+  }
+]
