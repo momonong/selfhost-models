@@ -51,7 +51,10 @@ class TransformersWorker:
             work.prepared.set()
             work.result = await asyncio.to_thread(self.engine.run, prepared, payload, work.emit, warmup)
         except Exception as exc:
-            logging.error("engine_failed type=%s", type(exc).__name__)
+            if warmup:
+                logging.exception("fixed synthetic warmup failed")
+            else:
+                logging.error("engine_failed type=%s", type(exc).__name__)
             self.failed = True
             work.status = 500  # No terminal confirmation on engine/CUDA errors.
         finally:

@@ -12,13 +12,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def output(args):
-    return subprocess.check_output(args, text=True, timeout=30).strip()
+    return subprocess.check_output(args, text=True, encoding="utf-8", timeout=30).strip()
 
 
 def main(args):
     containers = []
-    ids = output(["docker", "ps", "-aq"]).splitlines()
-    for identifier in ids:
+    ids = set(output(["docker", "ps", "-q"]).splitlines())
+    ids.update(output(["docker", "ps", "-aq", "--filter", "label=com.docker.compose.project=selfhost-models"]).splitlines())
+    for identifier in sorted(ids):
         item = json.loads(output(["docker", "inspect", identifier]))[0]
         project = item["Config"]["Labels"].get("com.docker.compose.project") if item["Config"].get("Labels") else None
         if item["State"]["Running"] or project == "selfhost-models":

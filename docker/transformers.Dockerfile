@@ -8,6 +8,7 @@ RUN uv venv --system-site-packages --python python /app/.venv && uv sync --locke
 COPY selfhost_models /app/selfhost_models
 COPY worker /app/worker
 ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 DO_NOT_TRACK=1 TOKENIZERS_PARALLELISM=false HF_HOME=/tmp/hf PYTHONUNBUFFERED=1
+ENV TRITON_CACHE_DIR=/runtime-cache/triton TORCHINDUCTOR_CACHE_DIR=/runtime-cache/inductor CUDA_CACHE_PATH=/runtime-cache/cuda TMPDIR=/runtime-cache
 RUN useradd --uid 10001 --create-home service
 USER service
 CMD ["python", "-m", "uvicorn", "worker.transformers_app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--no-access-log", "--timeout-graceful-shutdown", "5"]

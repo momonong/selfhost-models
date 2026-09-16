@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def output(command):
-    return subprocess.check_output(command, text=True, timeout=60).strip()
+    return subprocess.check_output(command, text=True, encoding="utf-8", timeout=60).strip()
 
 
 def main(path):

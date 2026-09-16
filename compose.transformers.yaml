@@ -12,5 +12,6 @@ services:
       MAX_INFLIGHT: "1"
       GPU_MEMORY_UTILIZATION: ${GPU_MEMORY_UTILIZATION:-0.60}
     read_only: true
-    tmpfs: [/tmp]
+    # Native PyTorch/Triton kernels compile and load shared objects here.
+    tmpfs: [/tmp, "/runtime-cache:rw,exec,nosuid,nodev,size=1g,mode=1777"]
     cap_drop: [ALL]

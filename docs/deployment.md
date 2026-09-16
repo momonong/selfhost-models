@@ -85,7 +85,7 @@ docker compose --env-file .state/compose.env -f compose.yaml -f compose.transfor
 
 Transformers 獨立使用 `worker/transformers/pyproject.toml` + `uv.lock`，不是 API 的第二份 requirements 鎖檔。官方 `pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime` 固定 digest `sha256:db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407`，提供 Python 3.12.3、PyTorch 2.13.0+cu130、CUDA 13.0 及 torchvision 配套。image 建置用 uv 0.12.15 建立繼承 system-site-packages 的獨立 venv，再 `uv sync --locked --no-dev` 安裝固定 Transformers 5.16.1 與 HTTP 依賴；不重裝基底 torch，也不變更 vLLM 套件組合。建置及 engine 初始化均檢查 runtime 版本。
 
-若修改 worker Python 依賴，使用 `uv lock --project worker/transformers` 更新其 uv.lock。這個專案的 Python 限 3.12，CUDA/PyTorch 由固定 image 提供，host 不需安裝 GPU Python 套件。worker 以 UID 10001、唯讀 filesystem、可寫 `/tmp` 運行；启动不執行 uv sync。模型必須已由 modelctl register/inspect 確認，不改動既有檔案。
+若修改 worker Python 依賴，使用 `uv lock --project worker/transformers` 更新其 uv.lock。這個專案的 Python 限 3.12，CUDA/PyTorch 由固定 image 提供，host 不需安裝 GPU Python 套件。worker 以 UID 10001、唯讀 filesystem 運行，`/tmp` 保存 HF 暫存；獨立 1 GiB `/runtime-cache` tmpfs 明確允許 exec，供官方 PyTorch/Triton 的 native kernel 編譯與載入。TRITON_CACHE_DIR、TORCHINDUCTOR_CACHE_DIR、CUDA_CACHE_PATH、TMPDIR 指向該區，停止後暫存釋放，模型仍唯讀。啟動不執行 uv sync；模型必須已由 modelctl register/inspect 確認，不改動既有檔案。
 
 架構支援依 [Transformers Qwen3.5 官方文件](https://huggingface.co/docs/transformers/main/model_doc/qwen3_5)，並已在固定 image 離線匯入對應類別核對；runtime 基底依 [官方 PyTorch image](https://hub.docker.com/layers/pytorch/pytorch/2.13.0-cuda13.0-cudnn9-runtime/images/sha256-db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407)。支援架構不等於任意 checkpoint 都已實測，實際範圍見驗收文件。
 
