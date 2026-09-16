@@ -1,0 +1,71 @@
+{
+  "verified_at": "2026-09-16T08:19:30.4211243Z",
+  "delivery_commit": "4dc0a81fa3579486b152f9a84e0f7f765c5d7726",
+  "serving_source_commit": "d971dab23b8f3eb803fc19c9718cbe81f89b656f",
+  "images": [
+    {
+      "repository": "momonong/selfhost-models-api",
+      "tag": "sha-4dc0a81",
+      "is_private": false,
+      "digest": "sha256:c8af47eaedc89d1b653b09d5de85dc9f0dedfa7d919bdaeb6e80e0b890e3793c",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:c0b9e6f985bce0f73f1974c89b5c3289fd6a912444ced8433fca572bc767c0ec"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:71b3ebf876475c46894d58e062fd83e9cdd9a711c90256c04c4452841c11850f"
+        }
+      ],
+      "anonymous_metadata_verified": true
+    },
+    {
+      "repository": "momonong/selfhost-models-vllm",
+      "tag": "sha-4dc0a81",
+      "is_private": false,
+      "digest": "sha256:25eea1d718346c7abeb5e9730a155360812b542045e7668e31f7a1daa5134fe3",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:b8628839214f5084c490b3ba38e26eb27fc54ba6d2cb193e996279e64663512f"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:4369e47fe3314468691e157f65c3b806ffa96c80cec24703b1ab89781014e208"
+        }
+      ],
+      "anonymous_metadata_verified": true
+    },
+    {
+      "repository": "momonong/selfhost-models-transformers",
+      "tag": "sha-4dc0a81",
+      "is_private": false,
+      "digest": "sha256:196a1a65d60c0db749a8cd5cbd5db0d937e13cb9214b1fc6d2e495dd31c1b7fd",
+      "platforms": [
+        {
+          "os": "linux",
+          "architecture": "amd64",
+          "digest": "sha256:a59a4a7762caf73a10d795f925884d0e8c5c6f2edac1ead99982b3e230a00282"
+        },
+        {
+          "os": "unknown",
+          "architecture": "unknown",
+          "digest": "sha256:85e838d014f16dbe6bd21f9507776f09f7ab518ae0b25ccdcecb85008f113983"
+        }
+      ],
+      "anonymous_metadata_verified": true
+    }
+  ],
+  "notes": [
+    "Published existing GPU-validated images without rebuilding.",
+    "Transformers final base layer mounted from pytorch/pytorch using registry API; initial push client stopped and retry succeeded.",
+    "No model weights, host state, or API keys included.",
+    "Runtime source comparison normalizes CRLF to LF.",
+    "CPU tests: 87 passed; registry publication did not restart serving containers."
+  ]
+}

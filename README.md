@@ -36,7 +36,9 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 
 已整合 Transformers backend 與 Ubuntu WSL2 驗收成果。Windows／WSL CPU 契約各 **84 項通過**；Windows Docker Desktop WSL2／RTX 5090 Laptop 上，兩 backend 依序完成一般／SSE、實際文字輸出後的 deadline／disconnect、runtime／API／worker 來源比對與正常停機。Transformers 為文字、單請求、queue 0；vLLM 保留圖片與工具能力。來源分支的完整超載／重啟回歸與首次失敗紀錄也保留。
 
-本次使用獨立 state 與 port 18082／18083，驗收後兩服務均 exit 0、lease 空；WSL worktree 已清理，模型、state 與原始證據妥善保留。API 與 Transformers worker 的來源有 CRLF／LF 差異，只能稱換行正規化後一致。Linux 實體桌機、Linux Transformers 與 HF 實際下載仍未驗證；詳細結果、操作與限制見 [驗收文件](docs/acceptance.md)。
+上述整合驗收使用獨立 state 與 port 18082／18083，結束後正常停機並清理 WSL worktree。後續筆電交付新增 UTF-8 對話 client，Windows CPU 測試 **87 項通過**，兩 backend 再次依序通過一般／SSE 與 smoke；交付時 vLLM／API 保持在 `127.0.0.1:18080` ready，使用 `.state`。目前即時狀態請以 `modelctl status` 與 `/health/ready` 為準。
+
+API 與 Transformers worker 的來源有 CRLF／LF 差異，只能稱換行正規化後一致。Linux 實體桌機、Linux Transformers 與 HF 實際下載仍未驗證；詳細結果、桌機驗收步驟及限制見 [驗收文件](docs/acceptance.md)。公開 images 與固定版本使用方式見 [部署文件](docs/deployment.md#docker-hub-images)。
 
 ```bash
 uv run --locked pytest -q

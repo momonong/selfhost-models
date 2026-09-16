@@ -41,6 +41,8 @@ API Dockerfile 從固定 digest 的官方 uv image 取得工具，以 `uv sync -
 
 ## 接入既有模型
 
+公開 image 的版本與拉取方式見本文末尾的 [Docker Hub images](#docker-hub-images)。
+
 ```powershell
 uv run --locked modelctl register Qwen/Qwen3.5-4B --path D:/hf_models/Qwen3.5-4B
 uv run --locked modelctl list
@@ -192,3 +194,49 @@ docker compose --env-file "$STATE_DIR/compose.env" -f compose.yaml -f "$STATE_DI
 官方 vLLM 0.29.0 的 V2 model runner 在此 WSL2／Blackwell host 因 `UVA is not available` 無法初始化。Compose 明確預設 `VLLM_USE_V2_MODEL_RUNNER=0`，使用同版本內的 V1 runner；不替換 CUDA/PyTorch、不自動改引擎。Linux 若另驗證 V2，可顯式覆寫環境變數後重建 worker；目前 Linux 未實測。
 
 上游對應問題：https://github.com/vllm-project/vllm/issues/50239
+
+## Docker Hub images
+
+2026-09-16 交付使用公開 repository，標籤為 `sha-4dc0a81`，對應筆電交付提交 `4dc0a81fa3579486b152f9a84e0f7f765c5d7726`。此提交新增 client、文件及證據；image 內推論程式碼沿用 `d971dab`，已核對來源。images 為本機 GPU 驗證過的既有產物，未因發布而重建。僅提供 `linux/amd64`；Windows 透過 Docker Desktop WSL2 執行。上方歷史驗收使用的舊 digest 不等於本次發布版本。
+
+| Image | 交付 digest |
+| --- | --- |
+| [momonong/selfhost-models-api](https://hub.docker.com/r/momonong/selfhost-models-api) | `sha256:c8af47eaedc89d1b653b09d5de85dc9f0dedfa7d919bdaeb6e80e0b890e3793c` |
+| [momonong/selfhost-models-vllm](https://hub.docker.com/r/momonong/selfhost-models-vllm) | `sha256:25eea1d718346c7abeb5e9730a155360812b542045e7668e31f7a1daa5134fe3` |
+| [momonong/selfhost-models-transformers](https://hub.docker.com/r/momonong/selfhost-models-transformers) | `sha256:196a1a65d60c0db749a8cd5cbd5db0d937e13cb9214b1fc6d2e495dd31c1b7fd` |
+
+固定 digest 拉取，避免標籤日後變動：
+
+```bash
+docker pull momonong/selfhost-models-api@sha256:c8af47eaedc89d1b653b09d5de85dc9f0dedfa7d919bdaeb6e80e0b890e3793c
+docker pull momonong/selfhost-models-vllm@sha256:25eea1d718346c7abeb5e9730a155360812b542045e7668e31f7a1daa5134fe3
+# 只在使用 Transformers 時需要
+docker pull momonong/selfhost-models-transformers@sha256:196a1a65d60c0db749a8cd5cbd5db0d937e13cb9214b1fc6d2e495dd31c1b7fd
+```
+
+images 不包含模型權重、host driver、API key 或使用者 state。模型仍須由 host 登錄固定 revision、唯讀掛載。公開發布與可拉取不代表 Linux 實體桌機已驗收。
+
+### 已配置部署使用下載的 image
+
+`modelctl serve` 目前仍執行 `up --build`，沒有直接從 registry 部署的選項。首次配置仍依本機指南；若已有符合當前 host 的 `.state/compose.env`、模型、key 與 state，可在無請求時停止服務，建立 `.state/published-images.json`：
+
+```json
+{
+  "services": {
+    "api": {"image": "momonong/selfhost-models-api@sha256:c8af47eaedc89d1b653b09d5de85dc9f0dedfa7d919bdaeb6e80e0b890e3793c"},
+    "worker": {"image": "momonong/selfhost-models-vllm@sha256:25eea1d718346c7abeb5e9730a155360812b542045e7668e31f7a1daa5134fe3"}
+  }
+}
+```
+
+確認保存的 `BACKEND` 為 `vllm`，已拉取上述兩個 images 後：
+
+```bash
+uv run --locked modelctl stop
+docker compose --env-file .state/compose.env -f compose.yaml -f .state/published-images.json up -d --no-build --pull never
+uv run --locked python scripts/chat.py --wait 600 "Reply with READY."
+```
+
+Transformers 必須使用已配置為 `BACKEND=transformers`、`MAX_INFLIGHT=1` 的 state，將 JSON 的 worker 換成表中的 Transformers image digest，並在 `-f compose.yaml` 後加入 `-f compose.transformers.yaml`；不要只換 image 而沿用 vLLM 配置。一次啟動一個 backend。需要重建容器時保留相同 override；重新執行 `modelctl serve` 會回到本機建置流程。
+
+發布證據見 [docker-hub.json](../evidence/2026-09-16-local-use/docker-hub.json)。本次運行中的容器保留原 image，發布沒有重啟服務；上述 registry 部署命令尚未另行重建實測。
