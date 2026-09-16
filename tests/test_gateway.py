@@ -38,8 +38,11 @@ class FakeBackend:
         yield httpx.Response(200, headers={"x-worker-epoch": self.epoch}, json=data)
 
 
-@pytest.fixture
-def app(tmp_path):
+@pytest.fixture(params=["vllm", "transformers"])
+def app(tmp_path, monkeypatch, request):
+    monkeypatch.setenv("BACKEND", request.param)
+    monkeypatch.setenv("MODEL_PROFILE", "qwen3_5")
+    monkeypatch.setenv("MAX_INFLIGHT", "1")
     app = Gateway(FakeBackend(), key=KEY, state_file=tmp_path / "leases.json")
     app.model, app.epoch, app.ready = "org/model", "engine-one", True
     app.capacity = 1
@@ -112,3 +115,37 @@ def test_schema_rejects_unknown_nested_fields():
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
         Chat.model_validate({**PAYLOAD, "messages": [{"role": "user", "content": "x", "secret": "x"}]})
+
+
+async def test_receiving_handlers_are_bounded_before_admission(app):
+    receiving = []
+    async def blocked_receive():
+        await asyncio.Event().wait()
+    async def send(event):
+        pass
+    scope = {"type": "http", "method": "POST", "path": "/v1/chat/completions",
+             "headers": [(b"authorization", ("Bearer " + KEY).encode()), (b"content-type", b"application/json")]}
+    try:
+        for _ in range(32):
+            receiving.append(asyncio.create_task(app(scope, blocked_receive, send)))
+        await asyncio.sleep(0)
+        assert app.clients == 32 and not app.leases
+        response = await call(app)
+        assert response.status_code == 429 and response.json()["error"]["code"] == "too_many_clients"
+    finally:
+        for task in receiving:
+            task.cancel()
+        await asyncio.gather(*receiving, return_exceptions=True)
+    assert app.clients == 0
+
+
+async def test_backend_capabilities_advertised_and_rejected_without_dispatch(app):
+    response = await call(app, path="/v1/models", method="GET")
+    model = response.json()["data"][0]
+    assert model["backend"] == app.backend_name
+    assert model["capabilities"]["cancellation"] == "drain_to_terminal"
+    if app.backend_name == "transformers":
+        assert not model["capabilities"]["images"] and not model["capabilities"]["tools"]
+        for options in ({"stop": "END"}, {"presence_penalty": 1.0}, {"chat_template_kwargs": {"enable_thinking": True}}):
+            assert (await call(app, {**PAYLOAD, **options})).status_code == 400
+        assert not app.backend.entered.is_set()

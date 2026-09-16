@@ -12,7 +12,8 @@ async def test_warmup_covers_decode_batch_and_vision():
         calls.append(payload)
         assert payload["max_tokens"] >= 2 and payload["min_tokens"] >= 2
         assert payload["ignore_eos"] is True
-        return httpx.Response(200, headers={"x-worker-epoch": "epoch"}, json={"choices": [{}]})
+        return httpx.Response(200, headers={"x-worker-epoch": "epoch"}, json={
+            "choices": [{"finish_reason": "length"}], "usage": {"completion_tokens": 4}})
     backend = VLLMBackend("http://worker", 4, profile="qwen3_5", capacity=2)
     await backend.client.aclose()
     backend.client = httpx.AsyncClient(transport=httpx.MockTransport(handler), base_url="http://worker")

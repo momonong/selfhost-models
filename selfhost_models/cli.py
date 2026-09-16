@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from .assets import Assets, default_root
+from .capabilities import capabilities
 
 PROJECT = Path(__file__).resolve().parents[1]
 
@@ -35,18 +36,36 @@ def doctor():
     return 0 if all(v["ok"] for v in checks.values() if isinstance(v, dict)) else 1
 
 
-def compose(state, args):
+def compose_command(state):
     env_file = state / "compose.env"
     if not env_file.exists():
         raise ValueError("no deployment configured; run serve first")
-    return run(["docker", "compose", "--project-directory", str(PROJECT), "--env-file", str(env_file),
-                "-f", str(PROJECT / "compose.yaml"), *args])
+    settings = dict(line.split("=", 1) for line in env_file.read_text().splitlines() if line and not line.startswith("#"))
+    backend = settings.get("BACKEND", "vllm").strip("'\"")
+    if backend not in ("vllm", "transformers"):
+        raise ValueError("unsupported configured backend")
+    command = ["docker", "compose", "--project-directory", str(PROJECT), "--env-file", str(env_file),
+               "-f", str(PROJECT / "compose.yaml")]
+    if backend == "transformers":
+        command += ["-f", str(PROJECT / "compose.transformers.yaml")]
+    return command
+
+
+def compose(state, args):
+    return run([*compose_command(state), *args])
 
 
 def serve(assets, args):
     record = assets.inspect(args.repo)
     model_type = json.loads((Path(record["path"]) / "config.json").read_text())["model_type"]
     profile = model_type if model_type in ("qwen3_5", "gemma4") else "text"
+    caps = capabilities(args.backend, profile)
+    if args.max_inflight is None:
+        args.max_inflight = 1 if args.backend == "transformers" else 2
+    if args.max_inflight > caps["max_inflight_limit"]:
+        raise ValueError("capacity exceeds backend limit")
+    if args.backend == "transformers" and not 128 <= args.context <= 2048:
+        raise ValueError("Transformers validated context range is 128..2048")
     if not 1 <= args.port <= 65535 or not 0.1 <= args.gpu_memory <= 0.9:
         raise ValueError("invalid port / GPU memory fraction")
     with socket.socket() as s:
@@ -68,7 +87,7 @@ def serve(assets, args):
     if os.name != "nt":
         runtime_state.chmod(0o700)
     values = {"MODEL_ID": record["repo_id"], "MODEL_REVISION": record["revision"],
-              "MODEL_PROFILE": profile,
+              "MODEL_PROFILE": profile, "BACKEND": args.backend,
               "API_UID": str(os.getuid() if os.name != "nt" else 10001),
               "API_GID": str(os.getgid() if os.name != "nt" else 10001),
               "API_STATE_PATH": runtime_state.resolve().as_posix(),
@@ -102,9 +121,10 @@ def main():
             s.add_argument("--path", type=Path, required=True)
             s.add_argument("--revision")
         elif command == "serve":
+            s.add_argument("--backend", choices=("vllm", "transformers"), default="vllm")
             s.add_argument("--port", type=int, default=18080)
             s.add_argument("--gpu-memory", type=float, default=0.60)
-            s.add_argument("--max-inflight", type=int, default=2)
+            s.add_argument("--max-inflight", type=int)
             s.add_argument("--context", type=int, default=2048)
             s.add_argument("--deadline", type=float, default=30)
             s.add_argument("--drain", type=float, default=120)

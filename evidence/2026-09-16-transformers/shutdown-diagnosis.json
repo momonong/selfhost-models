@@ -1,0 +1,16 @@
+{
+  "level": "real-container-shutdown-diagnosis",
+  "failed_image": "sha256:24aef3902b344c4ac583ad1ff58209ba1a8fc818d1b6d25f9a6726148c5efe44",
+  "exit_code": 137,
+  "oom_killed": false,
+  "observed_stop_timeout_seconds": 1,
+  "docker_events": "SIGTERM at 05:21:30.723 UTC; SIGKILL at 05:21:31.738 UTC; die exitCode=137.",
+  "application_log": "Application shutdown complete; Finished server process [1].",
+  "fix_commit": "8b11685",
+  "fix": "Explicit Transformers stop_grace_period: 30s; stopped both services with exit 0 after readiness and inference recheck.",
+  "successful_cleanup_evidence": "evidence/2026-09-16-transformers/after.json",
+  "raw_sha256": {
+    "evidence/raw/transformers-initial/stop-137-events.jsonl": "f94413b1fa1294f42000642bf0469a58463ff100907a10c1cc9a33208b056bd5",
+    "evidence/raw/transformers-initial/stop-137-inspect.json": "58f8cc708e59d6fcb9677c8ab4428ad45f46d624e630d87acbfbe2f2b2a30eec"
+  }
+}

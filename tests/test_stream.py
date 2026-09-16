@@ -3,8 +3,16 @@ import contextlib
 import json
 
 import httpx
+import pytest
 
 from selfhost_models.api import Gateway, Job
+
+
+@pytest.fixture(autouse=True, params=["vllm", "transformers"])
+def backend_settings(monkeypatch, request):
+    monkeypatch.setenv("BACKEND", request.param)
+    monkeypatch.setenv("MODEL_PROFILE", "qwen3_5")
+    monkeypatch.setenv("MAX_INFLIGHT", "1")
 
 
 class Chunks(httpx.AsyncByteStream):

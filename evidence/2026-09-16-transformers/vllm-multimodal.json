@@ -1,0 +1,43 @@
+{
+  "at": "2026-09-16T05:32:01.012374+00:00",
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "object": "model",
+    "created": 0,
+    "owned_by": "selfhost",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "backend": "vllm",
+    "capabilities": {
+      "text": true,
+      "stream": true,
+      "images": true,
+      "tools": true,
+      "thinking": true,
+      "cancellation": "drain_to_terminal",
+      "queue_capacity": 0,
+      "max_inflight_limit": 16,
+      "unsupported_parameters": []
+    },
+    "max_inflight": 2
+  },
+  "synthetic_image": {
+    "size": [
+      224,
+      224
+    ],
+    "expected": "red",
+    "actual": " Red",
+    "request_id": "1a30a92762364eb499528ed7a34c62dc"
+  },
+  "tool_call": {
+    "name": "lookup_synthetic_code",
+    "arguments_valid": true,
+    "request_id": "c8d063feb4014ebca4d68340ee387257"
+  },
+  "tool_result_roundtrip": {
+    "expected": "731",
+    "actual": "The returned code is 731.",
+    "request_id": "96e722a617ea4e82abda5825a9424012"
+  },
+  "claim": "synthetic smoke only; not an agentic quality benchmark"
+}

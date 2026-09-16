@@ -6,7 +6,7 @@
 
 - `GET /health/live`：API process 存活。
 - `GET /health/ready`：200 表示目前 worker 已成功暖機；否則 503。含 inflight、detached、uncertain 計數與 worker epoch。
-- `GET /v1/models`：Bearer 驗證；只列目前指定且 ready 的模型及固定 revision。
+- `GET /v1/models`：Bearer 驗證；列目前 ready 的模型、固定 revision、backend、capabilities 與 max_inflight。能力依實際部署宣告。
 - `POST /v1/chat/completions`：Bearer + application/json，一般 JSON 或 SSE。
 
 每次產生新的 `X-Request-ID`，回 `X-Service-Version`；不採信 client 自訂 ID。可提供 `X-Request-Timeout-Ms` 正整數縮短 deadline（1ms 至部署上限），不得延長。
@@ -18,7 +18,7 @@
 | model | 精確 HF repo ID；需與目前部署相同 |
 | messages | 1–64 則，system/user/assistant/tool；純文字每則至多 32,768 字元 |
 | stream | boolean，預設 false |
-| max_tokens | 整數 1–1024，預設 128；總 token context 另外由 vLLM 模型設定檢查 |
+| max_tokens | 整數 1–1024，預設 128；總 token context 另外由選定 backend 檢查 |
 | temperature | 0–2，預設 1 |
 | top_p | (0,1]，預設 1 |
 | seed | 可選 0–2^32-1；不保證跨 GPU/runtime 完全一致 |
@@ -32,6 +32,8 @@
 尚不支援 n、logprobs、logit_bias、response_format、JSON schema constrained decoding、parallel_tool_calls 開關、audio/video、embedding、Responses API、LoRA、自動選模。工具參數 schema 會傳給模型 template 作描述，不提供 strict schema 執行保證；客戶端必須驗證輸出的工具名稱／JSON 及自身權限。
 
 ## 模態與工具
+
+下列多模態／工具 profile 屬 vLLM。Transformers 的 `qwen3_5` 目前只支援文字、一般／SSE 與 usage，單請求、queue 0，thinking 固定 false。不支援的圖片、tools/tool history、thinking=true、stop、非零 presence/frequency penalties 於 dispatch 前回 400；零 penalties 與顯式 thinking=false 可接受。`temperature=0` 時 `top_p` 必須為 1；非零 temperature 使用 top_p 取樣且不套用隱藏的 top_k 預設。seed 不保證跨 runtime/GPU 一致。
 
 - text profile：文字 chat。
 - qwen3_5 profile：文字、單張圖片、function calling；qwen3 reasoning parser + qwen3_coder tool parser。

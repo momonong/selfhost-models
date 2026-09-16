@@ -1,0 +1,98 @@
+{
+  "at": "2026-09-16T05:20:54.688711+00:00",
+  "level": "real-GPU-synthetic-inputs",
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "object": "model",
+    "created": 0,
+    "owned_by": "selfhost",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "backend": "transformers",
+    "capabilities": {
+      "text": true,
+      "stream": true,
+      "images": false,
+      "tools": false,
+      "thinking": false,
+      "cancellation": "drain_to_terminal",
+      "queue_capacity": 0,
+      "max_inflight_limit": 1,
+      "unsupported_parameters": [
+        "stop",
+        "presence_penalty",
+        "frequency_penalty"
+      ]
+    },
+    "max_inflight": 1
+  },
+  "results": [
+    {
+      "check": "synthetic_arithmetic",
+      "answer": "4\n",
+      "usage": {
+        "prompt_tokens": 26,
+        "completion_tokens": 4,
+        "total_tokens": 30
+      }
+    },
+    {
+      "check": "greedy_json_sse_content_matches",
+      "done": true,
+      "usage": {
+        "prompt_tokens": 26,
+        "completion_tokens": 4,
+        "total_tokens": 30
+      }
+    },
+    {
+      "check": "sampling_text_parts_seed_repeat_same_runtime",
+      "outputs": [
+        "Apple\n",
+        "Apple\n"
+      ]
+    },
+    {
+      "check": "reject_stop",
+      "status": 400,
+      "code": "unsupported_backend_parameter"
+    },
+    {
+      "check": "reject_presence_penalty",
+      "status": 400,
+      "code": "unsupported_backend_parameter"
+    },
+    {
+      "check": "reject_frequency_penalty",
+      "status": 400,
+      "code": "unsupported_backend_parameter"
+    },
+    {
+      "check": "reject_thinking",
+      "status": 400,
+      "code": "unsupported_model_capability"
+    },
+    {
+      "check": "reject_top_p_with_greedy",
+      "status": 400,
+      "code": "top_p_requires_sampling"
+    },
+    {
+      "check": "reject_image",
+      "status": 400,
+      "code": "unsupported_model_capability"
+    },
+    {
+      "check": "reject_tools",
+      "status": 400,
+      "code": "unsupported_model_capability"
+    }
+  ],
+  "final_health": {
+    "ready": true,
+    "version": "0.1.0",
+    "worker_epoch": "982407570b0e4448a6a419b83a506412",
+    "inflight": 0,
+    "detached": 0,
+    "uncertain": 0
+  }
+}

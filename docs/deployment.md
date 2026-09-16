@@ -69,6 +69,28 @@ uv run --locked modelctl serve Qwen/Qwen3.5-4B --gpu-memory 0.60 --context 2048 
 uv run --locked modelctl status
 ```
 
+明確選擇 Transformers（先停止既有部署，不同時載入兩種 backend）：
+
+```bash
+uv run --locked modelctl stop
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend transformers --max-inflight 1 --context 2048 --gpu-memory 0.60
+uv run --locked modelctl status
+```
+
+`--backend` 預設 vllm，寫入 `.state/compose.env` 的 `BACKEND`。Transformers 容量省略時為 1，指定 >1 拒絕；vLLM 省略時維持 2。modelctl 及驗收腳本透過 `compose_command(state)` 根據保存的 BACKEND 選擇 Compose 檔案；Transformers 追加 `compose.transformers.yaml`，取代 worker image/command。手動操作必須帶兩個 `-f`，不能只使用基底設定：
+
+```bash
+docker compose --env-file .state/compose.env -f compose.yaml -f compose.transformers.yaml logs --tail 80 worker
+```
+
+Transformers 獨立使用 `worker/transformers/pyproject.toml` + `uv.lock`，不是 API 的第二份 requirements 鎖檔。官方 `pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime` 固定 digest `sha256:db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407`，提供 Python 3.12.3、PyTorch 2.13.0+cu130、CUDA 13.0 及 torchvision 配套。image 建置用 uv 0.12.15 建立繼承 system-site-packages 的獨立 venv，再 `uv sync --locked --no-dev` 安裝固定 Transformers 5.16.1 與 HTTP 依賴；不重裝基底 torch，也不變更 vLLM 套件組合。建置及 engine 初始化均檢查 runtime 版本。
+
+若修改 worker Python 依賴，使用 `uv lock --project worker/transformers` 更新其 uv.lock。這個專案的 Python 限 3.12，CUDA/PyTorch 由固定 image 提供，host 不需安裝 GPU Python 套件。worker 以 UID 10001、唯讀 filesystem 運行，`/tmp` 保存 HF 暫存；獨立 1 GiB `/runtime-cache` tmpfs 明確允許 exec，供官方 PyTorch/Triton 的 native kernel 編譯與載入。TRITON_CACHE_DIR、TORCHINDUCTOR_CACHE_DIR、CUDA_CACHE_PATH、TMPDIR 指向該區，停止後暫存釋放，模型仍唯讀。啟動不執行 uv sync；模型必須已由 modelctl register/inspect 確認，不改動既有檔案。
+
+架構支援依 [Transformers Qwen3.5 官方文件](https://huggingface.co/docs/transformers/main/model_doc/qwen3_5)，並已在固定 image 離線匯入對應類別核對；runtime 基底依 [官方 PyTorch image](https://hub.docker.com/layers/pytorch/pytorch/2.13.0-cuda13.0-cudnn9-runtime/images/sha256-db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407)。支援架構不等於任意 checkpoint 都已實測，實際範圍見驗收文件。
+
+Transformers 明確設定 `stop_grace_period: 30s`，留時間給 PyTorch/CUDA process 正常退出。本機未指定時的容器 StopTimeout 曾實際為 1 秒，uvicorn 已完成 lifespan shutdown，Docker 仍於 1 秒後送 SIGKILL，得到 137（非 OOM）；因此不依賴 host 隱含預設。若停止時仍有長時間工作，30 秒後仍可能強制停止，未決 lease 保留到新 epoch＋warmup 恢復；正常收尾先確認 inflight=0。
+
 一般啟動不連 HF；worker HF_HUB_OFFLINE／TRANSFORMERS_OFFLINE，模型唯讀掛在 `/models/current`。管理工具依 config.model_type 選已知 profile；不自動嘗試不同 engine。
 
 API 預設 `http://127.0.0.1:18080`，先輪詢 `/health/ready`。第一次建立 `.state/api-key`，client 從檔案讀 Bearer token；不將 token 貼入聊天、Git 或日誌。Linux key file mode 600，Windows 使用所在目錄既有 ACL；依需要自行收緊使用者權限。

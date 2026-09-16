@@ -8,13 +8,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
+from selfhost_models.cli import compose_command
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 async def main(output):
     state = ROOT / ".state"
-    compose = ["docker", "compose", "--env-file", str(state / "compose.env"), "-f", str(ROOT / "compose.yaml")]
+    compose = compose_command(state)
     worker = subprocess.check_output([*compose, "ps", "-q", "worker"], text=True).strip()
     info = json.loads(subprocess.check_output(["docker", "inspect", worker], text=True))[0]
     assert info["Config"]["Labels"]["com.docker.compose.project"] == "selfhost-models"
@@ -46,17 +47,22 @@ async def main(output):
                     async for line in response.aiter_lines():
                         if not line.startswith("data:"):
                             continue
-                        if not paused:
+                        data = line[5:].strip()
+                        chunk = None if data == "[DONE]" else json.loads(data)
+                        generated_text = chunk is not None and any(
+                            c.get("delta", {}).get("content") for c in chunk.get("choices", []))
+                        # A role/header-only event does not prove GPU decode began.
+                        if not paused and generated_text:
                             subprocess.run(["docker", "pause", worker], check=True, stdout=subprocess.DEVNULL)
                             paused = True
                             if mode == "disconnect":
                                 break
-                        data = line[5:].strip()
                         if data == "[DONE]":
                             saw_done = True
                         elif "error" in json.loads(data):
                             assert json.loads(data)["error"]["code"] == "deadline_exceeded"
                             saw_error = True
+                assert paused, "no generated content received before stream ended"
                 h = await wait_health(lambda h: h["detached"] > 0 and h["inflight"] > 0)
                 if mode == "deadline":
                     assert saw_error and not saw_done

@@ -217,5 +217,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 .state/
+.worktrees/
 .venv*/
 evidence/raw/

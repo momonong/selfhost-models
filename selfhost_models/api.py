@@ -13,7 +13,8 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from . import __version__
-from .backend import VLLMBackend
+from .backend import create_backend
+from .capabilities import capabilities, validate_capabilities
 from .schema import Chat
 from .storage import atomic_json
 
@@ -51,8 +52,12 @@ class Gateway:
         self.state_file = Path(state_file or os.getenv("STATE_FILE", ".state/leases.json"))
         self.model = os.getenv("MODEL_ID", "unconfigured/model")
         self.profile = os.getenv("MODEL_PROFILE", "text")
+        self.backend_name = os.getenv("BACKEND", "vllm")
+        self.capabilities = capabilities(self.backend_name, self.profile)
         self.revision = os.getenv("MODEL_REVISION", "unknown")
         self.capacity = int(os.getenv("MAX_INFLIGHT", "2"))
+        if self.capacity > self.capabilities["max_inflight_limit"]:
+            raise ValueError("capacity exceeds backend limit")
         self.deadline = float(os.getenv("DEADLINE_SECONDS", "30"))
         self.drain = float(os.getenv("DRAIN_SECONDS", "120"))
         self.max_body = int(os.getenv("MAX_BODY_BYTES", "2097152"))
@@ -77,7 +82,7 @@ class Gateway:
         if self.state_file.exists():
             self.leases = json.loads(self.state_file.read_text())["leases"]
         if self.backend is None:
-            self.backend = VLLMBackend(os.getenv("WORKER_URL", "http://worker:8000"), self.capacity + 2,
+            self.backend = create_backend(self.backend_name, os.getenv("WORKER_URL", "http://worker:8000"), self.capacity + 2,
                                        profile=self.profile, capacity=self.capacity)
         self.monitor = asyncio.create_task(self.watch())
 
@@ -257,13 +262,10 @@ class Gateway:
             raise Failure(400, "invalid_request") from None
         if payload["model"] != self.model:
             raise Failure(404, "model_not_served")
-        has_images = any(isinstance(m.get("content"), list) and any(p["type"] == "image_url" for p in m["content"])
-                         for m in payload["messages"])
-        has_tools = payload.get("tools") or any(m.get("tool_calls") or m["role"] == "tool" for m in payload["messages"])
-        if self.profile not in ("qwen3_5", "gemma4") and (has_images or has_tools or "chat_template_kwargs" in payload):
-            raise Failure(400, "unsupported_model_capability")
-        if self.profile == "gemma4" and "chat_template_kwargs" in payload:
-            raise Failure(400, "unsupported_model_capability")
+        try:
+            validate_capabilities(payload, self.backend_name, self.profile)
+        except ValueError as exc:
+            raise Failure(400, str(exc)) from None
         if self.profile == "qwen3_5":
             payload.setdefault("chat_template_kwargs", {"enable_thinking": False})
         if not self.ready:
@@ -340,7 +342,8 @@ class Gateway:
                         raise Failure(503, "worker_not_ready")
                     await self.json_response(send, 200, {"object": "list", "data": [{
                         "id": self.model, "object": "model", "created": 0, "owned_by": "selfhost",
-                        "revision": self.revision}]}, rid)
+                        "revision": self.revision, "backend": self.backend_name,
+                        "capabilities": self.capabilities, "max_inflight": self.capacity}]}, rid)
                 elif path == "/v1/chat/completions" and method == "POST":
                     await self.chat(receive, send, headers, rid, started)
                 else:

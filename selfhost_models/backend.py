@@ -34,7 +34,10 @@ class VLLMBackend:
         async def generate(body):
             r = await self.client.post("/v1/chat/completions", json=body, timeout=180)
             r.raise_for_status()
-            if r.headers.get("x-worker-epoch") != epoch or not r.json().get("choices"):
+            result = r.json()
+            if (r.headers.get("x-worker-epoch") != epoch or not result.get("choices") or
+                    any(c.get("finish_reason") is None for c in result["choices"]) or
+                    result.get("usage", {}).get("completion_tokens", 0) < 4):
                 raise RuntimeError("warmup identity or result mismatch")
 
         # Startup budget is separate from client deadline. Every warmup remains
@@ -59,3 +62,26 @@ class VLLMBackend:
 
     async def close(self):
         await self.client.aclose()
+
+
+class TransformersBackend(VLLMBackend):
+    """Same transport/terminal contract, with a text-only fixed-length warmup."""
+
+    async def warmup(self, model: str, epoch: str):
+        async with asyncio.timeout(180):
+            response = await self.client.post("/internal/warmup", json={"model": model}, timeout=180)
+            response.raise_for_status()
+            result = response.json()
+            if (response.headers.get("x-worker-epoch") != epoch or
+                    not result.get("choices") or
+                    any(c.get("finish_reason") is None for c in result["choices"]) or
+                    result.get("usage", {}).get("completion_tokens", 0) < 4):
+                raise RuntimeError("warmup identity or terminal result mismatch")
+
+
+def create_backend(name, *args, **kwargs):
+    if name == "vllm":
+        return VLLMBackend(*args, **kwargs)
+    if name == "transformers":
+        return TransformersBackend(*args, **kwargs)
+    raise ValueError("unsupported backend")

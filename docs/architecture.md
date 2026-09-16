@@ -4,15 +4,16 @@
 
 產品負責領域 prompt、產品規則、工具執行、人工校正與成效驗證。此 repo 負責固定模型資產、共用推論 API、Docker 部署與服務生命週期。
 
-`client → loopback API:18080 → internal worker:8000 → vLLM → GPU`
+`client → loopback API:18080 → internal worker:8000 → 明確選定的 vLLM 或 Transformers → GPU`
 
-統一 CPU API image；worker 基於固定官方 vLLM image。未來 Transformers 是另一個 image／backend，不把兩套 runtime 混裝。沒有 Kubernetes、Docker socket、自動換模或失敗 fallback。Windows driver 在 Windows host，透過 Docker Desktop WSL2 執行 Linux container；Linux 使用 Engine + NVIDIA Container Toolkit。
+統一 CPU API image；vLLM worker 基於固定官方 vLLM image，Transformers worker 基於固定官方 PyTorch image，兩套 runtime 分開建置。沒有 Kubernetes、Docker socket、自動換模或失敗 fallback。Windows driver 在 Windows host，透過 Docker Desktop WSL2 執行 Linux container；Linux 使用 Engine + NVIDIA Container Toolkit。
 
 ## 容量、deadline 與完成確認
 
-- 一個 uvicorn process、一個 vLLM frontend／engine、一個指定模型。
+- 一個 API uvicorn process、一個 worker frontend／engine、一個指定模型。Transformers worker 使用同 process 的受控 GPU thread，禁止多 worker process。
 - API 最多 32 個已授權 HTTP handler；body 最多 2 MiB、讀取最多 10 秒。推論預設最多 2 個 lease，等待佇列長度 **0**；超出立即 429 + Retry-After。
 - vLLM 的 max-num-seqs 與 admission 上限一致。vLLM 自行管理 batching、KV cache；API 不實作 GPU scheduler。
+- Transformers admission 與 worker 執行容量固定 1、queue 0；不做 batching。GPU memory fraction 限制 PyTorch allocator 上限，並不預先保留該比例的 VRAM；權重／allocator cache 常駐到 worker 停止。
 - lease 釋放表示該請求已終止、可接收下一個請求，不表示模型權重或整個 KV 記憶體池已還給作業系統。服務常駐時 vLLM 仍保留配置的 VRAM；需要讓其他工作使用這些 VRAM 時，由管理命令停止 worker。
 - deadline 預設 30 秒，涵蓋 body 接收、worker 執行、下游寫出。有限 body/輸出/token 上限避免無界累积。
 - 一般回應完整且含 finish_reason，或 SSE 收到 `[DONE]` 才算協定層的終止確認。400/404/422 的 worker 驗證拒絕也可釋放 lease。5xx、傳輸中斷、格式錯誤都視為不確定。

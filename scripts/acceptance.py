@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
+from selfhost_models.cli import compose_command
 
 PROJECT = Path(__file__).resolve().parents[1]
 
@@ -24,8 +25,7 @@ async def main(args):
         print(json.dumps(row), flush=True)
 
     def compose(*parts):
-        return subprocess.check_output(["docker", "compose", "--project-directory", str(PROJECT),
-            "--env-file", str(state / "compose.env"), "-f", str(PROJECT / "compose.yaml"), *parts], text=True).strip()
+        return subprocess.check_output([*compose_command(state), *parts], text=True).strip()
 
     async with httpx.AsyncClient(base_url=args.url, headers={"Authorization": "Bearer " + key},
                                 timeout=65, trust_env=False) as client:

@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-09-16T05:19:29.852381+00:00",
+  "level": "failed-real-GPU-warmup-diagnosis",
+  "source_commit": "6db8fdf",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "failure": "OSError: [Errno 30] Read-only file system: /home/service/.triton",
+  "cause": "Official PyTorch native bmm_outer_product dispatch invokes Triton, which needs a writable executable kernel cache.",
+  "observed_behavior": "Model loaded on GPU; warmup returned 500, worker health became 503, API stayed not ready and retained durable warmup lease. No unknown generation was retried in the same epoch.",
+  "fix": "Dedicated bounded /runtime-cache tmpfs with explicit exec; TRITON_CACHE_DIR/TORCHINDUCTOR_CACHE_DIR/CUDA_CACHE_PATH/TMPDIR configured. No CUDA/PyTorch/Transformers replacement.",
+  "raw_sha256": {
+    "evidence/raw/transformers-initial/leases.json": "ef60e74640fbbed3de7fd743808a1209f6942e6cf8807e9a50fc63808293e428",
+    "evidence/raw/transformers-initial/warmup-trace.log": "da17d95f5e00462bc86215920c72fcc50da79122955f7dde26ef561ae0acedcd",
+    "evidence/raw/transformers-initial/worker.log": "399f804c8fd900069c8fbd347a854b0e0274fd9c9834322ce6364880a7c187fb"
+  }
+}
