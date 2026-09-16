@@ -1,0 +1,94 @@
+name: selfhost-models
+services:
+  api:
+    image: selfhost-models-api:0.1.0
+    user: "${API_UID:-10001}:${API_GID:-10001}"
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    ports:
+      - "127.0.0.1:${API_PORT:-18080}:8000"
+    environment:
+      MODEL_ID: ${MODEL_ID:?Use modelctl serve}
+      MODEL_REVISION: ${MODEL_REVISION:?Use modelctl serve}
+      MODEL_PROFILE: ${MODEL_PROFILE:-text}
+      WORKER_URL: http://worker:8000
+      API_KEY_FILE: /run/secrets/api_key
+      STATE_FILE: /state/leases.json
+      MAX_INFLIGHT: ${MAX_INFLIGHT:-2}
+      DEADLINE_SECONDS: ${DEADLINE_SECONDS:-30}
+      DRAIN_SECONDS: ${DRAIN_SECONDS:-120}
+    secrets: [api_key]
+    volumes:
+      - type: bind
+        source: ${API_STATE_PATH:?Use modelctl serve}
+        target: /state
+        bind:
+          create_host_path: false
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [ingress, inference]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5m
+  worker:
+    image: selfhost-models-vllm:0.29.0
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+    environment:
+      MODEL_PROFILE: ${MODEL_PROFILE:-text}
+      # V2 runner requires UVA unavailable on the validated WSL2 host.
+      VLLM_USE_V2_MODEL_RUNNER: ${VLLM_USE_V2_MODEL_RUNNER:-0}
+    command:
+      - /models/current
+      - --served-model-name
+      - ${MODEL_ID:?Use modelctl serve}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --dtype
+      - bfloat16
+      - --max-model-len
+      - ${MAX_MODEL_LEN:-2048}
+      - --max-num-seqs
+      - ${MAX_INFLIGHT:-2}
+      - --gpu-memory-utilization
+      - ${GPU_MEMORY_UTILIZATION:-0.60}
+      - --enforce-eager
+      - --generation-config
+      - vllm
+      - --no-enable-log-requests
+      - --disable-uvicorn-access-log
+      - --middleware
+      - identity.WorkerIdentity
+    volumes:
+      - type: bind
+        source: ${MODEL_PATH:?Use modelctl serve}
+        target: /models/current
+        read_only: true
+        bind:
+          create_host_path: false
+    shm_size: 2gb
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["${GPU_DEVICE:-0}"]
+              capabilities: [gpu]
+    networks: [inference]
+    security_opt: [no-new-privileges:true]
+secrets:
+  api_key:
+    file: ${API_KEY_PATH:?Use modelctl serve}
+networks:
+  ingress:
+  inference:
+    internal: true

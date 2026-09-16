@@ -1,0 +1,116 @@
+{
+  "at": "2026-09-15T09:35:58.481079+00:00",
+  "host": "Windows-10-10.0.26200-SP0",
+  "git_head": "44270bbdbff42b9cbdc42c64608328f14f9dd2b2",
+  "containers": {
+    "api": {
+      "image": "selfhost-models-api:0.1.0",
+      "image_id": "sha256:02af3b5f740025874268458c14eaec60ea106c6a388c40c6c306e81a6965a47c",
+      "started_at": "2026-09-15T09:27:48.668865986Z",
+      "running": true,
+      "paused": false,
+      "ports": {
+        "8000/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "18080"
+          }
+        ]
+      },
+      "networks": [
+        "selfhost-models_inference",
+        "selfhost-models_ingress"
+      ],
+      "mounts": [
+        {
+          "destination": "/run/secrets/api_key",
+          "writable": false
+        },
+        {
+          "destination": "/state",
+          "writable": true
+        }
+      ]
+    },
+    "worker": {
+      "image": "selfhost-models-vllm:0.29.0",
+      "image_id": "sha256:bb98919dd317a8ffcada146589719c182f252212f4112bd32f7cfcfe9fe43f56",
+      "started_at": "2026-09-15T09:27:50.846083283Z",
+      "running": true,
+      "paused": false,
+      "ports": {},
+      "networks": [
+        "selfhost-models_inference"
+      ],
+      "mounts": [
+        {
+          "destination": "/models/current",
+          "writable": false
+        }
+      ]
+    }
+  },
+  "git_status": "M README.md\n M compose.yaml\n M docs/acceptance.md\n M docs/api.md\n M docs/architecture.md\n M docs/backend.md\n M docs/deployment.md\n M docs/model-selection.md\n M scripts/acceptance.py\n M selfhost_models/api.py\n M selfhost_models/backend.py\n M tests/test_deployment.py\n?? evidence/acceptance.json\n?? evidence/multimodal.json\n?? evidence/runtime.json\n?? evidence/stream-lifecycle.json\n?? scripts/capture_runtime.py\n?? scripts/stream_lifecycle_check.py\n?? tests/test_warmup.py",
+  "source_sha256": {
+    "compose.yaml": "78391a04ed31becde63929a0c64d10040aa6639ff79d0e66bb5bf43f543e4033",
+    "docker/api.Dockerfile": "df1afeedbbe53271c0d32a834b5d6bb85af29c7b67cca927bcc6686d22045f9b",
+    "docker/worker.Dockerfile": "337b40b41aca070c976998d9e58a68c8ff63a47ba0506fa2f235067855f904bc",
+    "pyproject.toml": "affd97d39adf137e411424e28f5e04de4e2ab95ac3fe7dff5f788ff2c1fa507c",
+    "requirements.lock": "bcce983ac54350f977e58786e425d9ffbdf6de129034e94fb3a4a9c92ba653f9",
+    "scripts/acceptance.py": "856ff4ce77c071ae2b8dec1bbcdbe9661c1cfa9f75b4e9a31f9082d07c91ff05",
+    "scripts/api_container_check.py": "61b6545a1d7855d9d03d16f44d08a839fd124ccac5404c5cb9aaed3db02e1572",
+    "scripts/capture_runtime.py": "b61a4f738647a0285b252656801d07237107577f29e09b46eec1d57f583f97db",
+    "scripts/multimodal_smoke.py": "6269ce7e6cd760604ce07c466193e6cf518a15480f53a86040d832c5e5045953",
+    "scripts/stream_lifecycle_check.py": "6b576a2ec1f60b1052a0e314e5d74f2e83a4aaac95849a0330f967a2daf4cbcc",
+    "selfhost_models/__init__.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+    "selfhost_models/api.py": "e2b340b605d181530bb192aba7c77616372099ae3a20cfd1ccadd13daaa52ee5",
+    "selfhost_models/assets.py": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+    "selfhost_models/backend.py": "34290ef76401ee726e2e09f031f7daf72d247aad1b23ab7cacb61a3ceded0cd9",
+    "selfhost_models/cli.py": "24af4b2c6c3e338e6906b3aa76c2a467331e226030cdf72fc1b878863398a3c3",
+    "selfhost_models/schema.py": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a",
+    "selfhost_models/storage.py": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+    "tests/test_assets.py": "4b95193e217047adcb110ab9f81931aa3795a0b4d352c5a34f005013050392d8",
+    "tests/test_capabilities.py": "4342f0845e2677ef2749ef35b00ca3eaffac6a55d418886f4c4bacceeefd3182",
+    "tests/test_deployment.py": "396d151f152da0f3a8e38a20262de5fa8e4bca1f8a49785e575910679c2b691a",
+    "tests/test_gateway.py": "c0a0af5873180bd9799b05445634e71143882daa57686a6cf3b1d48036e90333",
+    "tests/test_stream.py": "cc8f94bb8a8350242d8d82d35325eb8c8cb8c32a1a82dd25ab6cdedd18f1b1ed",
+    "tests/test_warmup.py": "3a0a5370089dec5397d957edd2f23b9adc560c79570305321bbd5323037ad7ae",
+    "worker/identity.py": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470",
+    "worker/launch.py": "b41fd16034d7a826297ce2db553a8c2a2301c3530b2eac39316a9383fa88c849"
+  },
+  "runtime": {
+    "vllm": "0.29.0",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "transformers": "5.16.1",
+    "runner_v2": "0"
+  },
+  "gpu": "name, driver_version, memory.total [MiB], memory.used [MiB], memory.free [MiB]\nNVIDIA GeForce RTX 5090 Laptop GPU, 581.57, 24463 MiB, 18805 MiB, 5247 MiB",
+  "health": {
+    "ready": true,
+    "version": "0.1.0",
+    "worker_epoch": "8fc9a6678ec548bab9387b7f6f841732",
+    "inflight": 0,
+    "detached": 0,
+    "uncertain": 0
+  },
+  "models": {
+    "object": "list",
+    "data": [
+      {
+        "id": "Qwen/Qwen3.5-4B",
+        "object": "model",
+        "created": 0,
+        "owned_by": "selfhost",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+      }
+    ]
+  },
+  "settings": {
+    "GPU_MEMORY_UTILIZATION": "0.6",
+    "MAX_INFLIGHT": "2",
+    "MAX_MODEL_LEN": "2048",
+    "DEADLINE_SECONDS": "30",
+    "DRAIN_SECONDS": "120"
+  }
+}

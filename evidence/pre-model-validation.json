@@ -1,0 +1,51 @@
+{
+  "date": "2026-09-15",
+  "status": "awaiting_model_selection",
+  "platform": "Windows / Docker Desktop WSL2 Linux containers",
+  "gpu": "NVIDIA GeForce RTX 5090 Laptop GPU",
+  "driver": "581.57",
+  "vram_mib": 24463,
+  "idle_observed_mib_range": [2994, 3084],
+  "unrelated_services_stopped": [],
+  "base_commit": "58a534f10523c21e5ec2263e5c95a94740c8c515",
+  "branch": "feat/model-serving",
+  "contract_tests": {"command": "python -m pytest -q", "passed": 26},
+  "api_container": {
+    "command": "python scripts/api_container_check.py",
+    "result": "passed",
+    "worker_missing_status": 503,
+    "unauthenticated_status": 401,
+    "persistent_fsync": true,
+    "model_loaded": false,
+    "test_containers_removed": true
+  },
+  "runtime_cuda_probe": {
+    "official_image": "vllm/vllm-openai:v0.29.0",
+    "digest": "sha256:c2914767605584b6d8f45686b82de173ecc99e781897aa3d0a66dacd72c51ae1",
+    "vllm": "0.29.0",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "transformers": "5.16.1",
+    "compute_capability": [12, 0],
+    "operation": "torch.ones(8, device='cuda').sum().item()",
+    "result": 8.0,
+    "model_inference": false
+  },
+  "candidate_registered_read_only": {
+    "repo_id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "path": "D:/hf_models/Qwen3.5-4B",
+    "required_files_checked": 11,
+    "bytes": 9342816694,
+    "weights_modified": false,
+    "model_selected": false
+  },
+  "not_yet_verified": [
+    "real model loading and warmup",
+    "real GPU non-stream and SSE inference",
+    "GPU overload, timeout, disconnect, restart recovery",
+    "synthetic visual and tool-call roundtrip",
+    "Linux physical host deployment",
+    "live Hugging Face fetch download"
+  ]
+}

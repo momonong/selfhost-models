@@ -1,0 +1,30 @@
+{
+  "at": "2026-09-15T09:30:25.489467+00:00",
+  "model": {
+    "id": "Qwen/Qwen3.5-4B",
+    "object": "model",
+    "created": 0,
+    "owned_by": "selfhost",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+  },
+  "synthetic_image": {
+    "size": [
+      224,
+      224
+    ],
+    "expected": "red",
+    "actual": " Red",
+    "request_id": "30ca77e1f6e3465e95d45ecda50318dd"
+  },
+  "tool_call": {
+    "name": "lookup_synthetic_code",
+    "arguments_valid": true,
+    "request_id": "26862f37139a43db90117acaba6975b5"
+  },
+  "tool_result_roundtrip": {
+    "expected": "731",
+    "actual": "The returned code is 731.",
+    "request_id": "dcc1094942c84b0ebd0dc0a142019cf5"
+  },
+  "claim": "synthetic smoke only; not an agentic quality benchmark"
+}

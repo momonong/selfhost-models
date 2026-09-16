@@ -1,0 +1,48 @@
+[
+  {
+    "mode": "deadline",
+    "at": "2026-09-16T04:06:45.027895+00:00",
+    "headers_status": 200,
+    "error_frame": true,
+    "done_frame": false,
+    "retained": {
+      "ready": false,
+      "version": "0.1.0",
+      "worker_epoch": "5d1258af7c7141c9b4cec6a17a315b26",
+      "inflight": 1,
+      "detached": 1,
+      "uncertain": 0
+    },
+    "drained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "5d1258af7c7141c9b4cec6a17a315b26",
+      "inflight": 0,
+      "detached": 0,
+      "uncertain": 0
+    }
+  },
+  {
+    "mode": "disconnect",
+    "at": "2026-09-16T04:06:52.950513+00:00",
+    "headers_status": 200,
+    "error_frame": false,
+    "done_frame": false,
+    "retained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "5d1258af7c7141c9b4cec6a17a315b26",
+      "inflight": 1,
+      "detached": 1,
+      "uncertain": 0
+    },
+    "drained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "5d1258af7c7141c9b4cec6a17a315b26",
+      "inflight": 0,
+      "detached": 0,
+      "uncertain": 0
+    }
+  }
+]

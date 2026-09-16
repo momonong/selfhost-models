@@ -1,0 +1,198 @@
+{
+  "captured_at": "2026-09-16T03:57:23.981840+00:00",
+  "containers": {
+    "api": {
+      "id": "cf1eada10efa35a1f14860c3d6026575d1cd577ea2d6651a245abc517f39c0ff",
+      "image_id": "sha256:02af3b5f740025874268458c14eaec60ea106c6a388c40c6c306e81a6965a47c",
+      "image": "selfhost-models-api:0.1.0",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "ExitCode": 255,
+        "Error": "",
+        "StartedAt": "2026-09-15T09:27:48.668865986Z",
+        "FinishedAt": "2026-09-16T01:59:19.276662415Z"
+      },
+      "restart_count": 0,
+      "restart_policy": {
+        "Name": "no",
+        "MaximumRetryCount": 0
+      }
+    },
+    "worker": {
+      "id": "841fd2c48088300525d7ccb4e3602a8729d0fb891eb84e41ca3f1c5168f48cb2",
+      "image_id": "sha256:bb98919dd317a8ffcada146589719c182f252212f4112bd32f7cfcfe9fe43f56",
+      "image": "selfhost-models-vllm:0.29.0",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "ExitCode": 255,
+        "Error": "",
+        "StartedAt": "2026-09-15T09:27:50.846083283Z",
+        "FinishedAt": "2026-09-16T01:59:19.277186691Z"
+      },
+      "restart_count": 0,
+      "restart_policy": {
+        "Name": "no",
+        "MaximumRetryCount": 0
+      }
+    }
+  },
+  "raw_files": {
+    "api-inspect.json": {
+      "sha256": "4bf6c1dab0ab85f0ae2dc14cb43d8d901b94e8e53272a9048ccc2d909f9d5ee6",
+      "bytes": 18010,
+      "exit_code": 0
+    },
+    "api-logs.txt": {
+      "sha256": "7b583d5aafc1b6346cc9d2cea5594fb500465435e2ea465f14f540ccd3aad604",
+      "bytes": 520316,
+      "exit_code": 0
+    },
+    "worker-inspect.json": {
+      "sha256": "7921118cba786cda030b875091d9c5acf888791c73164813279dc9d91ef0c301",
+      "bytes": 15780,
+      "exit_code": 0
+    },
+    "worker-logs.txt": {
+      "sha256": "c3dd3466018b2a0b81ddce4768e0fab0bd7a3e007affa58f6396c9f58ed2a6a5",
+      "bytes": 46054,
+      "exit_code": 0
+    },
+    "all-container-inventory.jsonl": {
+      "sha256": "efc924a8257b981d1cabbe5fa7a7fa04426ccf86fab9693e46dcb7964e31c241",
+      "bytes": 32251,
+      "exit_code": 0
+    },
+    "doctor.json": {
+      "sha256": "bea035500ca1977060178f133ed7d38bb9c9fd4c965724e1bf98e46ce4236822",
+      "bytes": 2710,
+      "exit_code": 0
+    },
+    "docker-version.json": {
+      "sha256": "5843b36d2ba73c43953eaf03e5e9aedcc6850ffe8ce6b3155f812b4736e1bd85",
+      "bytes": 1074,
+      "exit_code": 0
+    },
+    "docker-info.txt": {
+      "sha256": "53afa5f067c09787b12735d520629838379845395402e99b2e2a24a260c51fe7",
+      "bytes": 54,
+      "exit_code": 0
+    },
+    "docker-events.jsonl": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "exit_code": 0
+    },
+    "leases-before.json": {
+      "sha256": "3e2e87ce607156f0f3442e07f349f070f999053607ff089a4f0c186e50101c25",
+      "bytes": 16,
+      "exit_code": 0
+    },
+    "desktop-exit-window.txt": {
+      "sha256": "935ed257d304259614f704764e5c10ec3c7ec8e7c4621ecef2961edae24949a2",
+      "bytes": 135527
+    },
+    "desktop-recovery-events.txt": {
+      "sha256": "7ada9ad0476c022e94e2a84dc42aacc179b7ab4e618a41b32c2b6e5e8fa5b57b",
+      "bytes": 190955
+    },
+    "desktop-startup-window.txt": {
+      "sha256": "1bf3b91f9b3070b4a12ce3e5686879ba56acf96bed164d916e16a3916d84bdd8",
+      "bytes": 18559
+    },
+    "model-inspect.json": {
+      "sha256": "f2cd4490dc5fe9acc365a2c0d675b943b79c01dd2ca2c708944f707a726ef539",
+      "bytes": 2186
+    },
+    "windows-system-events.json": {
+      "sha256": "473ff44b7605d03ae2e0b0b7a6aeba4e032e2d1299a35bcba9f42f7d75250d52",
+      "bytes": 3391
+    }
+  },
+  "raw_directory": "evidence/raw/2026-09-16-before-start",
+  "application_log_observations": {
+    "api_last_timestamp": "2026-09-15T10:29:17.056268219Z",
+    "worker_last_timestamp": "2026-09-15T09:31:16.258355807Z",
+    "api_last_message": "HTTP Request: GET http://worker:8000/health HTTP/1.1 200 OK",
+    "fatal_at_recorded_exit": "No application log at 2026-09-16T01:59:19Z; no direct exit-cause record."
+  },
+  "host_events": [
+    {
+      "time": "2026-09-15T18:31:08.9314735+08:00",
+      "id": 12,
+      "provider": "Microsoft-Windows-Kernel-General",
+      "description": "OS startup"
+    },
+    {
+      "time": "2026-09-15T18:30:55.9972683+08:00",
+      "id": 13,
+      "provider": "Microsoft-Windows-Kernel-General",
+      "description": "OS shutdown"
+    },
+    {
+      "time": "2026-09-15T18:30:47.6329263+08:00",
+      "id": 1074,
+      "provider": "User32",
+      "description": "Planned OS update reboot requested by Windows servicing"
+    },
+    {
+      "time": "2026-09-15T18:30:07.9974889+08:00",
+      "id": 12,
+      "provider": "Microsoft-Windows-Kernel-General",
+      "description": "OS startup"
+    },
+    {
+      "time": "2026-09-15T18:29:55.7867513+08:00",
+      "id": 13,
+      "provider": "Microsoft-Windows-Kernel-General",
+      "description": "OS shutdown"
+    },
+    {
+      "time": "2026-09-15T18:29:08.1336664+08:00",
+      "id": 1074,
+      "provider": "User32",
+      "description": "Planned OS update reboot requested by Windows servicing"
+    }
+  ],
+  "docker_recovery_observations": [
+    {
+      "at": "2026-09-16T01:59:19.198533933Z",
+      "message": "Loading containers: start."
+    },
+    {
+      "at": "2026-09-16T01:59:19.282816330Z",
+      "service": "api",
+      "message": "error unmounting container: layer not mounted"
+    },
+    {
+      "at": "2026-09-16T01:59:19.288860277Z",
+      "service": "worker",
+      "message": "error unmounting container: layer not mounted"
+    },
+    {
+      "at": "2026-09-16T01:59:20.137107192Z",
+      "service": "worker",
+      "message": "Removing stale sandbox"
+    },
+    {
+      "at": "2026-09-16T01:59:20.316237153Z",
+      "service": "api",
+      "message": "Removing stale sandbox"
+    }
+  ],
+  "conclusion": {
+    "cause": "undetermined",
+    "confirmed": "OS update reboot preceded Docker daemon startup/recovery. Both exit timestamps coincide with recovery; both OOMKilled=false and Error empty.",
+    "limits": "No retained Docker event or application shutdown record establishes the original process termination mechanism or directly explains status 255. Do not label it a confirmed application crash, CUDA OOM, or Docker bug.",
+    "automatic_restart": "Both original containers used restart policy no; no automatic restart was configured."
+  }
+}
