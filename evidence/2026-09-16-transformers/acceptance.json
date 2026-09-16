@@ -1,0 +1,158 @@
+{
+  "environment": "real-service",
+  "url": "http://127.0.0.1:18080",
+  "faults": true,
+  "results": [
+    {
+      "check": "models",
+      "at": "2026-09-16T05:18:28.077872+00:00",
+      "model": {
+        "id": "Qwen/Qwen3.5-4B",
+        "object": "model",
+        "created": 0,
+        "owned_by": "selfhost",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "backend": "transformers",
+        "capabilities": {
+          "text": true,
+          "stream": true,
+          "images": false,
+          "tools": false,
+          "thinking": false,
+          "cancellation": "drain_to_terminal",
+          "queue_capacity": 0,
+          "max_inflight_limit": 1,
+          "unsupported_parameters": [
+            "stop",
+            "presence_penalty",
+            "frequency_penalty"
+          ]
+        },
+        "max_inflight": 1
+      }
+    },
+    {
+      "check": "non_stream",
+      "at": "2026-09-16T05:18:28.472403+00:00",
+      "status": 200,
+      "request_id": "4d1a69be665e4866a5e8c9411d3ab3d4",
+      "usage": {
+        "prompt_tokens": 18,
+        "completion_tokens": 4,
+        "total_tokens": 22
+      }
+    },
+    {
+      "check": "stream",
+      "at": "2026-09-16T05:18:28.867563+00:00",
+      "chunks": 4,
+      "done": true
+    },
+    {
+      "check": "unsupported_parameter",
+      "at": "2026-09-16T05:18:28.872987+00:00",
+      "status": 400
+    },
+    {
+      "check": "bad_tokens",
+      "at": "2026-09-16T05:18:28.877406+00:00",
+      "status": 400
+    },
+    {
+      "check": "unknown_model",
+      "at": "2026-09-16T05:18:28.882189+00:00",
+      "status": 404
+    },
+    {
+      "check": "context_limit",
+      "at": "2026-09-16T05:18:28.917604+00:00",
+      "status": 400
+    },
+    {
+      "check": "authentication",
+      "at": "2026-09-16T05:18:28.922502+00:00",
+      "status": 401
+    },
+    {
+      "check": "body_limit",
+      "at": "2026-09-16T05:18:28.940414+00:00",
+      "status": 413
+    },
+    {
+      "check": "overload_and_deadline",
+      "at": "2026-09-16T05:18:30.689979+00:00",
+      "statuses": [
+        504,
+        429,
+        429,
+        429,
+        429,
+        429,
+        429,
+        429
+      ],
+      "retained": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "51bafd54a73c468b81d173133ba5d7e3",
+        "inflight": 1,
+        "detached": 1,
+        "uncertain": 0
+      }
+    },
+    {
+      "check": "drain_completed",
+      "at": "2026-09-16T05:18:31.101435+00:00",
+      "health": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "51bafd54a73c468b81d173133ba5d7e3",
+        "inflight": 0,
+        "detached": 0,
+        "uncertain": 0
+      }
+    },
+    {
+      "check": "client_cancel_retains_lease",
+      "at": "2026-09-16T05:18:31.547974+00:00",
+      "health": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "51bafd54a73c468b81d173133ba5d7e3",
+        "inflight": 1,
+        "detached": 1,
+        "uncertain": 0
+      }
+    },
+    {
+      "check": "api_restart_quarantines",
+      "at": "2026-09-16T05:18:33.193359+00:00",
+      "health": {
+        "ready": false,
+        "version": "0.1.0",
+        "worker_epoch": null,
+        "inflight": 1,
+        "detached": 0,
+        "uncertain": 1
+      }
+    },
+    {
+      "check": "worker_unavailable",
+      "at": "2026-09-16T05:18:34.942739+00:00",
+      "status": 503
+    },
+    {
+      "check": "worker_restart_recovery",
+      "at": "2026-09-16T05:19:35.164914+00:00",
+      "status": 200,
+      "health": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "982407570b0e4448a6a419b83a506412",
+        "inflight": 0,
+        "detached": 0,
+        "uncertain": 0
+      }
+    }
+  ]
+}

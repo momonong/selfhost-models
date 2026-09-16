@@ -1,0 +1,54 @@
+{
+  "recorded_at": "2026-09-16T05:30:38.123155+00:00",
+  "level": "CPU-contract-and-offline-runtime-checks",
+  "host": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.14",
+  "uv": "uv 0.11.21 (5aa65dd7a 2026-06-11 x86_64-pc-windows-msvc)",
+  "checks": [
+    {
+      "command": "uv run --locked pytest -q",
+      "code_commit": "76fa5264bce055e39cfc6eda24e59a19063bdfff",
+      "passed": 57,
+      "seconds": 6.53,
+      "GPU": false
+    },
+    {
+      "command": "uv run --locked pytest -q tests/test_deployment.py",
+      "code_commit": "8b116854a44584a4f6047213e6edc922505c47df",
+      "passed": 2,
+      "seconds": 0.03,
+      "scope": "Final stop_grace_period delta; no serving source change."
+    },
+    {
+      "command": "uv lock --check --offline",
+      "result": "pass, 31 packages"
+    },
+    {
+      "command": "uv lock --project worker/transformers --check --offline",
+      "result": "pass, 35 packages"
+    },
+    {
+      "command": "docker run --rm --network none --read-only --tmpfs /tmp --tmpfs /runtime-cache --entrypoint uv selfhost-models-transformers:0.1.0 --no-cache pip check --python /app/.venv/bin/python",
+      "result": "Checked 33 packages; all installed packages compatible; no GPU attached."
+    },
+    {
+      "command": "scripts/transformers_runtime_check.py in offline worker image, existing model mounted read-only, no GPU",
+      "result": {
+        "python": "3.12.3",
+        "torch": "2.13.0+cu130",
+        "torch_path": "/usr/local/lib/python3.12/dist-packages/torch/__init__.py",
+        "torchvision": "0.28.0+cu130",
+        "cuda": "13.0",
+        "transformers": "5.16.1",
+        "architecture": "Qwen3_5ForConditionalGeneration",
+        "model_type": "qwen3_5",
+        "synthetic_prompt_tokens": 15,
+        "config_sha256": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670"
+      }
+    },
+    {
+      "command": "Offline complete source-set and SHA256 comparison against runtime-final.json",
+      "result": "Every API and worker Python file is present; recorded code/config hashes match current checkout."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+[
+  {
+    "mode": "deadline",
+    "at": "2026-09-16T05:20:02.681090+00:00",
+    "headers_status": 200,
+    "error_frame": true,
+    "done_frame": false,
+    "retained": {
+      "ready": false,
+      "version": "0.1.0",
+      "worker_epoch": "982407570b0e4448a6a419b83a506412",
+      "inflight": 1,
+      "detached": 1,
+      "uncertain": 0
+    },
+    "drained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "982407570b0e4448a6a419b83a506412",
+      "inflight": 0,
+      "detached": 0,
+      "uncertain": 0
+    }
+  },
+  {
+    "mode": "disconnect",
+    "at": "2026-09-16T05:20:17.066118+00:00",
+    "headers_status": 200,
+    "error_frame": false,
+    "done_frame": false,
+    "retained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "982407570b0e4448a6a419b83a506412",
+      "inflight": 1,
+      "detached": 1,
+      "uncertain": 0
+    },
+    "drained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "982407570b0e4448a6a419b83a506412",
+      "inflight": 0,
+      "detached": 0,
+      "uncertain": 0
+    }
+  }
+]

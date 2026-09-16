@@ -1,5 +1,67 @@
 # 驗收方式
 
+## Transformers backend（Windows，2026-09-16）
+
+Qwen/Qwen3.5-4B，固定 revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`，已完成 Windows Docker Desktop WSL2／RTX 5090 Laptop 真實 GPU 文字推論與生命週期驗收。模型唯讀接入 `D:/hf_models/Qwen3.5-4B`，未搬移、覆寫或下載。這是合成服務驗收；不代表 Linux 實體桌機上的 Transformers、圖片／工具能力或產品品質通過。
+
+共同起點 `fe3b5ba0c4159ef57a26da82819367cd95364d1c`，主工作目錄 `D:/projects/selfhost-models`，分支 `feat/transformers-backend`。推論與故障測試對應程式 `76fa5264bce055e39cfc6eda24e59a19063bdfff`；最終部署 `8b11685` 只補明確 stop grace period，並已重驗 readiness、一般／SSE 及正常停機。完整來源 SHA256、擷取時 commit、image ID 均在 runtime JSON，證據／文件的後續提交不代表重新建置 image。
+
+| 驗證層級 | 結果與保留證據 |
+|---|---|
+| CPU 單元／契約 | [57 passed 與命令紀錄](../evidence/2026-09-16-transformers/contract-checks.json)；兩 backend 共用 admission、取消、未知 lease、串流與 warmup terminal 契約，另測真實 ASGI worker 搭配 CPU engine double；不當作 GPU 證據 |
+| runtime 離線預檢 | Python 3.12.3、torch 2.13.0+cu130、CUDA 13.0、torchvision 0.28.0+cu130、Transformers 5.16.1；無網路／無 GPU 下成功匯入 Qwen3.5 類別並以既有 tokenizer 套用合成模板 |
+| 真實 GPU 一般／SSE、輸入／認證上限 | [完整驗收](../evidence/2026-09-16-transformers/acceptance.json)，2026-09-16 05:18–05:19 UTC；400／401／404／413 均符合預期 |
+| 超載、deadline、取消 | 容量 1、queue 0：7×429 + 1×504；保留 1 個 detached lease，完成 drain 後歸零 |
+| API／worker 重啟 | API 重啟後 uncertain=1 且 not ready；worker 不可用回 503，新 epoch＋4 token 暖機後 ready=true、所有 lease 歸零 |
+| 真實文字輸出後的 SSE 逾時／斷線 | [串流生命週期](../evidence/2026-09-16-transformers/stream-lifecycle.json)：只在非空 delta.content 後 pause；deadline 有 error／無 DONE，兩種情境保留 lease 至完成 |
+| 文字與取樣 | [文字 smoke](../evidence/2026-09-16-transformers/text-smoke.json)：合成 2+2 回 4、一般／SSE 內容一致、同 runtime 固定 seed 重複取樣一致；圖片、tools、thinking、stop、非零 penalties 與 greedy top_p 均 400 |
+| 來源／隔離 | [推論時 runtime](../evidence/2026-09-16-transformers/runtime.json) 及 [最終 runtime](../evidence/2026-09-16-transformers/runtime-final.json)：API 與 worker 的實際來源／uv.lock raw SHA256 均符合 checkout；worker 無 published port、模型唯讀、僅內網，API 無 Docker socket |
+| 停機補驗 | [stop grace 修正後一般／SSE](../evidence/2026-09-16-transformers/shutdown-recheck.json)、[停止後快照](../evidence/2026-09-16-transformers/after.json)：兩服務 exit 0、port 18080 關閉、GPU 約 440 MiB、model inventory 未變、state 保留、四個 KaChing 容器未改 |
+
+已保存兩個實測問題，沒有以失敗結果冒充通過：
+
+- [暖機 cache 診斷](../evidence/2026-09-16-transformers/startup-diagnosis.json)：官方 PyTorch native bmm 走 Triton 時寫入唯讀 `/home/service/.triton` 失敗。改成限定 1 GiB 的可寫／exec `/runtime-cache`，未更換 runtime 配套；原始日誌與未決 warmup lease 的 SHA256 保留。
+- [停機診斷](../evidence/2026-09-16-transformers/shutdown-diagnosis.json)：容器實際 StopTimeout=1 秒，Docker 依序送 SIGTERM/SIGKILL，得到 137 且 OOMKilled=false。明確設定 30 秒後重新驗證正常 exit 0。先前通過的推論／故障結果保留，僅補測受影響的收尾設定。
+
+最終 Transformers worker 本機 image ID：`sha256:17895a2b87a9f3968eb6acf0d80c60e0e3dfa3a65c540daf5160a2cb3cfb5700`，API：`sha256:c4dd80bb466538ec90c4bef9d50e6f694e07fe3510e6fa6190f7ed8b716b3d9c`。這是本機建置的 content-addressed ID，未推送 registry。官方基底與 uv digest 固定於 Dockerfile；後續建置 attestation 可能造成 image ID 不同，必須以實際來源 hash 和 runtime 核對。
+
+可重跑命令（先確定共用 GPU／容器無其他任務使用，`--output` 選新的證據目錄）：
+
+```bash
+uv sync --locked
+uv run --locked pytest -q
+uv run --locked modelctl doctor
+uv run --locked modelctl inspect Qwen/Qwen3.5-4B
+uv run --locked python scripts/service_snapshot.py --output evidence/tf-rerun/before.json
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend transformers --max-inflight 1 --context 2048 --gpu-memory 0.60
+uv run --locked python scripts/acceptance.py --faults --output evidence/tf-rerun/acceptance.json
+uv run --locked python scripts/stream_lifecycle_check.py --output evidence/tf-rerun/stream-lifecycle.json
+uv run --locked python scripts/transformers_smoke.py --output evidence/tf-rerun/text-smoke.json
+uv run --locked python scripts/capture_runtime.py --output evidence/tf-rerun/runtime.json
+uv run --locked modelctl stop
+uv run --locked python scripts/service_snapshot.py --before evidence/tf-rerun/before.json --output evidence/tf-rerun/after.json
+```
+
+故障腳本 `finally` 會解除本專案 worker pause；若任一命令失敗仍須依狀態執行 `modelctl stop`，保留模型、state 與失敗證據。不要刪除 lease journal 以繞過復原契約。
+
+### 本分支的 vLLM 真實 GPU 回歸
+
+Transformers 已於 05:25 UTC 正常停止並確認 GPU 釋放後，才啟動 vLLM。`docker/worker.Dockerfile`、`worker/identity.py`、`worker/launch.py`、API `uv.lock` 相對共同起點均無修改。官方 vLLM 0.29.0／torch 2.13.0+cu130／CUDA 13.0／Transformers 5.16.1、V1 runner 配套不變。
+
+- [完整 API／故障回歸](../evidence/2026-09-16-transformers/vllm-regression.json)：05:29–05:31 UTC，一般／SSE、錯誤輸入、6×429 + 2×504、取消、API 隔離及 worker 新 epoch 暖機恢復通過；暖機新增的 terminal＋至少 4-token 檢查也通過。
+- [合成圖片與工具往返](../evidence/2026-09-16-transformers/vllm-multimodal.json)：紅色圖片辨識與 client 執行合成工具後返回 731 通過。
+- [實際文字輸出後的串流故障](../evidence/2026-09-16-transformers/vllm-stream-lifecycle.json)：deadline／disconnect 保留 lease，drain 後歸零。
+- [vLLM runtime](../evidence/2026-09-16-transformers/vllm-runtime.json)：本分支 API 來源／鎖檔 raw hash 符合 checkout、ready=true 且所有 lease 歸零。本機 worker image ID `sha256:f990b1866f6ae4f6f1063395001ddfa40076acf0085d6ecae5c78e7a12170630`；重建 attestation 會使 ID 不同，但官方基底、套件與 worker 來源未變。
+- [整體最終狀態](../evidence/2026-09-16-transformers/final-state.json)：05:33 UTC，API／worker 均 exit 0、未 paused、18080 關閉；GPU 約 503 MiB、模型 inventory 未變、state 保留、四個 KaChing 容器的 ID／啟動時間／狀態未變。
+
+重跑 vLLM 時，把上述 serve 指令改為 `--backend vllm --max-inflight 2`，並用 `scripts/multimodal_smoke.py` 取代 Transformers 專用文字 smoke；一般與 stream lifecycle 兩支腳本共用。當前 `.state/compose.env` 保存的是最後回歸的 vLLM 設定，所有服務已停止；要啟動 Transformers，請明確重新執行 `modelctl serve ... --backend transformers`。
+
+### 與 WSL vLLM 驗收分支的整合注意事項
+
+另一本機 Ubuntu WSL2 驗收任務在 `test/linux-vllm-acceptance@e3fb6edd04e76429f58b86600ab83ad913101c2d`，worktree 位於 `.worktrees/linux-vllm-acceptance`；本任務未合入或清理它，亦未修改它的 `/home/morris/.local/state/selfhost-models/vllm-acceptance-20260916`。它報告的 WSL vLLM 成功不等於 Linux 實體桌機或 Linux Transformers 已通過。
+
+未來指定整合時，`scripts/capture_runtime.py`／`stream_lifecycle_check.py` 應同時保留本分支的 `compose_command(state)` backend 選擇、worker 來源比對、非空 delta.content 後 pause，以及該分支的 `--url/--state`、RepoDigests、raw SHA／只正規化 CRLF→LF 的文字比對及其 7 個測試。`docs/acceptance.md` 需保留雙方證據與不同主機／來源比對語義。本次不自動合併該分支。
+
 ## 最新交付複驗（2026-09-16）
 
 **最新 uv 版 API 與固定 vLLM worker 已通過完整真實 GPU 複驗，驗收後兩個服務均正常停止（exit 0）。** 本次交付程式起點為 `cea1d4a3dfb26edf2bf1b5a68bdc3dbac33dcb1d`；未修改 serving 程式、模型、Compose 設定或官方 worker 配套，僅補強證據腳本的輸出路徑及容器來源比對。
