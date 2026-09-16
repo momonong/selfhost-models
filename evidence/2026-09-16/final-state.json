@@ -1,0 +1,89 @@
+{
+  "at": "2026-09-16T04:07:25.977137+00:00",
+  "services": {
+    "api": {
+      "Status": "exited",
+      "Running": false,
+      "Paused": false,
+      "ExitCode": 0,
+      "OOMKilled": false,
+      "FinishedAt": "2026-09-16T04:07:24.810157672Z",
+      "id": "b18237bbd36ac62c110ef5a1542d9ad7cec1b3a01238c52cbfff1f3f0676d885"
+    },
+    "worker": {
+      "Status": "exited",
+      "Running": false,
+      "Paused": false,
+      "ExitCode": 0,
+      "OOMKilled": false,
+      "FinishedAt": "2026-09-16T04:07:25.269932263Z",
+      "id": "840a5bc596c05f7c6262d7905f56c7feca84182d94465a8de249889bc9cdf56f"
+    }
+  },
+  "other_services": [
+    {
+      "id": "80ef19f8d5f8941b6f66675d5d611c9cb201d651ad0b1d5f2231f9f230f30dda",
+      "name": "/kaching-portable-test-mcp-1",
+      "started_at": "2026-09-16T01:59:20.912450187Z",
+      "restart_count": 0,
+      "running": true
+    },
+    {
+      "id": "0a50b80667adc346ac305bfe6365b3a34f10bd529730256e2a84166c836082ee",
+      "name": "/kaching-portable-test-mcp-read-api-1",
+      "started_at": "2026-09-16T01:59:20.909457558Z",
+      "restart_count": 0,
+      "running": true
+    },
+    {
+      "id": "bdcc6a5a05e524d1aea8598642dca0fe4be0854a6001023d9ce03a71182ce0e9",
+      "name": "/kaching-portable-test-web-1",
+      "started_at": "2026-09-16T01:59:20.914191846Z",
+      "restart_count": 0,
+      "running": true
+    },
+    {
+      "id": "c582ba0d9e683e499fcc558ff6079e5465ae5776be284e1d25153811cd2e2355",
+      "name": "/kaching-portable-test-api-1",
+      "started_at": "2026-09-16T01:59:20.925221743Z",
+      "restart_count": 0,
+      "running": true
+    }
+  ],
+  "raw_files": {
+    "api-inspect.json": {
+      "sha256": "62bbe34bd22e592224d9b8918b37cd6a0258ba2b839178d92c6094fb7180cf94",
+      "bytes": 13900
+    },
+    "api-logs.txt": {
+      "sha256": "af8200f92798175af3517dd58befe61a7b6271f47ec46e1b3dce558cf8ae3e27",
+      "bytes": 297739
+    },
+    "worker-inspect.json": {
+      "sha256": "d5becc8582ee934c1830904e5911c1ba85b72980bb771793221c136faf9f891b",
+      "bytes": 15784
+    },
+    "worker-logs.txt": {
+      "sha256": "24f73831e833a5528ede2d942f7b21aa90e3f96ea9085f86d7ae164d759f2594",
+      "bytes": 48278
+    }
+  },
+  "other_services_unchanged": true,
+  "model_assets_unchanged": {
+    "repo_id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "registered_files": 11,
+    "unchanged": true,
+    "check": "registry metadata and inventory; not a full weight hash"
+  },
+  "state_preserved": {
+    "api_key_exists": true,
+    "compose_env_exists": true,
+    "leases": {
+      "leases": {}
+    }
+  },
+  "api_port_closed": true,
+  "gpu": "memory.used [MiB], memory.free [MiB]\n446 MiB, 23606 MiB",
+  "raw_directory": "evidence/raw/2026-09-16-after-stop"
+}

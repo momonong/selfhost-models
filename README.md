@@ -29,7 +29,7 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 - [Backend 契約與 Transformers 交接](docs/backend.md)
 - [模型候選與 GPU 盤點](docs/model-selection.md)
 
-已在 Windows WSL2／RTX 5090 Laptop 24 GB 上完成 **Qwen3.5-4B 真實 GPU 驗收**：一般／SSE、合成圖片、工具呼叫往返、超載、逾時／取消及重啟恢復。單元／契約測試 27 項通過。這是服務與合成輸入驗收，Linux 實機及產品品質仍待各自驗證；詳見驗收文件。
+已在 Windows WSL2／RTX 5090 Laptop 24 GB 上完成 **Qwen3.5-4B 真實 GPU 驗收**，並於 2026-09-16 以最新 uv 版 API 完整複驗：一般／SSE、合成圖片、工具呼叫往返、超載、逾時／取消及重啟恢復。單元／契約測試 27 項通過；驗收後 API 與 worker 已正常停止，資產與 state 保留。這是服務與合成輸入驗收，Linux 實機及產品品質仍待各自驗證；詳見驗收文件。
 
 ```bash
 uv run --locked pytest -q

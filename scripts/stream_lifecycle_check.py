@@ -1,4 +1,5 @@
 """Bounded faults after real SSE headers: deadline and disconnected consumer."""
+import argparse
 import asyncio
 import json
 import subprocess
@@ -11,7 +12,7 @@ import httpx
 ROOT = Path(__file__).resolve().parents[1]
 
 
-async def main():
+async def main(output):
     state = ROOT / ".state"
     compose = ["docker", "compose", "--env-file", str(state / "compose.env"), "-f", str(ROOT / "compose.yaml")]
     worker = subprocess.check_output([*compose, "ps", "-q", "worker"], text=True).strip()
@@ -69,9 +70,12 @@ async def main():
                     subprocess.run(["docker", "unpause", worker], check=True, stdout=subprocess.DEVNULL)
             h = await wait_health(lambda h: h["ready"] and h["inflight"] == 0)
             records[-1]["drained"] = h
-    (ROOT / "evidence/stream-lifecycle.json").write_text(json.dumps(records, indent=2), encoding="utf-8")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(records, indent=2), encoding="utf-8")
     print("stream lifecycle acceptance passed", flush=True)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", type=Path, default=ROOT / "evidence/stream-lifecycle.json")
+    asyncio.run(main(parser.parse_args().output))
