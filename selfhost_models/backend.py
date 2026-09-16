@@ -34,7 +34,10 @@ class VLLMBackend:
         async def generate(body):
             r = await self.client.post("/v1/chat/completions", json=body, timeout=180)
             r.raise_for_status()
-            if r.headers.get("x-worker-epoch") != epoch or not r.json().get("choices"):
+            result = r.json()
+            if (r.headers.get("x-worker-epoch") != epoch or not result.get("choices") or
+                    any(c.get("finish_reason") is None for c in result["choices"]) or
+                    result.get("usage", {}).get("completion_tokens", 0) < 4):
                 raise RuntimeError("warmup identity or result mismatch")
 
         # Startup budget is separate from client deadline. Every warmup remains

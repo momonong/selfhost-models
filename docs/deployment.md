@@ -87,7 +87,7 @@ Transformers 獨立使用 `worker/transformers/pyproject.toml` + `uv.lock`，不
 
 若修改 worker Python 依賴，使用 `uv lock --project worker/transformers` 更新其 uv.lock。這個專案的 Python 限 3.12，CUDA/PyTorch 由固定 image 提供，host 不需安裝 GPU Python 套件。worker 以 UID 10001、唯讀 filesystem、可寫 `/tmp` 運行；启动不執行 uv sync。模型必須已由 modelctl register/inspect 確認，不改動既有檔案。
 
-架構支援依 [Transformers Qwen3.5 官方文件](https://huggingface.co/docs/transformers/v5.16.1/model_doc/qwen3_5)；runtime 基底依 [官方 PyTorch image](https://hub.docker.com/layers/pytorch/pytorch/2.13.0-cuda13.0-cudnn9-runtime/images/sha256-db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407)。支援架構不等於任意 checkpoint 都已實測，實際範圍見驗收文件。
+架構支援依 [Transformers Qwen3.5 官方文件](https://huggingface.co/docs/transformers/main/model_doc/qwen3_5)，並已在固定 image 離線匯入對應類別核對；runtime 基底依 [官方 PyTorch image](https://hub.docker.com/layers/pytorch/pytorch/2.13.0-cuda13.0-cudnn9-runtime/images/sha256-db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407)。支援架構不等於任意 checkpoint 都已實測，實際範圍見驗收文件。
 
 一般啟動不連 HF；worker HF_HUB_OFFLINE／TRANSFORMERS_OFFLINE，模型唯讀掛在 `/models/current`。管理工具依 config.model_type 選已知 profile；不自動嘗試不同 engine。
 

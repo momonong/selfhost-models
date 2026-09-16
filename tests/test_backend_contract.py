@@ -30,8 +30,9 @@ async def test_identity_generate_close_contract(backend_class):
 
 @pytest.mark.parametrize("body,epoch", [({"choices": [{}]}, "epoch"),
     ({"choices": [{"finish_reason": "stop"}], "usage": {"completion_tokens": 4}}, "changed")])
-async def test_transformers_warmup_rejects_incomplete_or_wrong_epoch(body, epoch):
-    backend = TransformersBackend("http://worker", 3)
+@pytest.mark.parametrize("backend_class", [VLLMBackend, TransformersBackend])
+async def test_warmup_rejects_incomplete_or_wrong_epoch(body, epoch, backend_class):
+    backend = backend_class("http://worker", 3)
     await backend.close()
     backend.client = httpx.AsyncClient(base_url="http://worker", transport=httpx.MockTransport(
         lambda r: httpx.Response(200, headers={"x-worker-epoch": epoch}, json=body)))
