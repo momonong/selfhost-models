@@ -1,0 +1,304 @@
+{
+  "at": "2026-09-16T06:01:52.446938+00:00",
+  "host": "Windows-11-10.0.26200-SP0",
+  "git_head": "6c132a89cdc63396c71be6765f1ea601a60f6058",
+  "url": "http://127.0.0.1:18083",
+  "containers": {
+    "api": {
+      "id": "dcf418e904028dac1efd222c87fe347b18619bcfac758bf517d51ff45f1b3b70",
+      "image": "selfhost-models-api:0.1.0",
+      "image_id": "sha256:2ef94d5cb7824b23e859296f18fe210f3eff0cc93751edf469ae5b227ab0dd5f",
+      "started_at": "2026-09-16T05:57:02.692774562Z",
+      "running": true,
+      "paused": false,
+      "ports": {
+        "8000/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "18083"
+          }
+        ]
+      },
+      "networks": [
+        "selfhost-models_inference",
+        "selfhost-models_ingress"
+      ],
+      "mounts": [
+        {
+          "destination": "/state",
+          "writable": true
+        },
+        {
+          "destination": "/run/secrets/api_key",
+          "writable": false
+        }
+      ],
+      "repo_digests": [
+        "selfhost-models-api@sha256:2ef94d5cb7824b23e859296f18fe210f3eff0cc93751edf469ae5b227ab0dd5f"
+      ]
+    },
+    "worker": {
+      "id": "417bff1841464e8a19284e8f4e6b6a95a49819e79f906e5230678c21d673bf3e",
+      "image": "selfhost-models-vllm:0.29.0",
+      "image_id": "sha256:f990b1866f6ae4f6f1063395001ddfa40076acf0085d6ecae5c78e7a12170630",
+      "started_at": "2026-09-16T05:57:02.676219301Z",
+      "running": true,
+      "paused": false,
+      "ports": {},
+      "networks": [
+        "selfhost-models_inference"
+      ],
+      "mounts": [
+        {
+          "destination": "/models/current",
+          "writable": false
+        }
+      ],
+      "repo_digests": [
+        "selfhost-models-vllm@sha256:f990b1866f6ae4f6f1063395001ddfa40076acf0085d6ecae5c78e7a12170630"
+      ]
+    }
+  },
+  "git_status": "?? evidence/2026-09-16-integration/",
+  "source_sha256": {
+    ".python-version": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d",
+    "compose.transformers.yaml": "a3d25398925eed8f34fb5f1c7d6121a5160841c977b5a2db6820a0112b86bc6b",
+    "compose.yaml": "cede362380786dde8387dc43d5cda5e85084bf460a5ff91ccb0b924430710335",
+    "docker/api.Dockerfile": "3fda503ac05677f916c1111fdadaa4e12d0f54488604033814c0ce8c6254d3df",
+    "docker/transformers.Dockerfile": "d33d93834f5742c5459906c82b558afbbe4e072c073601cc4604f7a67cc0088c",
+    "docker/worker.Dockerfile": "337b40b41aca070c976998d9e58a68c8ff63a47ba0506fa2f235067855f904bc",
+    "pyproject.toml": "70567698bc4c0b9a3f2a86ae97292172b0f242546222f9228feeddbda9fa52e7",
+    "scripts/acceptance.py": "3b41a5ca77fcc8be32a00354266faad0b6ad2a4963de0c28f9364029ce1b0c91",
+    "scripts/api_container_check.py": "61b6545a1d7855d9d03d16f44d08a839fd124ccac5404c5cb9aaed3db02e1572",
+    "scripts/capture_runtime.py": "56624382b2a45466c8b73cd2983758b233d6e27396a06519b7de559751ec4755",
+    "scripts/deployment_target.py": "c2f1ac5ba8405aa1eb3060214e1bfc0a59f55729c7378667b2f04b99fc837d6f",
+    "scripts/multimodal_smoke.py": "6269ce7e6cd760604ce07c466193e6cf518a15480f53a86040d832c5e5045953",
+    "scripts/service_snapshot.py": "2633f014aa28dd9baf7c6b607884e070fcae3ae70d3e3a0b92793bc1b5e78a45",
+    "scripts/stream_lifecycle_check.py": "139b3699726028fcfcec49206d547bb49b164b6cb87f83ecefe900abbbab7071",
+    "scripts/transformers_runtime_check.py": "b38efba3a2fa3c82fed01864f83065dc17085e62b6149b7c99732eb28e95923b",
+    "scripts/transformers_smoke.py": "582a59ba58ddd1db4975d709b52285103ed083c7e9c2b808a61991f270590105",
+    "selfhost_models/__init__.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+    "selfhost_models/api.py": "f68186bc646121ee256c6f04843483ad27e0ce24bdfed547b39bf78de0e8e726",
+    "selfhost_models/assets.py": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+    "selfhost_models/backend.py": "81f5dc642128aa4985635524425f4bac27319ff4fba81c4ed1d094b0ea5f378b",
+    "selfhost_models/capabilities.py": "362eb82257d3cbe3a2938d61a2f1811d1670f4ad2e11ca17f31ec96b3e8a08bb",
+    "selfhost_models/cli.py": "6868459e77bc0673045be2b48f4301ffc3e637f99a13ad34b8cb2ed0280492c8",
+    "selfhost_models/schema.py": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a",
+    "selfhost_models/storage.py": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+    "tests/test_assets.py": "4b95193e217047adcb110ab9f81931aa3795a0b4d352c5a34f005013050392d8",
+    "tests/test_backend_contract.py": "d21fe48dd2f0a250db5b06315efc0faf746cbea1a38882850d6db4dc8bf21375",
+    "tests/test_capabilities.py": "4342f0845e2677ef2749ef35b00ca3eaffac6a55d418886f4c4bacceeefd3182",
+    "tests/test_deployment.py": "c22012c89689afe65ebde688164db683c774ff3d9ee1450a39719167ff356085",
+    "tests/test_deployment_target.py": "bddd36e976b56580c96b4befb57c59d30c72e807211f6524bd31238812181d45",
+    "tests/test_gateway.py": "7012c065bb929d77ec6d37e740da859b8576a0045ed245e28dd92b82b47e3bbb",
+    "tests/test_runtime_evidence.py": "ee8b580d6fc53358682f31523dab2dd220e85e22e21976c29777ba3beadc3e7d",
+    "tests/test_stream.py": "f7c4155a0664f1238c33a132f9109893c95ce8e67d49a55fb72020dff47cb8a2",
+    "tests/test_transformers_worker.py": "c683bf089e39dd247ed88568dfcfe40bd38b56bcb2ab2b5cfdd684ff44127066",
+    "tests/test_warmup.py": "56cfbb91abef37ef8f493faecdb79cc6e62868fa1bdf1cb386efd3e74a27e760",
+    "uv.lock": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3",
+    "worker/identity.py": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470",
+    "worker/launch.py": "b41fd16034d7a826297ce2db553a8c2a2301c3530b2eac39316a9383fa88c849",
+    "worker/transformers/pyproject.toml": "b3caf927c001b72e2da8bdc2b39e1956484a71683b5650119de3283c71bc3d2b",
+    "worker/transformers/uv.lock": "1b77d6c8c06ca0b7e2dd450fd38dd7e533eccfaf454470974a7386a4221b570a",
+    "worker/transformers_app.py": "b3c9f469f7f63f534a021e88c6738cac89161bf93ca68b40b05afcdd99677047",
+    "worker/transformers_engine.py": "a908ef8076aafeaa5addc0c7cab44ea467a3a09fc801a322565ca2e12d4e91c0"
+  },
+  "runtime": {
+    "vllm": "0.29.0",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "transformers": "5.16.1",
+    "runner_v2": "0"
+  },
+  "checkout_worker_source_hashes": {
+    "identity.py": {
+      "sha256": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470",
+      "lf_sha256": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470"
+    },
+    "launch.py": {
+      "sha256": "b41fd16034d7a826297ce2db553a8c2a2301c3530b2eac39316a9383fa88c849",
+      "lf_sha256": "b41fd16034d7a826297ce2db553a8c2a2301c3530b2eac39316a9383fa88c849"
+    }
+  },
+  "worker_source_hashes": {
+    "identity.py": {
+      "sha256": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470",
+      "lf_sha256": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470"
+    },
+    "launch.py": {
+      "sha256": "b41fd16034d7a826297ce2db553a8c2a2301c3530b2eac39316a9383fa88c849",
+      "lf_sha256": "b41fd16034d7a826297ce2db553a8c2a2301c3530b2eac39316a9383fa88c849"
+    }
+  },
+  "worker_source_sha256": {
+    "identity.py": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470",
+    "launch.py": "b41fd16034d7a826297ce2db553a8c2a2301c3530b2eac39316a9383fa88c849"
+  },
+  "worker_source_matches_checkout": true,
+  "worker_source_text_matches_checkout": true,
+  "worker_source_newline_only_differences": [],
+  "api_runtime": {
+    "python": "3.12.14",
+    "prefix": "/app/.venv",
+    "pytest_present": false,
+    "packages": {
+      "selfhost-models": "0.1.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.11.7",
+      "uvicorn": "0.35.0",
+      "huggingface-hub": "0.34.4",
+      "pillow": "11.3.0"
+    },
+    "source_sha256": {
+      "pyproject.toml": "44a00c59862e9561b158685901db98a77f73b499b1221b804b065db008d9e244",
+      "uv.lock": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3",
+      "selfhost_models/assets.py": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+      "selfhost_models/storage.py": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+      "selfhost_models/__init__.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+      "selfhost_models/backend.py": "270df5a0542b83963ad7c0aa91a93afba1b89c879083301d2a04e3298c663a4a",
+      "selfhost_models/schema.py": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a",
+      "selfhost_models/cli.py": "04772a3442f47ee5fcba9d6bc55f4fc8310b6f234e82a5729cbb64f1f67e403c",
+      "selfhost_models/capabilities.py": "fcd8e9553f8704c012b83df625455522a61fbbd1a85aa7db5ab3c47e6511b010",
+      "selfhost_models/api.py": "e9f35c851ad22825ba0d5ef8ae542ff0669328fd5df3498d712590d5c8bd7fa6"
+    },
+    "source_hashes": {
+      "pyproject.toml": {
+        "sha256": "44a00c59862e9561b158685901db98a77f73b499b1221b804b065db008d9e244",
+        "lf_sha256": "44a00c59862e9561b158685901db98a77f73b499b1221b804b065db008d9e244"
+      },
+      "uv.lock": {
+        "sha256": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3",
+        "lf_sha256": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3"
+      },
+      "selfhost_models/assets.py": {
+        "sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+        "lf_sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8"
+      },
+      "selfhost_models/storage.py": {
+        "sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+        "lf_sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4"
+      },
+      "selfhost_models/__init__.py": {
+        "sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+        "lf_sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed"
+      },
+      "selfhost_models/backend.py": {
+        "sha256": "270df5a0542b83963ad7c0aa91a93afba1b89c879083301d2a04e3298c663a4a",
+        "lf_sha256": "270df5a0542b83963ad7c0aa91a93afba1b89c879083301d2a04e3298c663a4a"
+      },
+      "selfhost_models/schema.py": {
+        "sha256": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a",
+        "lf_sha256": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a"
+      },
+      "selfhost_models/cli.py": {
+        "sha256": "04772a3442f47ee5fcba9d6bc55f4fc8310b6f234e82a5729cbb64f1f67e403c",
+        "lf_sha256": "04772a3442f47ee5fcba9d6bc55f4fc8310b6f234e82a5729cbb64f1f67e403c"
+      },
+      "selfhost_models/capabilities.py": {
+        "sha256": "fcd8e9553f8704c012b83df625455522a61fbbd1a85aa7db5ab3c47e6511b010",
+        "lf_sha256": "fcd8e9553f8704c012b83df625455522a61fbbd1a85aa7db5ab3c47e6511b010"
+      },
+      "selfhost_models/api.py": {
+        "sha256": "e9f35c851ad22825ba0d5ef8ae542ff0669328fd5df3498d712590d5c8bd7fa6",
+        "lf_sha256": "e9f35c851ad22825ba0d5ef8ae542ff0669328fd5df3498d712590d5c8bd7fa6"
+      }
+    }
+  },
+  "checkout_api_source_hashes": {
+    "pyproject.toml": {
+      "sha256": "70567698bc4c0b9a3f2a86ae97292172b0f242546222f9228feeddbda9fa52e7",
+      "lf_sha256": "44a00c59862e9561b158685901db98a77f73b499b1221b804b065db008d9e244"
+    },
+    "uv.lock": {
+      "sha256": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3",
+      "lf_sha256": "5ec4760a87b0141de5fa0da63b7fdf23f70f37b8066d2310c17882941618b0f3"
+    },
+    "selfhost_models/api.py": {
+      "sha256": "f68186bc646121ee256c6f04843483ad27e0ce24bdfed547b39bf78de0e8e726",
+      "lf_sha256": "e9f35c851ad22825ba0d5ef8ae542ff0669328fd5df3498d712590d5c8bd7fa6"
+    },
+    "selfhost_models/assets.py": {
+      "sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+      "lf_sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8"
+    },
+    "selfhost_models/backend.py": {
+      "sha256": "81f5dc642128aa4985635524425f4bac27319ff4fba81c4ed1d094b0ea5f378b",
+      "lf_sha256": "270df5a0542b83963ad7c0aa91a93afba1b89c879083301d2a04e3298c663a4a"
+    },
+    "selfhost_models/capabilities.py": {
+      "sha256": "362eb82257d3cbe3a2938d61a2f1811d1670f4ad2e11ca17f31ec96b3e8a08bb",
+      "lf_sha256": "fcd8e9553f8704c012b83df625455522a61fbbd1a85aa7db5ab3c47e6511b010"
+    },
+    "selfhost_models/cli.py": {
+      "sha256": "6868459e77bc0673045be2b48f4301ffc3e637f99a13ad34b8cb2ed0280492c8",
+      "lf_sha256": "04772a3442f47ee5fcba9d6bc55f4fc8310b6f234e82a5729cbb64f1f67e403c"
+    },
+    "selfhost_models/schema.py": {
+      "sha256": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a",
+      "lf_sha256": "2b65c2e6327690637d7b2788739a800f3d5d73516b6c93fff7e680540098368a"
+    },
+    "selfhost_models/storage.py": {
+      "sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+      "lf_sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4"
+    },
+    "selfhost_models/__init__.py": {
+      "sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+      "lf_sha256": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed"
+    }
+  },
+  "api_source_matches_checkout": false,
+  "api_source_text_matches_checkout": true,
+  "api_source_newline_only_differences": [
+    "pyproject.toml",
+    "selfhost_models/api.py",
+    "selfhost_models/backend.py",
+    "selfhost_models/capabilities.py",
+    "selfhost_models/cli.py"
+  ],
+  "source_comparison": "raw SHA256 retained; text comparison normalizes CRLF to LF only",
+  "gpu": "name, driver_version, memory.total [MiB], memory.used [MiB], memory.free [MiB]\nNVIDIA GeForce RTX 5090 Laptop GPU, 581.57, 24463 MiB, 15497 MiB, 8555 MiB",
+  "health": {
+    "ready": true,
+    "version": "0.1.0",
+    "worker_epoch": "44b0385554614ca5b699942c0fec0679",
+    "inflight": 0,
+    "detached": 0,
+    "uncertain": 0
+  },
+  "models": {
+    "object": "list",
+    "data": [
+      {
+        "id": "Qwen/Qwen3.5-4B",
+        "object": "model",
+        "created": 0,
+        "owned_by": "selfhost",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "backend": "vllm",
+        "capabilities": {
+          "text": true,
+          "stream": true,
+          "images": true,
+          "tools": true,
+          "thinking": true,
+          "cancellation": "drain_to_terminal",
+          "queue_capacity": 0,
+          "max_inflight_limit": 16,
+          "unsupported_parameters": []
+        },
+        "max_inflight": 2
+      }
+    ]
+  },
+  "settings": {
+    "BACKEND": "vllm",
+    "API_UID": "10001",
+    "API_GID": "10001",
+    "API_PORT": "18083",
+    "GPU_MEMORY_UTILIZATION": "0.6",
+    "MAX_INFLIGHT": "2",
+    "MAX_MODEL_LEN": "2048",
+    "DEADLINE_SECONDS": "30",
+    "DRAIN_SECONDS": "120"
+  }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "mode": "deadline",
+    "at": "2026-09-16T05:55:36.894582+00:00",
+    "headers_status": 200,
+    "generated_content_before_fault": true,
+    "url": "http://127.0.0.1:18082",
+    "backend": "transformers",
+    "worker_id": "112fb2de253a42f0384a9503edf07e13bbee54b2f49dcf34853c6e041c111125",
+    "error_frame": true,
+    "done_frame": false,
+    "retained": {
+      "ready": false,
+      "version": "0.1.0",
+      "worker_epoch": "9780dce31467443aaa1e585feb48f445",
+      "inflight": 1,
+      "detached": 1,
+      "uncertain": 0
+    },
+    "drained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "9780dce31467443aaa1e585feb48f445",
+      "inflight": 0,
+      "detached": 0,
+      "uncertain": 0
+    }
+  },
+  {
+    "mode": "disconnect",
+    "at": "2026-09-16T05:55:55.350841+00:00",
+    "headers_status": 200,
+    "generated_content_before_fault": true,
+    "url": "http://127.0.0.1:18082",
+    "backend": "transformers",
+    "worker_id": "112fb2de253a42f0384a9503edf07e13bbee54b2f49dcf34853c6e041c111125",
+    "error_frame": false,
+    "done_frame": false,
+    "retained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "9780dce31467443aaa1e585feb48f445",
+      "inflight": 1,
+      "detached": 1,
+      "uncertain": 0
+    },
+    "drained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "9780dce31467443aaa1e585feb48f445",
+      "inflight": 0,
+      "detached": 0,
+      "uncertain": 0
+    }
+  }
+]

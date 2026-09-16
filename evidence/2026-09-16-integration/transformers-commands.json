@@ -1,0 +1,200 @@
+[
+  {
+    "name": "register",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "modelctl",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers",
+      "register",
+      "Qwen/Qwen3.5-4B",
+      "--path",
+      "D:/hf_models/Qwen3.5-4B"
+    ],
+    "at": "2026-09-16T05:54:25.761905+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-register.log"
+  },
+  {
+    "name": "config",
+    "command": [
+      "docker",
+      "compose",
+      "--project-directory",
+      "D:\\projects\\selfhost-models",
+      "--env-file",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers\\compose.env",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.yaml",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.transformers.yaml",
+      "config",
+      "--format",
+      "json"
+    ],
+    "at": "2026-09-16T05:54:26.452541+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-config.log"
+  },
+  {
+    "name": "start",
+    "command": [
+      "docker",
+      "compose",
+      "--project-directory",
+      "D:\\projects\\selfhost-models",
+      "--env-file",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers\\compose.env",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.yaml",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.transformers.yaml",
+      "up",
+      "-d",
+      "--no-build",
+      "--pull",
+      "never"
+    ],
+    "at": "2026-09-16T05:54:26.974899+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-start.log"
+  },
+  {
+    "name": "acceptance",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/acceptance.py",
+      "--url",
+      "http://127.0.0.1:18082",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\transformers-acceptance.json"
+    ],
+    "at": "2026-09-16T05:55:28.471957+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-acceptance.log"
+  },
+  {
+    "name": "stream-lifecycle",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/stream_lifecycle_check.py",
+      "--url",
+      "http://127.0.0.1:18082",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\transformers-stream-lifecycle.json"
+    ],
+    "at": "2026-09-16T05:55:30.505185+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-stream-lifecycle.log"
+  },
+  {
+    "name": "smoke",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/transformers_smoke.py",
+      "--url",
+      "http://127.0.0.1:18082",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\transformers-smoke.json"
+    ],
+    "at": "2026-09-16T05:56:09.985896+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-smoke.log"
+  },
+  {
+    "name": "runtime",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/capture_runtime.py",
+      "--url",
+      "http://127.0.0.1:18082",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\transformers-runtime.json"
+    ],
+    "at": "2026-09-16T05:56:12.182752+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-runtime.log"
+  },
+  {
+    "name": "logs",
+    "command": [
+      "docker",
+      "compose",
+      "--project-directory",
+      "D:\\projects\\selfhost-models",
+      "--env-file",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers\\compose.env",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.yaml",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.transformers.yaml",
+      "logs",
+      "--no-color"
+    ],
+    "at": "2026-09-16T05:56:19.525542+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-logs.log"
+  },
+  {
+    "name": "stop",
+    "command": [
+      "docker",
+      "compose",
+      "--project-directory",
+      "D:\\projects\\selfhost-models",
+      "--env-file",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers\\compose.env",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.yaml",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.transformers.yaml",
+      "stop"
+    ],
+    "at": "2026-09-16T05:56:19.933601+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-stop.log"
+  },
+  {
+    "name": "after",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/service_snapshot.py",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-transformers",
+      "--port",
+      "18082",
+      "--before",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\before.json",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\transformers-after.json"
+    ],
+    "at": "2026-09-16T05:56:21.628380+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/transformers-after.log"
+  }
+]

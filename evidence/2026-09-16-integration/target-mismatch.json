@@ -1,0 +1,118 @@
+[
+  {
+    "script": "capture_runtime",
+    "case": "wrong-url",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/capture_runtime.py",
+      "--url",
+      "http://127.0.0.1:18080",
+      "--state",
+      ".state/integration-vllm",
+      "--output",
+      "evidence/raw/2026-09-16-integration/rejected-capture_runtime-wrong-url.json"
+    ],
+    "exit_code": 1,
+    "reason": "ValueError: URL must identify the configured loopback API port"
+  },
+  {
+    "script": "capture_runtime",
+    "case": "wrong-state",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/capture_runtime.py",
+      "--url",
+      "http://127.0.0.1:18080",
+      "--state",
+      ".state",
+      "--output",
+      "evidence/raw/2026-09-16-integration/rejected-capture_runtime-wrong-state.json"
+    ],
+    "exit_code": 1,
+    "reason": "ValueError: api deployment configuration differs from state"
+  },
+  {
+    "script": "stream_lifecycle_check",
+    "case": "wrong-url",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/stream_lifecycle_check.py",
+      "--url",
+      "http://127.0.0.1:18080",
+      "--state",
+      ".state/integration-vllm",
+      "--output",
+      "evidence/raw/2026-09-16-integration/rejected-stream_lifecycle_check-wrong-url.json"
+    ],
+    "exit_code": 1,
+    "reason": "ValueError: URL must identify the configured loopback API port"
+  },
+  {
+    "script": "stream_lifecycle_check",
+    "case": "wrong-state",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/stream_lifecycle_check.py",
+      "--url",
+      "http://127.0.0.1:18080",
+      "--state",
+      ".state",
+      "--output",
+      "evidence/raw/2026-09-16-integration/rejected-stream_lifecycle_check-wrong-state.json"
+    ],
+    "exit_code": 1,
+    "reason": "ValueError: api deployment configuration differs from state"
+  },
+  {
+    "script": "acceptance --faults",
+    "case": "wrong-url",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/acceptance.py",
+      "--faults",
+      "--url",
+      "http://127.0.0.1:18080",
+      "--state",
+      ".state/integration-vllm",
+      "--output",
+      "evidence/raw/2026-09-16-integration/rejected-acceptance-wrong-url.json"
+    ],
+    "exit_code": 1,
+    "reason": "ValueError: URL must identify the configured loopback API port"
+  },
+  {
+    "script": "acceptance --faults",
+    "case": "wrong-state",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/acceptance.py",
+      "--faults",
+      "--url",
+      "http://127.0.0.1:18080",
+      "--state",
+      ".state",
+      "--output",
+      "evidence/raw/2026-09-16-integration/rejected-acceptance-wrong-state.json"
+    ],
+    "exit_code": 1,
+    "reason": "ValueError: api deployment configuration differs from state"
+  }
+]

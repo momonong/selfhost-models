@@ -109,7 +109,23 @@ serve 在既有 selfhost-models 容器運行或 port 已用時拒絕接管。res
 
 固定 runtime 版本與實際 image digest、CUDA/PyTorch 組合見驗收紀錄。eager mode、短 context、小併發先建立可預期基準，後續另做 throughput、CUDA graphs 與記憶體調校；不以此次 smoke test 宣稱產品品質或 Linux 實機驗證。
 
+## 驗收腳本與自訂部署
+
+`capture_runtime.py`、`stream_lifecycle_check.py` 和 `acceptance.py --faults` 會先核對 URL 為設定的 HTTP loopback port、state key 與容器 secret 相同、Compose 設定 hash／backend 與所選 API／worker 一致。錯配在擷取或故障注入前拒絕。digest override 只有在 image ID 與當前設定的 image 完全相同、其餘部署設定未變時才接受；不同內容的歷史 image 必須搭配對應 checkout 驗收。
+
+例如已從此 checkout 啟動 `--state .state/integration-vllm`、port 18083 的部署，腳本使用同一組參數（輸出改用新的目錄）：
+
+```bash
+uv run --locked python scripts/capture_runtime.py --url http://127.0.0.1:18083 --state .state/integration-vllm --output evidence/rerun/runtime.json
+uv run --locked python scripts/stream_lifecycle_check.py --url http://127.0.0.1:18083 --state .state/integration-vllm --output evidence/rerun/stream-lifecycle.json
+uv run --locked modelctl --state .state/integration-vllm stop
+```
+
+本次整合的 `.state/integration-transformers`（18082）與 `.state/integration-vllm`（18083）均保留且服務已停止；原 `.state` 未覆寫。需重新啟動時明確選擇 backend／state／port，不可同時啟動兩個 backend。一般 `modelctl serve` 仍會 build；重用 image 時使用經核對的 Compose 設定和 `--no-build --pull never`，並以 runtime source checks 確認內容。
+
 ## WSL2 路徑、權限與固定 image 複驗
+
+下列 worktree、state 與 image digest 範例記錄 `e3fb6ed` 歷史驗收；該 worktree 在整合後已清理，原生 WSL state 與證據保留。當前版本一般操作請使用主目錄及上方 modelctl／backend 指令，不直接用舊 image 代表新版本。
 
 Ubuntu WSL2 可用 Linux CLI 連到 Docker Desktop，但仍屬 Windows 筆電驗證；Linux 桌機的 Engine、driver 與 NVIDIA Container Toolkit 要另外驗收。2026-09-16 WSL2 複驗使用既有 `/mnt/d/hf_models/Qwen3.5-4B`，沒有複製或下載模型。
 

@@ -1,0 +1,82 @@
+{
+  "environment": "real-service",
+  "url": "http://127.0.0.1:18082",
+  "faults": false,
+  "results": [
+    {
+      "check": "models",
+      "at": "2026-09-16T05:55:29.484285+00:00",
+      "model": {
+        "id": "Qwen/Qwen3.5-4B",
+        "object": "model",
+        "created": 0,
+        "owned_by": "selfhost",
+        "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "backend": "transformers",
+        "capabilities": {
+          "text": true,
+          "stream": true,
+          "images": false,
+          "tools": false,
+          "thinking": false,
+          "cancellation": "drain_to_terminal",
+          "queue_capacity": 0,
+          "max_inflight_limit": 1,
+          "unsupported_parameters": [
+            "stop",
+            "presence_penalty",
+            "frequency_penalty"
+          ]
+        },
+        "max_inflight": 1
+      }
+    },
+    {
+      "check": "non_stream",
+      "at": "2026-09-16T05:55:29.983038+00:00",
+      "status": 200,
+      "request_id": "357f1927c6c9428f9ea50bfbc12b4c39",
+      "usage": {
+        "prompt_tokens": 18,
+        "completion_tokens": 4,
+        "total_tokens": 22
+      }
+    },
+    {
+      "check": "stream",
+      "at": "2026-09-16T05:55:30.411389+00:00",
+      "chunks": 4,
+      "done": true
+    },
+    {
+      "check": "unsupported_parameter",
+      "at": "2026-09-16T05:55:30.416352+00:00",
+      "status": 400
+    },
+    {
+      "check": "bad_tokens",
+      "at": "2026-09-16T05:55:30.420789+00:00",
+      "status": 400
+    },
+    {
+      "check": "unknown_model",
+      "at": "2026-09-16T05:55:30.424552+00:00",
+      "status": 404
+    },
+    {
+      "check": "context_limit",
+      "at": "2026-09-16T05:55:30.456016+00:00",
+      "status": 400
+    },
+    {
+      "check": "authentication",
+      "at": "2026-09-16T05:55:30.459705+00:00",
+      "status": 401
+    },
+    {
+      "check": "body_limit",
+      "at": "2026-09-16T05:55:30.472321+00:00",
+      "status": 413
+    }
+  ]
+}

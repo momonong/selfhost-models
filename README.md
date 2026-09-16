@@ -32,9 +32,9 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 - [Backend 契約與 Transformers 執行路徑](docs/backend.md)
 - [模型候選與 GPU 盤點](docs/model-selection.md)
 
-已在 Windows WSL2／RTX 5090 Laptop 24 GB 上完成 **Qwen3.5-4B 的 Transformers 真實 GPU 文字推論與生命週期驗收**，同一分支的 vLLM 一般／SSE、圖片、工具、超載、逾時／取消及重啟恢復回歸也通過。CPU 單元／契約共 57 項通過。兩種 backend 依序載入，驗收後 API／worker 均正常停止，模型、state 與證據保留；Linux 實體桌機與 Linux Transformers 仍未驗證。能力差異、可重跑命令、image／commit 與限制見驗收文件。
+已整合 Transformers backend 與 Ubuntu WSL2 驗收成果。Windows／WSL CPU 契約各 **84 項通過**；Windows Docker Desktop WSL2／RTX 5090 Laptop 上，兩 backend 依序完成一般／SSE、實際文字輸出後的 deadline／disconnect、runtime／API／worker 來源比對與正常停機。Transformers 為文字、單請求、queue 0；vLLM 保留圖片與工具能力。來源分支的完整超載／重啟回歸與首次失敗紀錄也保留。
 
-同日另完成 **Ubuntu 24.04 WSL2 CLI 複驗**：重用相同 image digests，採 port 18081、Linux UID 1000 與原生 WSL state。修正驗收腳本 URL/state 設定及 CRLF/LF 來源比對，Windows／WSL 回歸各 34 項通過；真實 GPU 功能與補驗 runtime 證據獨立保存在 `evidence/2026-09-16-wsl2/`。這仍是 Windows 筆電／Docker Desktop，Linux 實體桌機尚未驗證。
+本次使用獨立 state 與 port 18082／18083，驗收後兩服務均 exit 0、lease 空；WSL worktree 已清理，模型、state 與原始證據妥善保留。API 與 Transformers worker 的來源有 CRLF／LF 差異，只能稱換行正規化後一致。Linux 實體桌機、Linux Transformers 與 HF 實際下載仍未驗證；詳細結果、操作與限制見 [驗收文件](docs/acceptance.md)。
 
 ```bash
 uv run --locked pytest -q

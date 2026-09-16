@@ -1,0 +1,23 @@
+{
+  "evidence/raw/2026-09-16-integration/run_backend.py": "52fc0b6c8814653ce6aaa5c6fecbb4c78af32034121e52546d76f69d1b7cf60d",
+  "evidence/raw/2026-09-16-integration/transformers-acceptance.log": "763959bd65e58292a8681660d1725c8608e4383109de83bdaf16c63cb4d9d16b",
+  "evidence/raw/2026-09-16-integration/transformers-after.log": "be0bd697d4046ee2a9b86ed96e148bf19bae1ed92793e944b2c67883996a07d6",
+  "evidence/raw/2026-09-16-integration/transformers-config.log": "22e7d13c13608c97117bb51a64ca80efac67f49446222f716997cbf17a1664d6",
+  "evidence/raw/2026-09-16-integration/transformers-logs.log": "d077dfe43ccdcea75a19386a10819bc856e8c784c33f00213cdabab8942e0f19",
+  "evidence/raw/2026-09-16-integration/transformers-register.log": "67c1b5e4f315fcc2328c8a800baf8155deabe9c564748257e86fe4caec8c601e",
+  "evidence/raw/2026-09-16-integration/transformers-runtime.log": "3cabfa80bfce91529e3b17f86b3d7096e0391a8baa8b58270f2ba55969051ce4",
+  "evidence/raw/2026-09-16-integration/transformers-smoke.log": "ec9a24f5f6e1a19b47e09b4a41561a445be9f51911dcdfc59e134d4eccff4307",
+  "evidence/raw/2026-09-16-integration/transformers-start.log": "a2644e63182ed36e6c909fd5b01ef984def312d489b40d04e5fce345c0a85b49",
+  "evidence/raw/2026-09-16-integration/transformers-stop.log": "98e7e6b79eea08184ece1209590a6e208d75e4d4a1cfadb0e48fb412528f3b26",
+  "evidence/raw/2026-09-16-integration/transformers-stream-lifecycle.log": "2bee2f7c9b03b064f7d6c326024520c759af23e15144ff597b6d64581b5bd59a",
+  "evidence/raw/2026-09-16-integration/vllm-acceptance.log": "45ed980cd44a0081b6088d3a4ae3fc7a43fc944080041468414eba88c6c7d6a0",
+  "evidence/raw/2026-09-16-integration/vllm-after.log": "9c347a78c28f84dfae57f3638cc91826e9350ad119269b6c7488efcdd90a8ef1",
+  "evidence/raw/2026-09-16-integration/vllm-config.log": "477e5a1df9e6db5c99c46bf38f6d282945cf6d18dec15e01ce3dcc73774000af",
+  "evidence/raw/2026-09-16-integration/vllm-logs.log": "4b152fe49db085107dbfe392a86874b93e66c44b3e8105546b626f73f2a04cde",
+  "evidence/raw/2026-09-16-integration/vllm-register.log": "6e88209368e6047f40a7ec26704588700b01f3dee4ff53aec2e62e5303284660",
+  "evidence/raw/2026-09-16-integration/vllm-runtime.log": "da373b9080d15917879dcf25b2572f605c211b417ac0a270c8c2648211469e67",
+  "evidence/raw/2026-09-16-integration/vllm-smoke.log": "4210fc44fc9371d68bde66329410e796cfda60b056bc64952cd195099f2294b5",
+  "evidence/raw/2026-09-16-integration/vllm-start.log": "db45adce83a553b77393cc6775e2e70d0c06625b59bce557327b30e8fa13e270",
+  "evidence/raw/2026-09-16-integration/vllm-stop.log": "98e7e6b79eea08184ece1209590a6e208d75e4d4a1cfadb0e48fb412528f3b26",
+  "evidence/raw/2026-09-16-integration/vllm-stream-lifecycle.log": "d14f01ff8f05e361903a136d06cd1d04e3cb3aa198dc462a99c9aaad94020b0e"
+}

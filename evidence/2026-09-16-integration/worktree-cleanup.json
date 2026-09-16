@@ -1,0 +1,23 @@
+{
+  "worktree": "D:\\projects\\selfhost-models\\.worktrees\\linux-vllm-acceptance",
+  "preserved_root": "D:\\projects\\selfhost-models\\evidence\\raw\\2026-09-16-integration\\worktree-preserved",
+  "ignored_files": 3999,
+  "preserved_files": 36,
+  "rebuildable_files": 3963,
+  "preservation": "copy2 then SHA256 readback; full manifest kept locally with original data",
+  "manifest_sha256": "eb36c3344d6811fd2b0f2783774ef23f37ad8aafeb8e2474c752078111a957f8",
+  "removed": true,
+  "removed_at": "2026-09-16T06:07:29.540864+00:00",
+  "method": "git worktree remove, no force",
+  "initial_attempt": {
+    "exit_code": 255,
+    "error": "Function not implemented deleting WSL venv lib64 symlink; Git deregistered the worktree but left partial files"
+  },
+  "recovery": "Restored original worktree registration/index and tracked source at e3fb6ed; verified clean, unlinked only .venv/lib64 -> lib using WSL; normal git worktree remove succeeded.",
+  "external_wsl_state": "/home/morris/.local/state/selfhost-models/vllm-acceptance-20260916 (preserved; leases empty)",
+  "preserved_branches": [
+    "feat/transformers-backend",
+    "test/linux-vllm-acceptance",
+    "integrate/transformers-wsl-validation"
+  ]
+}

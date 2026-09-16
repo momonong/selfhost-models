@@ -1,0 +1,192 @@
+[
+  {
+    "name": "register",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "modelctl",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm",
+      "register",
+      "Qwen/Qwen3.5-4B",
+      "--path",
+      "D:/hf_models/Qwen3.5-4B"
+    ],
+    "at": "2026-09-16T05:57:00.938612+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-register.log"
+  },
+  {
+    "name": "config",
+    "command": [
+      "docker",
+      "compose",
+      "--project-directory",
+      "D:\\projects\\selfhost-models",
+      "--env-file",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm\\compose.env",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.yaml",
+      "config",
+      "--format",
+      "json"
+    ],
+    "at": "2026-09-16T05:57:01.563542+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-config.log"
+  },
+  {
+    "name": "start",
+    "command": [
+      "docker",
+      "compose",
+      "--project-directory",
+      "D:\\projects\\selfhost-models",
+      "--env-file",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm\\compose.env",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.yaml",
+      "up",
+      "-d",
+      "--no-build",
+      "--pull",
+      "never"
+    ],
+    "at": "2026-09-16T05:57:02.080839+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-start.log"
+  },
+  {
+    "name": "acceptance",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/acceptance.py",
+      "--url",
+      "http://127.0.0.1:18083",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\vllm-acceptance.json"
+    ],
+    "at": "2026-09-16T06:01:13.744752+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-acceptance.log"
+  },
+  {
+    "name": "stream-lifecycle",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/stream_lifecycle_check.py",
+      "--url",
+      "http://127.0.0.1:18083",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\vllm-stream-lifecycle.json"
+    ],
+    "at": "2026-09-16T06:01:15.126930+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-stream-lifecycle.log"
+  },
+  {
+    "name": "smoke",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/multimodal_smoke.py",
+      "--url",
+      "http://127.0.0.1:18083",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\vllm-smoke.json"
+    ],
+    "at": "2026-09-16T06:01:45.282533+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-smoke.log"
+  },
+  {
+    "name": "runtime",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/capture_runtime.py",
+      "--url",
+      "http://127.0.0.1:18083",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\vllm-runtime.json"
+    ],
+    "at": "2026-09-16T06:01:48.901942+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-runtime.log"
+  },
+  {
+    "name": "logs",
+    "command": [
+      "docker",
+      "compose",
+      "--project-directory",
+      "D:\\projects\\selfhost-models",
+      "--env-file",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm\\compose.env",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.yaml",
+      "logs",
+      "--no-color"
+    ],
+    "at": "2026-09-16T06:01:56.910123+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-logs.log"
+  },
+  {
+    "name": "stop",
+    "command": [
+      "docker",
+      "compose",
+      "--project-directory",
+      "D:\\projects\\selfhost-models",
+      "--env-file",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm\\compose.env",
+      "-f",
+      "D:\\projects\\selfhost-models\\compose.yaml",
+      "stop"
+    ],
+    "at": "2026-09-16T06:01:57.334780+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-stop.log"
+  },
+  {
+    "name": "after",
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "python",
+      "scripts/service_snapshot.py",
+      "--state",
+      "D:\\projects\\selfhost-models\\.state\\integration-vllm",
+      "--port",
+      "18083",
+      "--before",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\before.json",
+      "--output",
+      "D:\\projects\\selfhost-models\\evidence\\2026-09-16-integration\\vllm-after.json"
+    ],
+    "at": "2026-09-16T06:01:58.933568+00:00",
+    "exit_code": 0,
+    "raw_log": "evidence/raw/2026-09-16-integration/vllm-after.log"
+  }
+]

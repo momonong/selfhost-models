@@ -1,0 +1,58 @@
+Using CPython 3.12.3 interpreter at: /usr/bin/python3.12
+Creating virtual environment at: .venv-wsl-integration
+Resolved 31 packages in 3ms
+   Building selfhost-models @ file:///mnt/d/projects/selfhost-models
+      Built selfhost-models @ file:///mnt/d/projects/selfhost-models
+Prepared 1 package in 929ms
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 30 packages in 7.60s
+ + annotated-types==0.8.0
+ + anyio==4.15.1
+ + certifi==2026.7.22
+ + charset-normalizer==3.5.1
+ + click==8.5.0
+ + filelock==3.32.6
+ + fsspec==2026.7.0
+ + h11==0.16.0
+ + hf-xet==1.6.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + huggingface-hub==0.34.4
+ + idna==3.19
+ + iniconfig==2.3.0
+ + packaging==26.3
+ + pillow==11.3.0
+ + pluggy==1.6.0
+ + pydantic==2.11.7
+ + pydantic-core==2.33.2
+ + pygments==2.21.0
+ + pytest==8.4.1
+ + pytest-asyncio==1.1.0
+ + pyyaml==6.0.3
+ + requests==2.34.2
+ + selfhost-models==0.1.0 (from file:///mnt/d/projects/selfhost-models)
+ + tqdm==4.70.1
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + urllib3==2.7.0
+ + uvicorn==0.35.0
+........................................................................ [ 90%]
+........                                                                 [100%]
+80 passed in 12.23s
+usage: capture_runtime.py [-h] [--url URL] [--state STATE] [--output OUTPUT]
+
+options:
+  -h, --help       show this help message and exit
+  --url URL
+  --state STATE
+  --output OUTPUT
+usage: stream_lifecycle_check.py [-h] [--url URL] [--state STATE]
+                                 [--output OUTPUT]
+
+options:
+  -h, --help       show this help message and exit
+  --url URL
+  --state STATE
+  --output OUTPUT

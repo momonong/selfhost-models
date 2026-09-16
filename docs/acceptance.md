@@ -1,5 +1,30 @@
 # 驗收方式
 
+## 整合交付（2026-09-16）
+
+從 `main@fe3b5ba0c4159ef57a26da82819367cd95364d1c` 依序 merge Transformers `876593a70a2c05954270da262edc842b13a14391`、WSL `e3fb6edd04e76429f58b86600ab83ad913101c2d`，保留兩邊歷史與原始證據。整合分支為 `integrate/transformers-wsl-validation`，主要工作目錄 `D:/projects/selfhost-models`。兩次 merge 為 `8d154a6`、`5938a9a`；驗收工具後續修正為 `6c132a8`。
+
+衝突位於 `capture_runtime.py`、`stream_lifecycle_check.py` 與本文件：合併 backend-aware `compose_command(state)`、URL/state/output、兩種 worker 來源檢查、raw SHA256／僅 CRLF→LF 正規化比較，並保留非空 `delta.content` 才注入故障的條件。API 與 worker 都要求來源檔案集合完全相同；內容、BOM、空白或最後換行漂移仍拒絕。新增部署預檢將 HTTP port、state 認證、Compose 設定、backend 與實際容器綁在同一部署，錯配先拒絕；同 image ID 的 digest 引用可接受，其他設定仍須一致。
+
+相對 Transformers 指定成果，serving、schema、模型、依賴、Dockerfile 與 Compose 內容均未改。本次重用既有本機 image，以 `--no-build --pull never` 啟動，沒有重新 build／pull 或下載權重；因此只重跑受整合影響的 GPU 驗收，不重複來源分支已通過的超載及 API／worker restart 完整回歸。
+
+| 層級 | 整合結果與證據 |
+|---|---|
+| Windows CPU | **84 passed / 5.22s**；[輸出](../evidence/2026-09-16-integration/cpu-tests-final.txt) |
+| Ubuntu WSL2 CPU／CLI | **84 passed / 9.63s**；[最終測試](../evidence/2026-09-16-integration/wsl-cpu-final.txt)、[離線環境與 CLI](../evidence/2026-09-16-integration/wsl-cpu-cli.txt)；主目錄獨立 `.venv-wsl-integration`，不共用 Windows `.venv` |
+| 固定依賴／範圍核對 | 兩份 uv lock 檢查、CLI、來源與歷史證據未變，[契約摘要](../evidence/2026-09-16-integration/contract-checks.json) |
+| Transformers 真實 GPU | 新 state `.state/integration-transformers`、port 18082；[一般／SSE 與輸入限制](../evidence/2026-09-16-integration/transformers-acceptance.json)、[文字／取樣與能力拒絕](../evidence/2026-09-16-integration/transformers-smoke.json)、[串流 deadline／disconnect](../evidence/2026-09-16-integration/transformers-stream-lifecycle.json) 均通過 |
+| vLLM 真實 GPU | Transformers 停止後才啟動，新 state `.state/integration-vllm`、port 18083；[一般／SSE 與輸入限制](../evidence/2026-09-16-integration/vllm-acceptance.json)、[圖片／工具](../evidence/2026-09-16-integration/vllm-smoke.json)、[串流 deadline／disconnect](../evidence/2026-09-16-integration/vllm-stream-lifecycle.json) 均通過 |
+| runtime／來源 | [Transformers](../evidence/2026-09-16-integration/transformers-runtime.json)、[vLLM](../evidence/2026-09-16-integration/vllm-runtime.json)：兩 API 各 5 檔、Transformers worker 8 檔僅換行不同，raw match=false／text match=true；vLLM worker 逐位元相同。完整原始 hash、差異清單、image ID、model revision 均保留 |
+| URL/state 錯配 | 三個相關入口共 6 次實際拒絕，[結果](../evidence/2026-09-16-integration/target-mismatch.json)；故障注入前拒絕，不操作其他部署 |
+| 正常停機 | [Transformers](../evidence/2026-09-16-integration/transformers-after.json)、[vLLM](../evidence/2026-09-16-integration/vllm-after.json)：API／worker exit 0、port 關閉、leases 空、模型 inventory 與既有四個 KaChing 容器未變 |
+
+模型仍為 `Qwen/Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`，唯讀掛載。GPU 執行環境仍是 Windows Docker Desktop WSL2／RTX 5090 Laptop；這不是 Linux 實體桌機或 Linux Transformers 的驗收。HF 實際下載、其他 GPU／driver、產品品質與強制 GPU abort 都未由本次證實。Transformers 仍為文字、單請求、queue 0、`drain_to_terminal`，能力限制見 backend 文件。
+
+Transformers runtime 對應 `5938a9a`；vLLM runtime 對應 `6c132a8`。中間僅新增驗收預檢的同 image ID 引用相容與 `acceptance --faults` guard，既有正常設定驗證與 serving 未變；補做最終 CPU 與實際錯配檢查，未重跑不受影響的 Transformers 推論。完整命令列與退出碼見 [Transformers 命令](../evidence/2026-09-16-integration/transformers-commands.json)、[vLLM 命令](../evidence/2026-09-16-integration/vllm-commands.json)，本次原始日誌保留於 `evidence/raw/2026-09-16-integration/`。
+
+WSL worktree 已經由 `git worktree remove` 清理，來源與整合分支保留。[清理紀錄](../evidence/2026-09-16-integration/worktree-cleanup.json) 包含 ignored 檔案盤點與 Windows Git symlink 清理故障／恢復過程。36 個 state／原始證據檔先另存至 `evidence/raw/2026-09-16-integration/worktree-preserved/` 並 SHA256 核對；WSL 原生 `/home/morris/.local/state/selfhost-models/vllm-acceptance-20260916` 保持原樣。下方各節為來源任務的歷史驗收，測試數量與當時部署狀態不代表當前整合版本。
+
 ## Transformers backend（Windows，2026-09-16）
 
 Qwen/Qwen3.5-4B，固定 revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`，已完成 Windows Docker Desktop WSL2／RTX 5090 Laptop 真實 GPU 文字推論與生命週期驗收。模型唯讀接入 `D:/hf_models/Qwen3.5-4B`，未搬移、覆寫或下載。這是合成服務驗收；不代表 Linux 實體桌機上的 Transformers、圖片／工具能力或產品品質通過。

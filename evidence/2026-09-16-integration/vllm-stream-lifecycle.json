@@ -1,0 +1,56 @@
+[
+  {
+    "mode": "deadline",
+    "at": "2026-09-16T06:01:21.691925+00:00",
+    "headers_status": 200,
+    "generated_content_before_fault": true,
+    "url": "http://127.0.0.1:18083",
+    "backend": "vllm",
+    "worker_id": "417bff1841464e8a19284e8f4e6b6a95a49819e79f906e5230678c21d673bf3e",
+    "error_frame": true,
+    "done_frame": false,
+    "retained": {
+      "ready": false,
+      "version": "0.1.0",
+      "worker_epoch": "44b0385554614ca5b699942c0fec0679",
+      "inflight": 1,
+      "detached": 1,
+      "uncertain": 0
+    },
+    "drained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "44b0385554614ca5b699942c0fec0679",
+      "inflight": 0,
+      "detached": 0,
+      "uncertain": 0
+    }
+  },
+  {
+    "mode": "disconnect",
+    "at": "2026-09-16T06:01:32.115262+00:00",
+    "headers_status": 200,
+    "generated_content_before_fault": true,
+    "url": "http://127.0.0.1:18083",
+    "backend": "vllm",
+    "worker_id": "417bff1841464e8a19284e8f4e6b6a95a49819e79f906e5230678c21d673bf3e",
+    "error_frame": false,
+    "done_frame": false,
+    "retained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "44b0385554614ca5b699942c0fec0679",
+      "inflight": 1,
+      "detached": 1,
+      "uncertain": 0
+    },
+    "drained": {
+      "ready": true,
+      "version": "0.1.0",
+      "worker_epoch": "44b0385554614ca5b699942c0fec0679",
+      "inflight": 0,
+      "detached": 0,
+      "uncertain": 0
+    }
+  }
+]

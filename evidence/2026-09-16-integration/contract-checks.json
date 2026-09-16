@@ -1,0 +1,41 @@
+{
+  "at": "2026-09-16T05:59:23.183569+00:00",
+  "integration_code_commit": "5938a9acb670bba0a6eb9fe6de59df9f38801117",
+  "base": "fe3b5ba0c4159ef57a26da82819367cd95364d1c",
+  "sources": [
+    "876593a70a2c05954270da262edc842b13a14391",
+    "e3fb6edd04e76429f58b86600ab83ad913101c2d"
+  ],
+  "windows_cpu": {
+    "passed": 84,
+    "seconds": 5.22,
+    "log": "cpu-tests-final.txt"
+  },
+  "wsl_cpu": {
+    "passed": 84,
+    "seconds": 9.63,
+    "log": "wsl-cpu-final.txt"
+  },
+  "lock_checks": [
+    "uv lock --check --offline",
+    "uv lock --project worker/transformers --check --offline"
+  ],
+  "cli_checks": [
+    "modelctl --help",
+    "capture_runtime.py --help",
+    "stream_lifecycle_check.py --help"
+  ],
+  "unchanged_from_transformers_source": [
+    "selfhost_models",
+    "worker",
+    "docker",
+    "compose.yaml",
+    "compose.transformers.yaml",
+    "pyproject.toml",
+    "uv.lock"
+  ],
+  "gpu_scope": "New integrated general/SSE, readiness, deadline/disconnect after generated content, smoke and source/config capture; existing full overload/API-worker restart regressions retained at source. No serving/schema/dependency/image content changes; no rebuild/pull/download.",
+  "historical_evidence_unchanged": true,
+  "final_validation_tools_commit": "6c132a89cdc63396c71be6765f1ea601a60f6058",
+  "tool_followup_scope": "Adds same-image-ID digest-reference compatibility and acceptance --faults preflight; validated by final CPU suites and live mismatch checks. Standard configured-image validation and serving are unchanged."
+}

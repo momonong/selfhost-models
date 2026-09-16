@@ -1,0 +1,132 @@
+{
+  "at": "2026-09-16T06:02:02.916826+00:00",
+  "containers": [
+    {
+      "id": "0a50b80667adc346ac305bfe6365b3a34f10bd529730256e2a84166c836082ee",
+      "name": "/kaching-portable-test-mcp-read-api-1",
+      "project": "kaching-portable-test",
+      "image_id": "sha256:dfa89d3eb3d32c38470aa366963acc2d6587c8b5f7f4090b90ebaff907287b49",
+      "started_at": "2026-09-16T01:59:20.909457558Z",
+      "running": true,
+      "paused": false,
+      "exit_code": 0
+    },
+    {
+      "id": "417bff1841464e8a19284e8f4e6b6a95a49819e79f906e5230678c21d673bf3e",
+      "name": "/selfhost-models-worker-1",
+      "project": "selfhost-models",
+      "image_id": "sha256:f990b1866f6ae4f6f1063395001ddfa40076acf0085d6ecae5c78e7a12170630",
+      "started_at": "2026-09-16T05:57:02.676219301Z",
+      "running": false,
+      "paused": false,
+      "exit_code": 0
+    },
+    {
+      "id": "80ef19f8d5f8941b6f66675d5d611c9cb201d651ad0b1d5f2231f9f230f30dda",
+      "name": "/kaching-portable-test-mcp-1",
+      "project": "kaching-portable-test",
+      "image_id": "sha256:1a01d94d51a0d0ce7153e26e3d05d70d8df3fd70e19100e00610b44f3ce47067",
+      "started_at": "2026-09-16T01:59:20.912450187Z",
+      "running": true,
+      "paused": false,
+      "exit_code": 0
+    },
+    {
+      "id": "bdcc6a5a05e524d1aea8598642dca0fe4be0854a6001023d9ce03a71182ce0e9",
+      "name": "/kaching-portable-test-web-1",
+      "project": "kaching-portable-test",
+      "image_id": "sha256:a15de551f24d32d9ffd14a02c3c7c4376a33110b3f8a783b887ed82591f83930",
+      "started_at": "2026-09-16T01:59:20.914191846Z",
+      "running": true,
+      "paused": false,
+      "exit_code": 0
+    },
+    {
+      "id": "c582ba0d9e683e499fcc558ff6079e5465ae5776be284e1d25153811cd2e2355",
+      "name": "/kaching-portable-test-api-1",
+      "project": "kaching-portable-test",
+      "image_id": "sha256:55e5e4e6384cdbd635993583a682c79cf06748e48694511d53564a1b7752ed02",
+      "started_at": "2026-09-16T01:59:20.925221743Z",
+      "running": true,
+      "paused": false,
+      "exit_code": 0
+    },
+    {
+      "id": "dcf418e904028dac1efd222c87fe347b18619bcfac758bf517d51ff45f1b3b70",
+      "name": "/selfhost-models-api-1",
+      "project": "selfhost-models",
+      "image_id": "sha256:2ef94d5cb7824b23e859296f18fe210f3eff0cc93751edf469ae5b227ab0dd5f",
+      "started_at": "2026-09-16T05:57:02.692774562Z",
+      "running": false,
+      "paused": false,
+      "exit_code": 0
+    }
+  ],
+  "gpu": "name, driver_version, memory.total [MiB], memory.used [MiB], memory.free [MiB]\nNVIDIA GeForce RTX 5090 Laptop GPU, 581.57, 24463 MiB, 676 MiB, 23376 MiB",
+  "port": 18083,
+  "port_open": false,
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "model_files": {
+    "chat_template.jinja": {
+      "size": 7756,
+      "mtime_ns": 1785355420765882600,
+      "sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715"
+    },
+    "config.json": {
+      "size": 3161,
+      "mtime_ns": 1785355420731137600,
+      "sha256": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670"
+    },
+    "merges.txt": {
+      "size": 3353259,
+      "mtime_ns": 1785355420848439600,
+      "sha256": "a9d356d7bdf1ef4949e3e748e95b8e10ad9d4e2e838eddc38a0a7b6b94d1db8d"
+    },
+    "model.safetensors-00001-of-00002.safetensors": {
+      "size": 5329398688,
+      "mtime_ns": 1785355519749340600
+    },
+    "model.safetensors-00002-of-00002.safetensors": {
+      "size": 3990429408,
+      "mtime_ns": 1785355517020933800
+    },
+    "model.safetensors.index.json": {
+      "size": 76196,
+      "mtime_ns": 1785355420998751400,
+      "sha256": "cf3f798ee02ba45f9622aa8892a47369ab667d0afbf154ee7c2212de42e6302d"
+    },
+    "preprocessor_config.json": {
+      "size": 390,
+      "mtime_ns": 1785355420994567400,
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516"
+    },
+    "tokenizer.json": {
+      "size": 12807982,
+      "mtime_ns": 1785355422027915500,
+      "sha256": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42"
+    },
+    "tokenizer_config.json": {
+      "size": 16710,
+      "mtime_ns": 1785355421088309500,
+      "sha256": "316230d6a809701f4db5ea8f8fc862bc3a6f3229c937c174e674ff3ca0a64ac8"
+    },
+    "video_preprocessor_config.json": {
+      "size": 385,
+      "mtime_ns": 1785355421087309900,
+      "sha256": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13"
+    },
+    "vocab.json": {
+      "size": 6722759,
+      "mtime_ns": 1785355421280194000,
+      "sha256": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003"
+    }
+  },
+  "runtime_state_exists": true,
+  "cleanup_checks": {
+    "model_unchanged": true,
+    "unrelated_services_unchanged": true,
+    "services_stopped_exit_zero": true,
+    "port_closed": true,
+    "state_preserved": true
+  }
+}
