@@ -2,6 +2,8 @@
 
 ## 有界影片（2026-09-16，工作分支驗收）
 
+後續版本核對：影片成果已於 `841132e1732d29e72458fd4b09d012b12e4e7792` 合併並推送 GitHub main。以下保留當時工作分支驗收狀態；截至桌機交接文件更新時，影片 images 尚未發布。桌機請依本文的 Linux 桌機章節操作。
+
 起點 `main@5a077e3883b3b2b6a0e817ff91f209ace6b15bd9`，`feat/video-inference`，沿用主要工作目錄，沒有額外 worktree。已和 PixelReceipt 接入任務協調排他維護，僅操作本專案 API/worker；不並載 backend、不改模型、不發布 image。[可行性與失敗紀錄](video-feasibility.md)；證據集中於 `evidence/2026-09-16-video/`。
 
 重跑需已協調服務使用時段；以下會重建本專案容器及受控 pause/restart，不能對正在給其他產品使用的服務直接執行。每次改用新的 evidence 目錄保留失敗結果。
@@ -62,38 +64,83 @@ uv run --locked python scripts/capture_runtime.py --output evidence/<run>/runtim
 
 ## Linux 桌機實機驗收（待執行）
 
-這是未執行的操作清單，不是 Linux 通過證據。使用桌機獨立 checkout 與相同交付 commit，先核對 Git 狀態、driver、Docker Engine、Compose、NVIDIA Container Toolkit 與 GPU 空間。不得用 Windows／WSL2 結果替代。主機基礎環境缺失時先依發行版安排安裝，不在驗收腳本內更新驅動或重啟共用 Docker。
+這是桌機尚未執行的驗收程序，不是 Linux 通過證據。先完成 [桌機交接入口](deployment.md#linux-桌機交接入口) 的來源、host、模型與獨立 state 準備。目前原始碼交付基準為 `841132e`；舊公開 `sha-4dc0a81` 不包含影片功能，下列流程從桌機 checkout 建置。
 
-1. `uv sync --locked`、`uv run --locked pytest -q`、`uv run --locked modelctl doctor`。
-2. 找到既有 Qwen3.5-4B 的 Linux 路徑（例如 `/srv/selfhost-models/models/Qwen3.5-4B`），使用 `modelctl register Qwen/Qwen3.5-4B --path <實際路徑>`。執行 inspect，核對 revision 為 `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`；缺少資產就先安排下載或移轉，不猜 revision。
-3. 若桌機沒有應用 image，可從筆電 `docker image save -o <archive.tar> selfhost-models-api:0.1.0 selfhost-models-vllm:0.29.0 selfhost-models-transformers:0.1.0`，移轉並核對 archive SHA256，再於桌機 `docker image load -i <archive.tar>`。image 不含權重或 state。若改成在桌機重建，必須記錄新 image ID 與來源／runtime，不宣稱同一應用 image。
-4. 下方採一般 `modelctl serve` 建置啟動流程，會記錄桌機實際產生的 image ID；即使事先移轉了 image，也不能假設 build 後 ID 不變。固定基底、套件與來源並以 runtime 檢查驗證；不要使用歷史 state 的 Windows 路徑。若需要嚴格不 build 的相同 image 驗收，另依部署文件配置主機專屬 state 與 digest override。
-5. 以下從 repo 根目錄依序執行，先 vLLM，完全停止後才 Transformers。證據目录每次使用新名稱。
+先盤點 GPU／port／其他服務並安排排他維護時段。即使 ready，也不代表沒有產品正在使用服務；以下包含超載、pause/restart、解碼與暫存檢查。現有部署需先協調停機，不直接搶占。不得同時載入兩個 backend。命令於 repo 根目錄以 Bash 執行，每次使用新的 evidence 目錄；任何失敗先保存 logs 與狀態，不跳過後繼續宣稱通過。
+
+### A. CPU 與主機基準
 
 ```bash
-uv run --locked python scripts/service_snapshot.py --output evidence/linux-desktop-before.json
-uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --context 2048 --max-inflight 2 --gpu-memory 0.60
-uv run --locked python scripts/chat.py --stream 'Reply with the word READY.'
-uv run --locked python scripts/acceptance.py --faults --output evidence/linux-desktop-vllm/acceptance.json
-uv run --locked python scripts/multimodal_smoke.py --output evidence/linux-desktop-vllm/smoke.json
-uv run --locked python scripts/stream_lifecycle_check.py --output evidence/linux-desktop-vllm/stream.json
-uv run --locked python scripts/capture_runtime.py --output evidence/linux-desktop-vllm/runtime.json
-uv run --locked modelctl stop
-uv run --locked python scripts/service_snapshot.py --before evidence/linux-desktop-before.json --output evidence/linux-desktop-vllm/stopped.json
-
-uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend transformers --context 2048 --max-inflight 1 --gpu-memory 0.60
-uv run --locked python scripts/chat.py --stream 'Reply with the word READY.'
-uv run --locked python scripts/acceptance.py --faults --output evidence/linux-desktop-transformers/acceptance.json
-uv run --locked python scripts/transformers_smoke.py --output evidence/linux-desktop-transformers/smoke.json
-uv run --locked python scripts/stream_lifecycle_check.py --output evidence/linux-desktop-transformers/stream.json
-uv run --locked python scripts/capture_runtime.py --output evidence/linux-desktop-transformers/runtime.json
-uv run --locked modelctl stop
-uv run --locked python scripts/service_snapshot.py --before evidence/linux-desktop-before.json --output evidence/linux-desktop-transformers/stopped.json
+set -euo pipefail
+RUN="evidence/linux-desktop-$(date -u +%Y%m%dT%H%M%SZ)"
+mkdir -p "$RUN"
+git rev-parse HEAD > "$RUN/source-commit.txt"
+git status --short > "$RUN/git-status.txt"
+uv sync --locked
+uv run --locked pytest -q | tee "$RUN/cpu-tests.txt"
+uv run --locked modelctl doctor > "$RUN/doctor.txt"
+uv run --locked python scripts/service_snapshot.py --output "$RUN/before.json"
+# 生成本機合成素材；不下載任何桌球影片。也產生 decoder check 所需的 720p60 fixture。
+uv run --locked python scripts/video_decode_probe.py --stress --output "$RUN/decode-probe.json"
 ```
 
-通過條件：每個命令 exit 0；CPU 測試通過；一般／SSE 有完成結果；故障期間 lease 保留、恢復後歸零；能力拒絕正確；模型／來源／runtime 可追溯；最終正常停機且其他服務未變。任何步驟失敗先保留 logs，不繼續宣稱通過；故障注入 finally 解除 pause，仍需確認停機。可用 `scripts/service_snapshot.py` 在開始前保存快照，停止後帶 `--before` 核對模型、其他服務與正常停止。最後要常駐使用時，再啟動選定 backend 並確認 ready。
+CPU 測試基準為影片交付的 113 項；若來源後續變更，依實際測試與差異核對。解碼探測是 CPU 證據，不能當 GPU 驗證。`RUN` 變數需保留在同一個 shell；若換 shell，設回同一個本次目錄，不覆寫舊紀錄。
 
-若某種 backend 失敗，分別記錄結果，不因另一種成功而一併標記 Linux 通過。不得刪除 lease state 來繞過故障。
+### B. vLLM 文字／圖片／工具與影片
+
+```bash
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 8192 --max-inflight 2 --gpu-memory 0.60
+uv run --locked python scripts/chat.py --wait 600 --stream 'Reply with READY.'
+uv run --locked python scripts/acceptance.py --faults --output "$RUN/vllm-general.json"
+uv run --locked python scripts/multimodal_smoke.py --output "$RUN/vllm-image-tools.json"
+uv run --locked python scripts/stream_lifecycle_check.py --output "$RUN/vllm-text-stream.json"
+uv run --locked python scripts/video_decoder_check.py --output "$RUN/linux-decoder.json"
+uv run --locked python scripts/video_acceptance.py --output "$RUN/video-api.json"
+uv run --locked python scripts/stream_lifecycle_check.py --video .state/video-fixtures/synthetic-60s.mp4 --output "$RUN/video-stream.json"
+uv run --locked python scripts/capture_runtime.py --output "$RUN/vllm-runtime.json"
+uv run --locked modelctl stop
+uv run --locked python scripts/service_snapshot.py --before "$RUN/before.json" --output "$RUN/vllm-stopped.json"
+```
+
+先確認 ready、模型 revision／backend／videos 正確。影片測試涵蓋 2/10/30/60 秒合成 MP4、一般與 SSE、usage／DONE、超限、解碼逾時、超載、斷線及暫存清理；decoder check 驗證 API 容器內的 OS limits、真實子程序 kill/wait 與清理。串流故障需在實際非空文字後才注入，確認底層未完成時仍持有 lease。若筆電的 8192 context／並行 2／GPU 0.60 無法在桌機初始化，保存失敗與 VRAM 紀錄，先協調調整；不能悄悄降低影片規格後宣稱原上限通過。
+
+### C. Transformers 文字（必須先完成 B 的停止核對）
+
+```bash
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend transformers --context 2048 --max-inflight 1 --gpu-memory 0.60
+uv run --locked python scripts/chat.py --wait 600 --stream 'Reply with READY.'
+uv run --locked python scripts/acceptance.py --faults --output "$RUN/transformers-general.json"
+uv run --locked python scripts/transformers_smoke.py --output "$RUN/transformers-smoke.json"
+uv run --locked python scripts/stream_lifecycle_check.py --output "$RUN/transformers-stream.json"
+uv run --locked python scripts/capture_runtime.py --output "$RUN/transformers-runtime.json"
+uv run --locked modelctl stop
+uv run --locked python scripts/service_snapshot.py --before "$RUN/before.json" --output "$RUN/transformers-stopped.json"
+```
+
+Transformers 不支援影片，不加 `--video`。若本次桌機只部署 vLLM，可以延後 C，但交接須明確標示 Linux Transformers 未驗收，不能以 vLLM 成功代替。
+
+### D. 完成條件與失敗收尾
+
+- 命令 exit 0，且 evidence 各檢查成功；一般／SSE 取得完整結果，能力限制與錯誤回應正確。
+- 取消／逾時後 lease 保留到實際完成，恢復後歸零；decoder children 與暫存清理，模型／其他服務不受影響。
+- 保存實際 commit、dirty state、模型 revision、image IDs、runtime、GPU／driver；重建結果不假稱與筆電 image digest 一樣。
+- 若命令失敗，`set -e` 會中止後續命令，但不會自動完成停機。另開 shell 保存本專案 Compose logs，檢查容器是否 paused、lease 與就緒狀態；在協調好的維護範圍內恢復／停止本專案容器，不刪 journal、不停止其他服務。未回收子程序或未正常停止不能算通過。
+- 最終驗收停機快照應有正常退出、未 paused、端口釋放。需要日常運行時依部署文件重新啟動選定 backend，取得 ready 並記錄最後狀態；測試完成和服務常駐是兩件事。
+- Linux GPU 服務通過、HF 實際下載通過、桌球精彩程度品質通過分開回報；合成影片不能證明快速攻防判斷品質。
+
+### 桌機任務開場文字
+
+```text
+請依 docs/deployment.md「Linux 桌機交接入口」及 docs/acceptance.md「Linux 桌機實機驗收」在這台桌機部署並驗收 selfhost-models。
+先讀 AGENTS.md，核對實際工作目錄、HEAD、dirty state 與其他任務／GPU／Docker 使用情況。
+影片來源基準為 841132e1732d29e72458fd4b09d012b12e4e7792；確認 checkout 包含此提交及本次交接文件，記錄實際 HEAD，不自行 reset。
+舊 Docker Hub sha-4dc0a81 不支援影片；先採固定來源本機建置，若已有更新發布紀錄則核對其來源及 digest 後再決定。
+建立桌機專屬模型登錄與 state/key，不複製筆電 .state。優先完成 vLLM 文字／圖片／工具／影片，再完全停止後驗證 Transformers 文字。
+可執行已協調維護時段內的本專案部署與故障驗收；驅動／Docker 主機級變更及模型下載若尚未授權，先列出具體需求。
+若缺少硬體資源或相容性不足，保存失敗證據並討論，不替換固定 runtime 或悄悄降低驗收規格。
+完成後保留 vLLM 影片服務 ready 供桌機本機使用，回報 key 檔案位置但不輸出內容。不開放 LAN／公網，不影響其他服務。
+不合併、推送或發布新 images；如需修正程式，在工作分支完成並交代變更與驗證。桌球產品品質另行驗收。
+```
 
 ## 整合交付（2026-09-16）
 

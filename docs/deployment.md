@@ -12,6 +12,63 @@ uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 
 
 只有 `/health/ready` 成功且 `/v1/models` 宣告 videos 才能送影片；暖機包含最大影片形狀。新建容器的 JIT 可能較久，不因等待而刪除 lease state。初始化失敗／未知工作仍須保留日誌，按既有新 worker epoch 恢復流程處理。完整 API 限制與重跑證據見 [API](api.md)、[驗收](acceptance.md)。本機建置不等於 Docker Hub 已發布；本次影片 image 未發布。
 
+## Linux 桌機交接入口
+
+截至 2026-09-16 本次核對，GitHub `main` 已包含影片功能提交 `841132e1732d29e72458fd4b09d012b12e4e7792`。Docker Hub 三個 repositories 仍只有 `sha-4dc0a81`；**舊 API／worker images 不支援這次影片契約，不可混用新 Compose 與舊 images 來驗收影片**。下方 Docker Hub 表格保留作舊版發布紀錄。本節採用桌機從固定來源建置，不需要等待新版 image 發布。
+
+### 1. 取得來源與盤點主機
+
+在桌機既有 checkout 操作前，先確認沒有其他任務使用該目錄；沒有 checkout 才 clone，不建立額外 worktree。核對 `git status --short`、`git worktree list`、`git rev-parse HEAD` 與 `git log -5 --oneline`，不要強制重設既有工作。
+
+```bash
+git fetch origin
+git merge-base --is-ancestor 841132e1732d29e72458fd4b09d012b12e4e7792 HEAD
+# 上一行非零表示目前 checkout 尚未包含影片交付，先解決版本問題。
+uname -m
+cat /etc/os-release
+nvidia-smi
+docker version
+docker compose version
+nvidia-ctk --version
+uv --version
+uv sync --locked
+uv run --locked modelctl doctor
+```
+
+這組 runtime 的桌機目標為 Linux x86_64／NVIDIA GPU。不要只比較 VRAM 容量；GPU 架構、host driver 與各 image 的 CUDA runtime 也要相容。driver 留在 host，PyTorch／CUDA 依 Dockerfile 固定配套；不另裝 host PyTorch 來修容器。缺 driver、Docker 或 NVIDIA Container Toolkit 時，由桌機任務依實際發行版處理；涉及 Docker 重啟前先協調其他服務。不要因為筆電用 WSL2 就在 Linux 桌機安裝 WSL。
+
+記錄實際 HEAD、dirty state、GPU 型號／總量／已用 VRAM、driver、Docker／Compose 與 Toolkit 版本。筆電影片的 context 8192、並行 2、GPU fraction 0.60 是驗證起點，不保證桌機相同設定可用。沿用預設 V1 runner；切到 V2 屬另一項配置變更，需獨立驗證。
+
+### 2. 模型及主機狀態
+
+不要複製筆電 `.state`、API key、leases.json、compose.env、`.venv` 或實驗 override。桌機使用自己的 state 與 key；以下預設是桌機 repo 下的 `.state`，由 modelctl 產生 host 路徑與 UID/GID。以同一個有 Docker 權限的普通使用者執行，避免混用 sudo 造成檔案擁有者不同。
+
+先找到已存在的完整模型目錄，再登錄（範例路徑需依實際資產修改）：
+
+```bash
+uv run --locked modelctl register Qwen/Qwen3.5-4B --path /srv/selfhost-models/models/Qwen3.5-4B
+uv run --locked modelctl inspect Qwen/Qwen3.5-4B
+```
+
+必須核對 revision 為 `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`。保留來源 metadata；缺 metadata 時，只有能以移轉清單等證據確認來源，才提供明確 `--revision`，不能用旗標掩蓋未知來源。移轉權重時核對檔案清單及 SHA256；不要搬動筆電正在掛載的原模型。
+
+若沒有資產，另行選擇移轉或下載。獲授權下載後使用 `uv run --locked modelctl fetch Qwen/Qwen3.5-4B --revision 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`，確認預設 `/srv/selfhost-models/models` 可寫；需要其他位置時，所有相關 modelctl 命令一致使用 `--model-root <實際目錄>`（放在子命令前）。HF 真實下載仍待桌機實測，啟動及請求不下載模型。
+
+### 3. 驗收後常駐使用
+
+先完成 [Linux 桌機驗收](acceptance.md#linux-桌機實機驗收待執行)。`modelctl serve` 會從 checkout 建置 API／選定 worker，保存桌機實際 image ID 與 runtime 證據；固定原始碼不代表 image digest 必然與筆電相同。磁碟需容納 runtime、build cache 與權重。
+
+驗收結束且兩 backend 均已停止後，若選定影片服務作日常部署：
+
+```bash
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 8192 --max-inflight 2 --gpu-memory 0.60
+uv run --locked python scripts/chat.py --wait 600 --stream 'Reply with READY.'
+```
+
+依 [Client 接入指南](client-integration.md) 安全讀取桌機 `.state/api-key`，檢查 `/health/ready` 及 `/v1/models` 的 model/revision/backend/videos。其他專案的設定必須改用桌機本地路徑，不沿用 Windows key 路徑。`127.0.0.1:18080` 只代表桌機自己；筆電不會因此連上桌機。本次不開放 LAN／公網，也不假設其他容器可連線。
+
+目前沒有開機自啟；主機重新啟動、Docker ready 後用 `uv run --locked modelctl restart`，再驗證 readiness。初始化失敗先保存 logs，不刪 lease journal。交接回報應分開列出：各 backend／影片驗收結果、最終運行 backend、端口、image IDs、剩餘問題；桌球品質仍需產品端人工評估。
+
 ## Host
 
 - Windows：NVIDIA driver + Docker Desktop WSL2 backend；模型根目錄預設 `D:/hf_models`。
@@ -208,6 +265,16 @@ docker compose --env-file "$STATE_DIR/compose.env" -f compose.yaml -f "$STATE_DI
 上游對應問題：https://github.com/vllm-project/vllm/issues/50239
 
 ## Docker Hub images
+
+### 後續版本標籤提案（尚未實施）
+
+對外使用專案版本標籤（例如 `0.2.0`，僅為示例，尚未指定下次版本），保留 `sha-<commit>` 追溯來源；`latest` 指向最新已驗證穩定交付。不要每次 main 提交就更新 latest，預發布也不更新。版本與 SHA 標籤發布後不覆寫；若同一來源重建產物不同，使用新的建置識別，不移動舊標籤。Docker tag 本身可以變動，正式部署仍固定 digest；見 [Docker 官方說明](https://docs.docker.com/build/building/best-practices/#pin-base-image-versions)。
+
+API、vLLM 與 Transformers 使用同一組專案交付版本，發布紀錄分別保存各 image digest、實際來源 commit、runtime 版本與驗證範圍；未變更的 image 可以重用，但不能虛稱以新來源重建。vLLM 的 `0.29.0` 是上游 runtime 版本，不是 selfhost-models 版本。正式版本需同步核對套件版本、API 版本與發布說明，目前仍為 `0.1.0`，本次文件工作未升版。
+
+先發布並驗證整組固定版本，再更新各 repository 的 latest。跨 repository 的 tag 更新不是原子操作，因此部署不要依賴三個 latest 永遠在同一瞬間一致。latest 是移動別名，不是 Docker 自動判斷的最高版本，也不會自動更新已運行的容器。這項提案尚未改動 registry 或 Compose 預設。
+
+### 已發布的筆電初版
 
 2026-09-16 交付使用公開 repository，標籤為 `sha-4dc0a81`，對應筆電交付提交 `4dc0a81fa3579486b152f9a84e0f7f765c5d7726`。此提交新增 client、文件及證據；image 內推論程式碼沿用 `d971dab`，已核對來源。images 為本機 GPU 驗證過的既有產物，未因發布而重建。僅提供 `linux/amd64`；Windows 透過 Docker Desktop WSL2 執行。上方歷史驗收使用的舊 digest 不等於本次發布版本。
 
