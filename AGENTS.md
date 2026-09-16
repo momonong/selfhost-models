@@ -6,7 +6,8 @@
 - 固定官方推論 runtime 配套，不單獨替換 PyTorch；模型使用固定 revision、唯讀掛載，啟動與請求不得下載。
 - API 不掛載 Docker socket。單一 API process；擴充副本前必須重新設計全域 admission 與持久化 lease。
 - 取消／逾時不代表 GPU 已停止；維持 backend 文件中的完成確認與重啟恢復語義。
-- Python 3.11–3.13；`python -m pip install -r requirements.lock`、`python -m pip install --no-deps -e .`。
-- 契約測試：`python -m pytest -q`。GPU 驗收入口見 `docs/acceptance.md`；不得將 mock 測試描述成 GPU 驗證。
+- 依賴統一使用 uv（>=0.11.21,<0.13）：`pyproject.toml` + `uv.lock`；提交兩者，不另維護 requirements 鎖檔。Python 預設 3.12、支援 3.11–3.13；`uv sync --locked`。
+- 執行使用 `uv run --locked`；測試放 dev dependency group，API image 以 `uv sync --locked --no-dev` 安裝。vLLM worker 保留官方 runtime 套件。
+- 契約測試：`uv run --locked pytest -q`。GPU 驗收入口見 `docs/acceptance.md`；不得將 mock 測試描述成 GPU 驗證。
 - GPU／Docker 故障注入只針對本專案 Compose 容器，執行前盤點共用資源。
 - 文件入口：README；架構與 backend 契約分別在 `docs/architecture.md`、`docs/backend.md`。

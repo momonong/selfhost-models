@@ -3,23 +3,23 @@
 ## 契約與單元測試（不需 GPU）
 
 ```bash
-python -m pytest -q
+uv run --locked pytest -q
 ```
 
 包含 registry 不改動權重、固定 revision／混合 revision 拒絕、缺 shard、檔案變更、錯誤欄位、API 驗證、deadline／斷線 lease、API 重啟隔離、SSE terminal／截斷／慢速消費者、inline image 與 tool history。
 
 ## 真實 GPU 服務
 
-1. `modelctl doctor` 唯讀盤點 host 與共用資源。
+1. `uv run --locked modelctl doctor` 唯讀盤點 host 與共用資源。
 2. register／fetch 選定模型，再 serve。不要停止其他專案服務。
 3. 輪詢 `/health/ready` 到 200。
 4. 執行：
 
 ```bash
-python scripts/acceptance.py --faults --output evidence/acceptance.json
-python scripts/multimodal_smoke.py --output evidence/multimodal.json
-python scripts/stream_lifecycle_check.py
-python scripts/capture_runtime.py
+uv run --locked python scripts/acceptance.py --faults --output evidence/acceptance.json
+uv run --locked python scripts/multimodal_smoke.py --output evidence/multimodal.json
+uv run --locked python scripts/stream_lifecycle_check.py
+uv run --locked python scripts/capture_runtime.py
 ```
 
 使用合成、非敏感文字；驗證模型列表、一般／SSE、錯誤參數、未知模型、context、認證、body 上限。`--faults` 只對經 Compose label 核對的 selfhost-models worker 做 pause/unpause，確認 429、deadline 504、斷線 lease 不提前釋放；再重啟 API 驗證未決工作保留，重啟 worker 驗證新 epoch 暖機恢復。finally 會 unpause worker，不刻意耗盡 GPU。
@@ -37,7 +37,7 @@ python scripts/capture_runtime.py
 設定：BF16、context 2048、最多 2 個工作、等待佇列 0、GPU memory utilization 0.60、client deadline 30 秒、drain 上限 120 秒。可重現的啟動命令：
 
 ```bash
-modelctl serve Qwen/Qwen3.5-4B --gpu-memory 0.60 --context 2048 --max-inflight 2
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --gpu-memory 0.60 --context 2048 --max-inflight 2
 ```
 
 本次 JSON 證據：
@@ -62,6 +62,25 @@ modelctl serve Qwen/Qwen3.5-4B --gpu-memory 0.60 --context 2048 --max-inflight 2
 
 實測修正：WSL2 的 V2 runner 因 UVA 不可用，明確改用同一官方 runtime 的 V1 runner。單 token 暖機未涵蓋 decode 編譯，首個正式請求曾逾時；暖機改為多 token、併發及合成視覺後，重新啟動並完成上述整套驗收。首次或新輸入 shape 的編譯時間仍可能不同。
 
-最終快照 ready=true、inflight/detached/uncertain 皆 0；整張 GPU 使用 18805 MiB、空閒 5247 MiB。這包含桌面與 vLLM 常駐權重／cache，不是純權重大小。請求完成會釋放 admission 名額；`modelctl stop` 才停止本專案容器並歸還其常駐 GPU 記憶體。
+最終快照 ready=true、inflight/detached/uncertain 皆 0；整張 GPU 使用 18805 MiB、空閒 5247 MiB。這包含桌面與 vLLM 常駐權重／cache，不是純權重大小。請求完成會釋放 admission 名額；`uv run --locked modelctl stop` 才停止本專案容器並歸還其常駐 GPU 記憶體。
 
 fetch 的固定 revision 行為有契約測試，尚未實際下載外部模型。工具 smoke 不代表長程 agent 成功率；本版不提供音訊／影片 API、任意 URL 圖片或產品工具執行。
+
+## uv 遷移驗證（2026-09-16）
+
+此輪只變更 Python 套件管理與 API image 的安裝方式；Docker／Compose 管理容器，vLLM worker 的 CUDA／PyTorch 配套未變。上方 2026-09-15 GPU 證據保留原樣，本輪未啟動 GPU worker 或重跑 GPU 驗收。
+
+uv 0.12.15 + Python 3.12.14：舊 `requirements.lock` 的 30 個套件版本與 `uv.lock` 逐一比對無差異。PATH 既有 uv 0.11.21 也通過同一鎖檔的離線 sync、27 項測試與 CLI 檢查；因此專案支援 >=0.11.21,<0.13，Docker 工具固定 0.12.15。Windows 安裝依上游 metadata 排除 hf-xet，Linux API image 安裝 hf-xet 1.6.0。
+
+| 指令／檢查 | 結果 |
+|---|---|
+| `uv sync --locked` | 新建 `.venv` 並安裝成功 |
+| `uv lock --check --offline` | 鎖檔與專案一致 |
+| `uv run --locked pytest -q` | 27 passed |
+| `uv pip check` | 30 個已安裝套件相容 |
+| `uv run --locked modelctl --help` | CLI entry point 正常 |
+| `docker build -f docker/api.Dockerfile -t selfhost-models-api:0.1.0 .` | 成功，兩段 `uv sync --locked --no-dev` |
+| `uv run --locked python scripts/api_container_check.py` | loopback、401、worker 缺席 503、持久化 fsync 通過；測試容器已移除 |
+| 新 image 的 `--network none --read-only` Python import | 成功，`sys.prefix=/app/.venv`，pytest 不存在 |
+
+新 API image ID（`docker image inspect`）：`sha256:62f1c05a6bdcfcd37677f43f422d8134e596364b863bfeba212fb94cad73d22b`。此 Linux container 建置／執行證據來自 Windows Docker Desktop，不等於 Linux 實體桌機驗證。

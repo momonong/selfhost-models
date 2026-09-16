@@ -20,7 +20,7 @@ def main():
     snapshot = {"at": datetime.now(timezone.utc).isoformat(), "host": platform.platform(),
                 "git_head": output(["git", "rev-parse", "HEAD"]), "containers": {}}
     snapshot["git_status"] = output(["git", "status", "--short"])
-    sources = [ROOT / "compose.yaml", ROOT / "requirements.lock", ROOT / "pyproject.toml"]
+    sources = [ROOT / "compose.yaml", ROOT / "uv.lock", ROOT / "pyproject.toml", ROOT / ".python-version"]
     for directory in ("selfhost_models", "worker", "docker", "scripts", "tests"):
         sources.extend(p for p in (ROOT / directory).rglob("*")
                        if p.is_file() and "__pycache__" not in p.parts)
