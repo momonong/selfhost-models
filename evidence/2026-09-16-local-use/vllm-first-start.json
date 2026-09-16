@@ -1,0 +1,14 @@
+{
+  "result": "initial client readiness timeout",
+  "wait_seconds": 360,
+  "health": {
+    "ready": true,
+    "version": "0.1.0",
+    "worker_epoch": "8046be3eb1754922af2ca971e6bef175",
+    "inflight": 0,
+    "detached": 0,
+    "uncertain": 0
+  },
+  "at": "2026-09-16T07:21:19.6439707Z",
+  "notes": "Worker logs show initial kernel JIT compilation; unfinished warmup lease preserved. Exact cause of long compile delay not established. Recover by restarting worker and API, never deleting journal."
+}

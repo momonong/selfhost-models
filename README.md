@@ -4,6 +4,8 @@
 
 ## 開始使用
 
+筆電日常啟動、直接對話、API 接入與 backend 切換，請看 [本機使用指南](docs/local-use.md)。Linux 桌機尚未驗收，不影響已驗證的筆電使用範圍。
+
 uv 0.11.21–0.12.x、Docker Compose、可用的 NVIDIA GPU container 環境。Python 預設 3.12（支援 3.11–3.13），由 uv 管理：
 
 首次安裝 uv 與依賴更新方式見 [套件管理](docs/deployment.md#uv-套件管理)。

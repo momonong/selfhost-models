@@ -1,5 +1,52 @@
 # 驗收方式
 
+## 筆電可用部署（2026-09-16）
+
+本次從 `d971dab` 建立 `feat/local-service-delivery`，新增日常 client 與使用／桌機驗收文件；沒有修改 serving、依賴鎖檔、模型或 runtime 配套。透過一般 `modelctl serve` 路徑重建 API／worker，新的實際 image ID 與來源比對見本次 runtime JSON，不以舊 image ID 代表此次部署。
+
+- [CPU 測試](../evidence/2026-09-16-local-use/cpu-tests.txt)：87 passed，包含 client 的 SSE error／截斷判定；不是 GPU 證據。
+- Transformers：[一般／SSE 與錯誤](../evidence/2026-09-16-local-use/transformers-acceptance.json)、[取樣／能力限制](../evidence/2026-09-16-local-use/transformers-smoke.json)、[runtime](../evidence/2026-09-16-local-use/transformers-runtime.json) 通過，之後[正常停機](../evidence/2026-09-16-local-use/transformers-stopped.json)。首次 PowerShell 轉存中文有編碼問題，client 改為 UTF-8，後續由 vLLM 補驗中文串流；原始檔保留，不宣稱初次中文顯示正常。
+- vLLM：[首次啟動未 ready](../evidence/2026-09-16-local-use/vllm-first-start.json) 保留。worker 日誌在暖機期間出現長時間 kernel JIT，client 等待 360 秒後失敗，API 保留未知 warmup lease；延遲的完整根因未確定。沒有刪除 journal 或放寬安全契約，使用 `modelctl restart` 取得新 epoch 後恢復。
+- 恢復後 vLLM：[一般／SSE 與錯誤](../evidence/2026-09-16-local-use/vllm-acceptance.json)、[合成圖片／工具](../evidence/2026-09-16-local-use/vllm-smoke.json)、[中文串流](../evidence/2026-09-16-local-use/vllm-client-stream-recovery.txt)、[runtime](../evidence/2026-09-16-local-use/vllm-runtime-final.json) 通過。Ubuntu WSL 另以 Linux Python 執行同一 client 呼叫這個服務，回覆 [READY](../evidence/2026-09-16-local-use/wsl-client.txt)。
+- [交付快照](../evidence/2026-09-16-local-use/delivery.json)：vLLM 在 `127.0.0.1:18080` ready、inflight/detached/uncertain 均 0，刻意保持運行；模型 inventory 與其他服務未變。權重大小／mtime／小檔 hash 核對不等於完整權重逐位元比對。
+
+本次重驗一般部署、backend 切換、新 client 與實際暖機失敗後恢復；沒有重跑未變更 serving 的全部 pause／超載故障案例，先前整合與來源分支證據仍保留。未配置開機自啟，未實際重開 Windows；筆電喚醒且 Docker Desktop 運行是可用條件。LAN／公網接入、Linux 實體桌機、HF 實際下載仍未由本次驗證。日常操作見 [本機使用指南](local-use.md)。
+
+## Linux 桌機實機驗收（待執行）
+
+這是未執行的操作清單，不是 Linux 通過證據。使用桌機獨立 checkout 與相同交付 commit，先核對 Git 狀態、driver、Docker Engine、Compose、NVIDIA Container Toolkit 與 GPU 空間。不得用 Windows／WSL2 結果替代。主機基礎環境缺失時先依發行版安排安裝，不在驗收腳本內更新驅動或重啟共用 Docker。
+
+1. `uv sync --locked`、`uv run --locked pytest -q`、`uv run --locked modelctl doctor`。
+2. 找到既有 Qwen3.5-4B 的 Linux 路徑（例如 `/srv/selfhost-models/models/Qwen3.5-4B`），使用 `modelctl register Qwen/Qwen3.5-4B --path <實際路徑>`。執行 inspect，核對 revision 為 `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`；缺少資產就先安排下載或移轉，不猜 revision。
+3. 若桌機沒有應用 image，可從筆電 `docker image save -o <archive.tar> selfhost-models-api:0.1.0 selfhost-models-vllm:0.29.0 selfhost-models-transformers:0.1.0`，移轉並核對 archive SHA256，再於桌機 `docker image load -i <archive.tar>`。image 不含權重或 state。若改成在桌機重建，必須記錄新 image ID 與來源／runtime，不宣稱同一應用 image。
+4. 下方採一般 `modelctl serve` 建置啟動流程，會記錄桌機實際產生的 image ID；即使事先移轉了 image，也不能假設 build 後 ID 不變。固定基底、套件與來源並以 runtime 檢查驗證；不要使用歷史 state 的 Windows 路徑。若需要嚴格不 build 的相同 image 驗收，另依部署文件配置主機專屬 state 與 digest override。
+5. 以下從 repo 根目錄依序執行，先 vLLM，完全停止後才 Transformers。證據目录每次使用新名稱。
+
+```bash
+uv run --locked python scripts/service_snapshot.py --output evidence/linux-desktop-before.json
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --context 2048 --max-inflight 2 --gpu-memory 0.60
+uv run --locked python scripts/chat.py --stream 'Reply with the word READY.'
+uv run --locked python scripts/acceptance.py --faults --output evidence/linux-desktop-vllm/acceptance.json
+uv run --locked python scripts/multimodal_smoke.py --output evidence/linux-desktop-vllm/smoke.json
+uv run --locked python scripts/stream_lifecycle_check.py --output evidence/linux-desktop-vllm/stream.json
+uv run --locked python scripts/capture_runtime.py --output evidence/linux-desktop-vllm/runtime.json
+uv run --locked modelctl stop
+uv run --locked python scripts/service_snapshot.py --before evidence/linux-desktop-before.json --output evidence/linux-desktop-vllm/stopped.json
+
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend transformers --context 2048 --max-inflight 1 --gpu-memory 0.60
+uv run --locked python scripts/chat.py --stream 'Reply with the word READY.'
+uv run --locked python scripts/acceptance.py --faults --output evidence/linux-desktop-transformers/acceptance.json
+uv run --locked python scripts/transformers_smoke.py --output evidence/linux-desktop-transformers/smoke.json
+uv run --locked python scripts/stream_lifecycle_check.py --output evidence/linux-desktop-transformers/stream.json
+uv run --locked python scripts/capture_runtime.py --output evidence/linux-desktop-transformers/runtime.json
+uv run --locked modelctl stop
+uv run --locked python scripts/service_snapshot.py --before evidence/linux-desktop-before.json --output evidence/linux-desktop-transformers/stopped.json
+```
+
+通過條件：每個命令 exit 0；CPU 測試通過；一般／SSE 有完成結果；故障期間 lease 保留、恢復後歸零；能力拒絕正確；模型／來源／runtime 可追溯；最終正常停機且其他服務未變。任何步驟失敗先保留 logs，不繼續宣稱通過；故障注入 finally 解除 pause，仍需確認停機。可用 `scripts/service_snapshot.py` 在開始前保存快照，停止後帶 `--before` 核對模型、其他服務與正常停止。最後要常駐使用時，再啟動選定 backend 並確認 ready。
+
+若某種 backend 失敗，分別記錄結果，不因另一種成功而一併標記 Linux 通過。不得刪除 lease state 來繞過故障。
+
 ## 整合交付（2026-09-16）
 
 從 `main@fe3b5ba0c4159ef57a26da82819367cd95364d1c` 依序 merge Transformers `876593a70a2c05954270da262edc842b13a14391`、WSL `e3fb6edd04e76429f58b86600ab83ad913101c2d`，保留兩邊歷史與原始證據。整合分支為 `integrate/transformers-wsl-validation`，主要工作目錄 `D:/projects/selfhost-models`。兩次 merge 為 `8d154a6`、`5938a9a`；驗收工具後續修正為 `6c132a8`。

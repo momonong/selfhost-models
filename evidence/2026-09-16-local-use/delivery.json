@@ -1,0 +1,17 @@
+{
+  "intentionally_left_running": true,
+  "wsl_client_passed": true,
+  "backend": "vllm",
+  "at": "2026-09-16T07:25:34.2963466Z",
+  "model_inventory_unchanged": true,
+  "unrelated_services_unchanged": true,
+  "url": "http://127.0.0.1:18080",
+  "health": {
+    "ready": true,
+    "version": "0.1.0",
+    "worker_epoch": "0885ac4c49de4d41829289778eaa1efe",
+    "inflight": 0,
+    "detached": 0,
+    "uncertain": 0
+  }
+}
