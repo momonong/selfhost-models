@@ -89,6 +89,8 @@ Transformers 獨立使用 `worker/transformers/pyproject.toml` + `uv.lock`，不
 
 架構支援依 [Transformers Qwen3.5 官方文件](https://huggingface.co/docs/transformers/main/model_doc/qwen3_5)，並已在固定 image 離線匯入對應類別核對；runtime 基底依 [官方 PyTorch image](https://hub.docker.com/layers/pytorch/pytorch/2.13.0-cuda13.0-cudnn9-runtime/images/sha256-db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407)。支援架構不等於任意 checkpoint 都已實測，實際範圍見驗收文件。
 
+Transformers 明確設定 `stop_grace_period: 30s`，留時間給 PyTorch/CUDA process 正常退出。本機未指定時的容器 StopTimeout 曾實際為 1 秒，uvicorn 已完成 lifespan shutdown，Docker 仍於 1 秒後送 SIGKILL，得到 137（非 OOM）；因此不依賴 host 隱含預設。若停止時仍有長時間工作，30 秒後仍可能強制停止，未決 lease 保留到新 epoch＋warmup 恢復；正常收尾先確認 inflight=0。
+
 一般啟動不連 HF；worker HF_HUB_OFFLINE／TRANSFORMERS_OFFLINE，模型唯讀掛在 `/models/current`。管理工具依 config.model_type 選已知 profile；不自動嘗試不同 engine。
 
 API 預設 `http://127.0.0.1:18080`，先輪詢 `/health/ready`。第一次建立 `.state/api-key`，client 從檔案讀 Bearer token；不將 token 貼入聊天、Git 或日誌。Linux key file mode 600，Windows 使用所在目錄既有 ACL；依需要自行收緊使用者權限。

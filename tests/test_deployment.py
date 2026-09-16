@@ -25,6 +25,7 @@ def test_transformers_override_keeps_runtime_isolated_and_bounds_kernel_cache():
     worker = yaml.safe_load((ROOT / "compose.transformers.yaml").read_text())["services"]["worker"]
     assert worker["build"]["dockerfile"] == "docker/transformers.Dockerfile"
     assert worker["environment"]["MAX_INFLIGHT"] == "1"
+    assert worker["stop_grace_period"] == "30s"
     assert worker["read_only"] and worker["cap_drop"] == ["ALL"]
     assert "ports" not in worker and "volumes" not in worker  # Inherits read-only model/internal network.
     cache = next(m for m in worker["tmpfs"] if m.startswith("/runtime-cache:"))
