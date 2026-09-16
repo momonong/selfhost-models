@@ -1,0 +1,90 @@
+{
+  "at": "2026-09-16T05:10:53.095281+00:00",
+  "scope": "runtime capture after CRLF-only comparison fix",
+  "services": {
+    "api": {
+      "id": "3931800d72a2bc718edbf873f2e18502f69c12ee6517faa37c2300a4b0f19b87",
+      "image_id": "sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-09-16T05:08:53.609381278Z",
+        "FinishedAt": "2026-09-16T05:10:51.717697809Z",
+        "Health": {
+          "Status": "unhealthy",
+          "FailingStreak": 0,
+          "Log": [
+            {
+              "Start": "2026-09-16T05:10:31.010565719Z",
+              "End": "2026-09-16T05:10:31.114513612Z",
+              "ExitCode": 1,
+              "Output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/usr/local/lib/python3.12/urllib/request.py\", line 215, in urlopen\n    return opener.open(url, data, timeout)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/urllib/request.py\", line 521, in open\n    response = meth(req, response)\n               ^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/urllib/request.py\", line 630, in http_response\n    response = self.parent.error(\n               ^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/urllib/request.py\", line 559, in error\n    return self._call_chain(*args)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/urllib/request.py\", line 492, in _call_chain\n    result = func(*args)\n             ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/urllib/request.py\", line 639, in http_error_default\n    raise HTTPError(req.full_url, code, msg, hdrs, fp)\nurllib.error.HTTPError: HTTP Error 503: Service Unavailable\n"
+            },
+            {
+              "Start": "2026-09-16T05:10:36.11563084Z",
+              "End": "2026-09-16T05:10:36.233016542Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-09-16T05:10:41.233578978Z",
+              "End": "2026-09-16T05:10:41.345946069Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-09-16T05:10:46.34697257Z",
+              "End": "2026-09-16T05:10:46.458743057Z",
+              "ExitCode": 0,
+              "Output": ""
+            },
+            {
+              "Start": "2026-09-16T05:10:51.459999396Z",
+              "End": "2026-09-16T05:10:51.563066279Z",
+              "ExitCode": 0,
+              "Output": ""
+            }
+          ]
+        }
+      }
+    },
+    "worker": {
+      "id": "bc00ac410342cbaacd04fa5661fa36d50a4dc623fa7a549382e865db434bf732",
+      "image_id": "sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-09-16T05:08:53.596994347Z",
+        "FinishedAt": "2026-09-16T05:10:52.120291641Z"
+      }
+    }
+  },
+  "other_services_unchanged": true,
+  "model_inventory_unchanged": true,
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "state_preserved": "/home/morris/.local/state/selfhost-models/vllm-acceptance-20260916",
+  "key_mode": "0o600",
+  "leases": {
+    "leases": {}
+  },
+  "api_port_closed": true,
+  "gpu_after": "name, driver_version, memory.used [MiB], memory.free [MiB]\nNVIDIA GeForce RTX 5090 Laptop GPU, 581.57, 426 MiB, 23626 MiB",
+  "raw_hashes": {
+    "api-recapture.log": "89205c86a1548cad1c226ca97d0d9c20ec0ee619df62fea7a02024ba380a1b55",
+    "worker-recapture.log": "426b137fc6cd630b132d527e2966d0a6c222c0736671ed766119fb240d284a45"
+  }
+}

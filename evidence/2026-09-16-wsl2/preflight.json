@@ -1,0 +1,125 @@
+{
+  "at": "2026-09-16T12:57:56.488972+08:00",
+  "scope": "Ubuntu WSL2 on Windows laptop; not native Linux desktop",
+  "source_commit": "fe3b5ba0c4159ef57a26da82819367cd95364d1c",
+  "git_status": "M scripts/capture_runtime.py\n M scripts/stream_lifecycle_check.py",
+  "os_release": "PRETTY_NAME=\"Ubuntu 24.04.3 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.3 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "kernel": "6.6.87.2-microsoft-standard-WSL2",
+  "uid": 1000,
+  "gid": 1000,
+  "uv": "uv 0.12.2 (x86_64-unknown-linux-gnu)",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "docker_context": "default",
+  "docker_version": {
+    "client": "28.5.1",
+    "server": "28.5.1",
+    "api": "1.51",
+    "os": "linux",
+    "arch": "amd64",
+    "platform": "Docker Desktop 4.50.0 (209931)"
+  },
+  "docker_info": {
+    "operating_system": "Docker Desktop",
+    "kernel": "6.6.87.2-microsoft-standard-WSL2",
+    "runtimes": [
+      "io.containerd.runc.v2",
+      "nvidia",
+      "runc"
+    ]
+  },
+  "compose": "Docker Compose version v2.40.3-desktop.1",
+  "gpu_before": "Wed Sep 16 12:57:57 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 580.102.01             Driver Version: 581.57         CUDA Version: 13.0     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  NVIDIA GeForce RTX 5090 ...    On  |   00000000:01:00.0 Off |                  N/A |\n| N/A   52C    P8              7W /   90W |     443MiB /  24463MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+",
+  "compute_before": "pid, process_name, used_gpu_memory [MiB]",
+  "disk": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sdf       1007G   47G  910G   5% /\nD:\\             1.9T  1.4T  447G  77% /mnt/d",
+  "containers_before": {
+    "840a5bc596c05f7c6262d7905f56c7feca84182d94465a8de249889bc9cdf56f": {
+      "name": "/selfhost-models-worker-1",
+      "project": "selfhost-models",
+      "running": false,
+      "paused": false,
+      "started_at": "2026-09-16T04:04:27.183281216Z",
+      "restart_count": 0,
+      "image_id": "sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173"
+    },
+    "b18237bbd36ac62c110ef5a1542d9ad7cec1b3a01238c52cbfff1f3f0676d885": {
+      "name": "/selfhost-models-api-1",
+      "project": "selfhost-models",
+      "running": false,
+      "paused": false,
+      "started_at": "2026-09-16T04:04:24.741434093Z",
+      "restart_count": 0,
+      "image_id": "sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e"
+    },
+    "80ef19f8d5f8941b6f66675d5d611c9cb201d651ad0b1d5f2231f9f230f30dda": {
+      "name": "/kaching-portable-test-mcp-1",
+      "project": "kaching-portable-test",
+      "running": true,
+      "paused": false,
+      "started_at": "2026-09-16T01:59:20.912450187Z",
+      "restart_count": 0,
+      "image_id": "sha256:1a01d94d51a0d0ce7153e26e3d05d70d8df3fd70e19100e00610b44f3ce47067"
+    },
+    "0a50b80667adc346ac305bfe6365b3a34f10bd529730256e2a84166c836082ee": {
+      "name": "/kaching-portable-test-mcp-read-api-1",
+      "project": "kaching-portable-test",
+      "running": true,
+      "paused": false,
+      "started_at": "2026-09-16T01:59:20.909457558Z",
+      "restart_count": 0,
+      "image_id": "sha256:dfa89d3eb3d32c38470aa366963acc2d6587c8b5f7f4090b90ebaff907287b49"
+    },
+    "bdcc6a5a05e524d1aea8598642dca0fe4be0854a6001023d9ce03a71182ce0e9": {
+      "name": "/kaching-portable-test-web-1",
+      "project": "kaching-portable-test",
+      "running": true,
+      "paused": false,
+      "started_at": "2026-09-16T01:59:20.914191846Z",
+      "restart_count": 0,
+      "image_id": "sha256:a15de551f24d32d9ffd14a02c3c7c4376a33110b3f8a783b887ed82591f83930"
+    },
+    "c582ba0d9e683e499fcc558ff6079e5465ae5776be284e1d25153811cd2e2355": {
+      "name": "/kaching-portable-test-api-1",
+      "project": "kaching-portable-test",
+      "running": true,
+      "paused": false,
+      "started_at": "2026-09-16T01:59:20.925221743Z",
+      "restart_count": 0,
+      "image_id": "sha256:55e5e4e6384cdbd635993583a682c79cf06748e48694511d53564a1b7752ed02"
+    }
+  },
+  "images": {
+    "api": "selfhost-models-api@sha256:3ec4784560e022bdcf50ef655164b61985e026e480a0ebda686237a7d8b3b69e",
+    "worker": "selfhost-models-vllm@sha256:419b067bd636b368b7bcb714ac5b811c48defdd2f16cc7aaab62171228102173"
+  },
+  "settings": {
+    "MODEL_ID": "Qwen/Qwen3.5-4B",
+    "MODEL_REVISION": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "MODEL_PROFILE": "qwen3_5",
+    "MODEL_PATH": "/mnt/d/hf_models/Qwen3.5-4B",
+    "API_KEY_PATH": "/home/morris/.local/state/selfhost-models/vllm-acceptance-20260916/api-key",
+    "API_STATE_PATH": "/home/morris/.local/state/selfhost-models/vllm-acceptance-20260916/runtime",
+    "API_UID": "1000",
+    "API_GID": "1000",
+    "API_PORT": "18081",
+    "GPU_DEVICE": "0",
+    "GPU_MEMORY_UTILIZATION": "0.60",
+    "MAX_MODEL_LEN": "2048",
+    "MAX_INFLIGHT": "2",
+    "DEADLINE_SECONDS": "30",
+    "DRAIN_SECONDS": "120",
+    "VLLM_USE_V2_MODEL_RUNNER": "0"
+  },
+  "model": {
+    "repo_id": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "provenance": "hf-local-metadata",
+    "file_count": 11
+  },
+  "key_mode": "0o600",
+  "state_mode": "0o700",
+  "raw_preflight": {
+    "path": "evidence/raw/2026-09-16-wsl2/preflight-original.json",
+    "sha256": "855847d7cf9f1e2dbb3613adedb2031ff800f55ec98379f1cf268d3a161f92e7",
+    "summary": "Unrelated stopped containers and desktop process list omitted; full original retained locally"
+  }
+}

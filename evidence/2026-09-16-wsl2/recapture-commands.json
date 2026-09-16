@@ -1,0 +1,10 @@
+[
+  {
+    "check": "wsl-runtime",
+    "exit_code": 0
+  },
+  {
+    "check": "windows-runtime",
+    "exit_code": 0
+  }
+]

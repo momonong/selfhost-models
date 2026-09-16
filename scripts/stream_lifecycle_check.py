@@ -8,21 +8,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
-from selfhost_models.cli import compose_command
+
+if __package__:
+    from .deployment_target import validate_target
+else:
+    from deployment_target import validate_target
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-async def main(output):
-    state = ROOT / ".state"
-    compose = compose_command(state)
-    worker = subprocess.check_output([*compose, "ps", "-q", "worker"], text=True).strip()
-    info = json.loads(subprocess.check_output(["docker", "inspect", worker], text=True))[0]
-    assert info["Config"]["Labels"]["com.docker.compose.project"] == "selfhost-models"
-    assert info["Config"]["Labels"]["com.docker.compose.service"] == "worker"
+async def main(args):
+    state = args.state.resolve()
+    compose, settings, containers = validate_target(state, args.url)
+    worker = containers["worker"]["Id"]
     key = (state / "api-key").read_text().strip()
     records = []
-    async with httpx.AsyncClient(base_url="http://127.0.0.1:18080", headers={"Authorization": "Bearer " + key},
+    async with httpx.AsyncClient(base_url=args.url, headers={"Authorization": "Bearer " + key},
                                 trust_env=False, timeout=35) as client:
         async def wait_health(predicate):
             until = time.monotonic() + 120
@@ -67,7 +68,9 @@ async def main(output):
                 if mode == "deadline":
                     assert saw_error and not saw_done
                 record = {"mode": mode, "at": datetime.now(timezone.utc).isoformat(),
-                          "headers_status": 200, "error_frame": saw_error,
+                          "headers_status": 200, "generated_content_before_fault": True,
+                          "url": args.url, "backend": settings.get("BACKEND", "vllm"),
+                          "worker_id": worker, "error_frame": saw_error,
                           "done_frame": saw_done, "retained": h}
                 records.append(record)
                 print(json.dumps(record), flush=True)
@@ -76,12 +79,14 @@ async def main(output):
                     subprocess.run(["docker", "unpause", worker], check=True, stdout=subprocess.DEVNULL)
             h = await wait_health(lambda h: h["ready"] and h["inflight"] == 0)
             records[-1]["drained"] = h
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(records, indent=2), encoding="utf-8")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(records, indent=2), encoding="utf-8")
     print("stream lifecycle acceptance passed", flush=True)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--url", default="http://127.0.0.1:18080")
+    parser.add_argument("--state", type=Path, default=ROOT / ".state")
     parser.add_argument("--output", type=Path, default=ROOT / "evidence/stream-lifecycle.json")
-    asyncio.run(main(parser.parse_args().output))
+    asyncio.run(main(parser.parse_args()))

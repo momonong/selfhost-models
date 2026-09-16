@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-16",
+  "source_commit": "fe3b5ba0c4159ef57a26da82819367cd95364d1c",
+  "scope": "CPU unit/contract tests and acceptance-script CLI checks; not GPU evidence",
+  "dependency_changes": false,
+  "post_fix_tests": [
+    {"host": "Ubuntu 24.04.3 WSL2", "command": "uv run --locked pytest -q", "result": "34 passed in 4.66s", "exit_code": 0},
+    {"host": "Windows 11", "environment": "UV_PROJECT_ENVIRONMENT=.venv-windows", "command": "uv run --locked pytest -q", "result": "34 passed in 2.80s", "exit_code": 0}
+  ],
+  "added_coverage": "Exact bytes vs CRLF-only differences; altered content, whitespace, BOM, final newline, missing/extra files must fail",
+  "checks": [
+    {
+      "host": "Ubuntu 24.04.3 WSL2",
+      "uv": "0.12.2",
+      "python": "3.12.3",
+      "environment": ".venv",
+      "sync": "uv sync --locked",
+      "test_command": "uv run --locked pytest -q",
+      "result": "27 passed in 7.88s",
+      "exit_code": 0,
+      "script_help": ["stream_lifecycle_check.py", "capture_runtime.py"],
+      "script_help_exit_code": 0
+    },
+    {
+      "host": "Windows 11",
+      "uv": "0.12.15",
+      "python": "3.12.14",
+      "environment": "UV_PROJECT_ENVIRONMENT=.venv-windows",
+      "sync": "uv sync --locked",
+      "test_command": "uv run --locked pytest -q",
+      "result": "27 passed in 5.78s",
+      "exit_code": 0,
+      "script_help": ["stream_lifecycle_check.py", "capture_runtime.py"],
+      "script_help_exit_code": 0
+    }
+  ]
+}

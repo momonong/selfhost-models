@@ -34,6 +34,8 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 
 已在 Windows WSL2／RTX 5090 Laptop 24 GB 上完成 **Qwen3.5-4B 的 Transformers 真實 GPU 文字推論與生命週期驗收**，同一分支的 vLLM 一般／SSE、圖片、工具、超載、逾時／取消及重啟恢復回歸也通過。CPU 單元／契約共 57 項通過。兩種 backend 依序載入，驗收後 API／worker 均正常停止，模型、state 與證據保留；Linux 實體桌機與 Linux Transformers 仍未驗證。能力差異、可重跑命令、image／commit 與限制見驗收文件。
 
+同日另完成 **Ubuntu 24.04 WSL2 CLI 複驗**：重用相同 image digests，採 port 18081、Linux UID 1000 與原生 WSL state。修正驗收腳本 URL/state 設定及 CRLF/LF 來源比對，Windows／WSL 回歸各 34 項通過；真實 GPU 功能與補驗 runtime 證據獨立保存在 `evidence/2026-09-16-wsl2/`。這仍是 Windows 筆電／Docker Desktop，Linux 實體桌機尚未驗證。
+
 ```bash
 uv run --locked pytest -q
 uv run --locked python scripts/acceptance.py --faults
