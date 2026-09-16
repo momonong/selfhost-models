@@ -11,11 +11,18 @@ from pathlib import Path
 import httpx
 from selfhost_models.cli import compose_command
 
+if __package__:
+    from .deployment_target import validate_target
+else:
+    from deployment_target import validate_target
+
 PROJECT = Path(__file__).resolve().parents[1]
 
 
 async def main(args):
     state = args.state.resolve()
+    if args.faults:
+        validate_target(state, args.url)
     key = (state / "api-key").read_text().strip()
     rows = []
 

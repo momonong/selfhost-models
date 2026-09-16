@@ -19,8 +19,8 @@ def validate_target(state, url):
             or (endpoint.port or 80) != int(settings["API_PORT"])):
         raise ValueError("URL must identify the configured loopback API port")
 
-    def output(args):
-        return subprocess.check_output(args, text=True, encoding="utf-8", timeout=30).strip()
+    def output(args, **kwargs):
+        return subprocess.check_output(args, text=True, encoding="utf-8", timeout=30, **kwargs).strip()
 
     compose = compose_command(state)
     config = json.loads(output([*compose, "config", "--format", "json"]))
@@ -41,13 +41,21 @@ def validate_target(state, url):
             if str(actual_env.get(key)) != str(value):
                 raise ValueError(f"{service} configuration mismatch: {key}")
         if obj["Config"]["Image"] != expected["image"]:
-            raise ValueError(f"{service} image/backend mismatch")
+            image_id = output(["docker", "image", "inspect", expected["image"], "--format", "{{.Id}}"])
+            if obj["Image"] != image_id:
+                raise ValueError(f"{service} image/backend mismatch")
         containers[service] = obj
     api = containers["api"]
     # Compose's service hash includes bind paths, secrets, backend and settings.
     # This also detects a copied key paired with a different runtime directory.
     for service, obj in containers.items():
-        expected_hash = output([*compose, "config", "--hash", service]).split()[-1]
+        if obj["Config"]["Image"] != config["services"][service]["image"]:
+            # A digest override may name the exact same image. Normalize only
+            # that verified reference; every other deployment setting must match.
+            override = json.dumps({"services": {service: {"image": obj["Config"]["Image"]}}})
+            expected_hash = output([*compose, "-f", "-", "config", "--hash", service], input=override).split()[-1]
+        else:
+            expected_hash = output([*compose, "config", "--hash", service]).split()[-1]
         if obj["Config"]["Labels"].get("com.docker.compose.config-hash") != expected_hash:
             raise ValueError(f"{service} deployment configuration differs from state")
     ports = api["NetworkSettings"]["Ports"].get("8000/tcp") or []
