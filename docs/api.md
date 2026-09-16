@@ -1,6 +1,6 @@
 # API 0.1 支援範圍
 
-這是 OpenAI-compatible Chat Completions 的明確子集。**不是完整 OpenAI 相容實作。** 未列參數及巢狀欄位一律 400，不靜默忽略。
+這是 OpenAI-compatible Chat Completions 的明確子集。**不是完整 OpenAI 相容實作。** 未列參數及巢狀欄位一律 400，不靜默忽略。其他 repo 的完整設定、能力選擇、重試與連線指引見 [Client 接入指南](client-integration.md)；本頁保留協定欄位的權威規格。
 
 ## Endpoints
 

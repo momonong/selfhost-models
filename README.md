@@ -4,7 +4,7 @@
 
 ## 開始使用
 
-筆電日常啟動、直接對話、API 接入與 backend 切換，請看 [本機使用指南](docs/local-use.md)。Linux 桌機尚未驗收，不影響已驗證的筆電使用範圍。
+筆電日常啟動、直接對話與 backend 切換，請看 [本機使用指南](docs/local-use.md)；其他專案接入請直接看 [Client 接入指南](docs/client-integration.md)。Linux 桌機尚未驗收，不影響已驗證的筆電使用範圍。
 
 uv 0.11.21–0.12.x、Docker Compose、可用的 NVIDIA GPU container 環境。Python 預設 3.12（支援 3.11–3.13），由 uv 管理：
 
@@ -28,6 +28,7 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 ## 文件與驗證
 
 - [架構與生命週期](docs/architecture.md)
+- [其他專案 Client 接入指南](docs/client-integration.md)
 - [API 支援範圍與限制](docs/api.md)
 - [資產管理、Windows／Linux 部署](docs/deployment.md)
 - [可重跑驗收與證據](docs/acceptance.md)

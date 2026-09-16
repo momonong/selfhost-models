@@ -21,6 +21,8 @@ client 預設等待 ready 最多 300 秒；`--wait` 可調整。模型冷啟動�
 
 ## API 接入
 
+其他專案的開發者或 coding agent 應先閱讀 [Client 接入指南](client-integration.md)；本節只摘要筆電操作者的本機設定。
+
 - Base URL：`http://127.0.0.1:18080/v1`。
 - Model：`Qwen/Qwen3.5-4B`。
 - API key：讀取本機 `.state/api-key`，不要複製到 Git 或日誌。
