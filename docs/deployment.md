@@ -10,11 +10,11 @@ uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 
 
 只允許固定 revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`，context 必須 8192、最多 2 個名額；不自動改設定或 fallback。`modelctl` 在私有 compose.env 寫 `VIDEO_ENABLED=1`／`API_MEMORY_LIMIT=2g`；未啟用仍關閉影片，API memory 預設 512m。兩種配置的 API 都有 2 CPU、64 pids、128 MiB `/tmp` tmpfs。影像 budget 與影片總 budget 在 gateway 到 worker 邊界分開，沒有更換 vLLM runtime。
 
-只有 `/health/ready` 成功且 `/v1/models` 宣告 videos 才能送影片；暖機包含最大影片形狀。新建容器的 JIT 可能較久，不因等待而刪除 lease state。初始化失敗／未知工作仍須保留日誌，按既有新 worker epoch 恢復流程處理。完整 API 限制與重跑證據見 [API](api.md)、[驗收](acceptance.md)。本機建置不等於 Docker Hub 已發布；本次影片 image 未發布。
+只有 `/health/ready` 成功且 `/v1/models` 宣告 videos 才能送影片；暖機包含最大影片形狀。新建容器的 JIT 可能較久，不因等待而刪除 lease state。初始化失敗／未知工作仍須保留日誌，按既有新 worker epoch 恢復流程處理。完整 API 限制與重跑證據見 [API](api.md)、[驗收](acceptance.md)。影片版已納入 0.2.0 發布，固定 images 見本文 Docker Hub 章節。
 
 ## Linux 桌機交接入口
 
-截至 2026-09-16 本次核對，GitHub `main` 已包含影片功能提交 `841132e1732d29e72458fd4b09d012b12e4e7792`。Docker Hub 三個 repositories 仍只有 `sha-4dc0a81`；**舊 API／worker images 不支援這次影片契約，不可混用新 Compose 與舊 images 來驗收影片**。下方 Docker Hub 表格保留作舊版發布紀錄。本節採用桌機從固定來源建置，不需要等待新版 image 發布。
+影片功能來源為 `841132e`，0.2.0 發布來源為 `29bec681f6577f88067edf8cca9952e66b58232c`；桌機 checkout 須包含後者及本文件。三個公開 repositories 使用 `0.2.0` 與 `latest`，舊 `sha-4dc0a81` 已移除。先依本文 Docker Hub 章節拉取固定 images，再用 `--no-build`，或選擇從原始碼建置並另行記錄產物。
 
 ### 1. 取得來源與盤點主機
 
@@ -22,7 +22,7 @@ uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 
 
 ```bash
 git fetch origin
-git merge-base --is-ancestor 841132e1732d29e72458fd4b09d012b12e4e7792 HEAD
+git merge-base --is-ancestor 29bec681f6577f88067edf8cca9952e66b58232c HEAD
 # 上一行非零表示目前 checkout 尚未包含影片交付，先解決版本問題。
 uname -m
 cat /etc/os-release
@@ -56,12 +56,12 @@ uv run --locked modelctl inspect Qwen/Qwen3.5-4B
 
 ### 3. 驗收後常駐使用
 
-先完成 [Linux 桌機驗收](acceptance.md#linux-桌機實機驗收待執行)。`modelctl serve` 會從 checkout 建置 API／選定 worker，保存桌機實際 image ID 與 runtime 證據；固定原始碼不代表 image digest 必然與筆電相同。磁碟需容納 runtime、build cache 與權重。
+先完成 [Linux 桌機驗收](acceptance.md#linux-桌機實機驗收待執行)。`modelctl serve --no-build` 使用已拉取的固定 images；省略選項才從 checkout 建置 API／選定 worker。保存桌機實際 image ID 與 runtime 證據；固定原始碼不代表重建 digest 必然與筆電相同。磁碟需容納 runtime、build cache 與權重。
 
 驗收結束且兩 backend 均已停止後，若選定影片服務作日常部署：
 
 ```bash
-uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 8192 --max-inflight 2 --gpu-memory 0.60
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 8192 --max-inflight 2 --gpu-memory 0.60 --no-build
 uv run --locked python scripts/chat.py --wait 600 --stream 'Reply with READY.'
 ```
 
@@ -266,56 +266,47 @@ docker compose --env-file "$STATE_DIR/compose.env" -f compose.yaml -f "$STATE_DI
 
 ## Docker Hub images
 
-### 後續版本標籤提案（尚未實施）
+### 0.2.0 版本標籤規則
 
-對外使用專案版本標籤（例如 `0.2.0`，僅為示例，尚未指定下次版本），保留 `sha-<commit>` 追溯來源；`latest` 指向最新已驗證穩定交付。不要每次 main 提交就更新 latest，預發布也不更新。版本與 SHA 標籤發布後不覆寫；若同一來源重建產物不同，使用新的建置識別，不移動舊標籤。Docker tag 本身可以變動，正式部署仍固定 digest；見 [Docker 官方說明](https://docs.docker.com/build/building/best-practices/#pin-base-image-versions)。
+每個公開 repository 使用 `0.2.0` 與 `latest`，兩者指向同一 digest。版本標籤發布後不覆寫；latest 僅在整組固定版本驗證後更新。不再新增 SHA tag，來源 commit 寫入 `org.opencontainers.image.revision` label 與發布紀錄。Docker tag 本身可以變動，正式部署仍固定 digest；見 [Docker 官方說明](https://docs.docker.com/build/building/best-practices/#pin-base-image-versions)。
 
-API、vLLM 與 Transformers 使用同一組專案交付版本，發布紀錄分別保存各 image digest、實際來源 commit、runtime 版本與驗證範圍；未變更的 image 可以重用，但不能虛稱以新來源重建。vLLM 的 `0.29.0` 是上游 runtime 版本，不是 selfhost-models 版本。正式版本需同步核對套件版本、API 版本與發布說明，目前仍為 `0.1.0`，本次文件工作未升版。
+API、vLLM 與 Transformers 使用同一組專案交付版本，發布紀錄分別保存各 image digest、來源 commit、runtime 版本與驗證範圍。vLLM 的 `0.29.0` 是上游 runtime 版本，不是 selfhost-models 版本。API、worker 套件與 API 回報版本已同步為 `0.2.0`，上游依賴未升級。一般本機 build 未傳 SOURCE_REVISION 時 label 為 unknown，不冒用已發布來源。
 
-先發布並驗證整組固定版本，再更新各 repository 的 latest。跨 repository 的 tag 更新不是原子操作，因此部署不要依賴三個 latest 永遠在同一瞬間一致。latest 是移動別名，不是 Docker 自動判斷的最高版本，也不會自動更新已運行的容器。這項提案尚未改動 registry 或 Compose 預設。
+先發布並驗證整組固定版本，再更新各 repository 的 latest。跨 repository 的 tag 更新不是原子操作，因此部署不要依賴三個 latest 永遠在同一瞬間一致。latest 是移動別名，不是 Docker 自動判斷的最高版本，也不會自動更新已運行的容器。
 
-### 已發布的筆電初版
+### 已發布的 0.2.0
 
-2026-09-16 交付使用公開 repository，標籤為 `sha-4dc0a81`，對應筆電交付提交 `4dc0a81fa3579486b152f9a84e0f7f765c5d7726`。此提交新增 client、文件及證據；image 內推論程式碼沿用 `d971dab`，已核對來源。images 為本機 GPU 驗證過的既有產物，未因發布而重建。僅提供 `linux/amd64`；Windows 透過 Docker Desktop WSL2 執行。上方歷史驗收使用的舊 digest 不等於本次發布版本。
+發布來源為 `29bec681f6577f88067edf8cca9952e66b58232c`。三份 images 都重新建置並核對來源、版本及 runtime 匯入；117 項 CPU 測試通過。推論程式沿用影片驗收版本，新增 CLI no-build 與版本資訊；沒有對重新包裝的 images 重跑完整 GPU 驗收。筆電既有服務未重啟。僅提供 `linux/amd64`；Windows 使用 Docker Desktop WSL2。舊 `sha-4dc0a81` 標籤已移除，舊 evidence 保留供追溯，不再作部署入口。
 
 | Image | 交付 digest |
 | --- | --- |
-| [momonong/selfhost-models-api](https://hub.docker.com/r/momonong/selfhost-models-api) | `sha256:c8af47eaedc89d1b653b09d5de85dc9f0dedfa7d919bdaeb6e80e0b890e3793c` |
-| [momonong/selfhost-models-vllm](https://hub.docker.com/r/momonong/selfhost-models-vllm) | `sha256:25eea1d718346c7abeb5e9730a155360812b542045e7668e31f7a1daa5134fe3` |
-| [momonong/selfhost-models-transformers](https://hub.docker.com/r/momonong/selfhost-models-transformers) | `sha256:196a1a65d60c0db749a8cd5cbd5db0d937e13cb9214b1fc6d2e495dd31c1b7fd` |
+| [momonong/selfhost-models-api](https://hub.docker.com/r/momonong/selfhost-models-api) | `sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4` |
+| [momonong/selfhost-models-vllm](https://hub.docker.com/r/momonong/selfhost-models-vllm) | `sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0` |
+| [momonong/selfhost-models-transformers](https://hub.docker.com/r/momonong/selfhost-models-transformers) | `sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f` |
 
-固定 digest 拉取，避免標籤日後變動：
+依固定 digest 拉取後，給本機 Compose 預設版本名稱；這只變更本機標籤，不修改 registry。若後續自行 build，不能再假設該本機標籤仍為發布產物，需重新拉取／核對：
 
 ```bash
-docker pull momonong/selfhost-models-api@sha256:c8af47eaedc89d1b653b09d5de85dc9f0dedfa7d919bdaeb6e80e0b890e3793c
-docker pull momonong/selfhost-models-vllm@sha256:25eea1d718346c7abeb5e9730a155360812b542045e7668e31f7a1daa5134fe3
+docker pull momonong/selfhost-models-api@sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4
+docker tag momonong/selfhost-models-api@sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4 momonong/selfhost-models-api:0.2.0
+docker pull momonong/selfhost-models-vllm@sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0
+docker tag momonong/selfhost-models-vllm@sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0 momonong/selfhost-models-vllm:0.2.0
 # 只在使用 Transformers 時需要
-docker pull momonong/selfhost-models-transformers@sha256:196a1a65d60c0db749a8cd5cbd5db0d937e13cb9214b1fc6d2e495dd31c1b7fd
+docker pull momonong/selfhost-models-transformers@sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f
+docker tag momonong/selfhost-models-transformers@sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f momonong/selfhost-models-transformers:0.2.0
 ```
 
 images 不包含模型權重、host driver、API key 或使用者 state。模型仍須由 host 登錄固定 revision、唯讀掛載。公開發布與可拉取不代表 Linux 實體桌機已驗收。
 
-### 已配置部署使用下載的 image
+### 使用下載的 image 建立主機部署
 
-`modelctl serve` 目前仍執行 `up --build`，沒有直接從 registry 部署的選項。首次配置仍依本機指南；若已有符合當前 host 的 `.state/compose.env`、模型、key 與 state，可在無請求時停止服務，建立 `.state/published-images.json`：
-
-```json
-{
-  "services": {
-    "api": {"image": "momonong/selfhost-models-api@sha256:c8af47eaedc89d1b653b09d5de85dc9f0dedfa7d919bdaeb6e80e0b890e3793c"},
-    "worker": {"image": "momonong/selfhost-models-vllm@sha256:25eea1d718346c7abeb5e9730a155360812b542045e7668e31f7a1daa5134fe3"}
-  }
-}
-```
-
-確認保存的 `BACKEND` 為 `vllm`，已拉取上述兩個 images 後：
+完成桌機主機準備、模型 register／inspect 並拉取 images 後，在本專案沒有運行容器的時候執行：
 
 ```bash
-uv run --locked modelctl stop
-docker compose --env-file .state/compose.env -f compose.yaml -f .state/published-images.json up -d --no-build --pull never
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 8192 --max-inflight 2 --gpu-memory 0.60 --no-build
 uv run --locked python scripts/chat.py --wait 600 "Reply with READY."
 ```
 
-Transformers 必須使用已配置為 `BACKEND=transformers`、`MAX_INFLIGHT=1` 的 state，將 JSON 的 worker 換成表中的 Transformers image digest，並在 `-f compose.yaml` 後加入 `-f compose.transformers.yaml`；不要只換 image 而沿用 vLLM 配置。一次啟動一個 backend。需要重建容器時保留相同 override；重新執行 `modelctl serve` 會回到本機建置流程。
+`--no-build` 仍檢查模型與 revision，建立本機 key/state/compose.env，使用 `up --no-build --pull never`；缺 image 就失敗，不 fallback 到 build。省略此選項則沿用原始碼建置。Transformers 先停止 vLLM，再使用 `--backend transformers --context 2048 --max-inflight 1 --no-build`，不加 video。CLI 契約已測試，實際桌機建立與 GPU 驗收仍待執行。
 
-發布證據見 [docker-hub.json](../evidence/2026-09-16-local-use/docker-hub.json)。本次運行中的容器保留原 image，發布沒有重啟服務；上述 registry 部署命令尚未另行重建實測。
+來源與容器驗證見 [images.json](../evidence/2026-09-16-release-0.2.0/images.json)，發布證據見 [docker-hub.json](../evidence/2026-09-16-release-0.2.0/docker-hub.json)。本次運行中的筆電容器保留原 image，發布沒有重啟服務；Linux 桌機與桌球品質仍需分別驗收。

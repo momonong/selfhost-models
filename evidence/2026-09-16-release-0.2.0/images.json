@@ -1,0 +1,80 @@
+{
+  "source_commit": "29bec681f6577f88067edf8cca9952e66b58232c",
+  "cpu_tests": "117 passed",
+  "gpu_scope": "No new GPU run; inference source retained from video acceptance. Live deployment unchanged.",
+  "images": [
+    {
+      "role": "api",
+      "image": "momonong/selfhost-models-api:0.2.0",
+      "digest": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4",
+      "labels": {
+        "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+        "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+        "org.opencontainers.image.version": "0.2.0"
+      },
+      "source_hashes": {
+        "/app/selfhost_models/assets.py": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+        "/app/selfhost_models/storage.py": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+        "/app/selfhost_models/__init__.py": "667d4a15b970b851e20d17510224670c14646cfb6d5a1e388ca6b9cc6da8bf41",
+        "/app/selfhost_models/backend.py": "59eb1aca6cd1ee9c78258d3304ee83063f818804c3df43ac1f3f58004a9fbbd1",
+        "/app/selfhost_models/schema.py": "9f6fea574f955feb236d48cc054f51619d3462099423dcaae510a7dd93f0d277",
+        "/app/selfhost_models/cli.py": "b10af88edb5e64879a91c86fc074e2037761147f29ca6e481eaf59e0cff3846c",
+        "/app/selfhost_models/capabilities.py": "242e9432fcb5ea54020f01e5d9d75b79e7dce374ee1e2a76c09ff6afa6b5c015",
+        "/app/selfhost_models/video_decoder.py": "b343087e2c837b1fc3f55f8ab579be4d39cdeb987511105f5802bf157b1cc699",
+        "/app/selfhost_models/api.py": "750c442598ae7cb04d08fef6779ac9935cdb885ba33c96b6e78aa388b59ffb95",
+        "/app/selfhost_models/video.py": "de3d0384ffe99a62225c7e15a36c20c7ec7918d1e0b51db9c908bb0a55d6b985"
+      },
+      "check": "API import and version OK"
+    },
+    {
+      "role": "vllm",
+      "image": "momonong/selfhost-models-vllm:0.2.0",
+      "digest": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0",
+      "labels": {
+        "ai.vllm.build.commit": "98dff2a81d747d1dba01a47f939f48c3526d4206",
+        "ai.vllm.build.pipeline": "019d130e-464e-4ff7-b84b-492992c0c06b",
+        "ai.vllm.build.url": "https://buildkite.com/vllm/release-v2/builds/6292",
+        "ai.vllm.image.tag": "vllm/vllm-openai:v0.29.0",
+        "maintainer": "NVIDIA CORPORATION <cudatools@nvidia.com>",
+        "org.opencontainers.image.ref.name": "ubuntu",
+        "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+        "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+        "org.opencontainers.image.url": "https://buildkite.com/vllm/release-v2/builds/6292",
+        "org.opencontainers.image.version": "0.2.0"
+      },
+      "source_hashes": {
+        "/opt/selfhost/identity.py": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470",
+        "/opt/selfhost/launch.py": "97b4c9d3f954fff8fd0977ecb84beefbfea368d7e3f99fd7ebdfa8875376daa6"
+      },
+      "check": "WARNING 09-16 15:17:32 [interface.py:1008] Using 'pin_memory=False' as WSL is detected. This may slow down performance.\nvLLM version OK"
+    },
+    {
+      "role": "transformers",
+      "image": "momonong/selfhost-models-transformers:0.2.0",
+      "digest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f",
+      "labels": {
+        "com.nvidia.volumes.needed": "nvidia_driver",
+        "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+        "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+        "org.opencontainers.image.version": "0.2.0"
+      },
+      "source_hashes": {
+        "/app/selfhost_models/assets.py": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+        "/app/selfhost_models/storage.py": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+        "/app/selfhost_models/__init__.py": "667d4a15b970b851e20d17510224670c14646cfb6d5a1e388ca6b9cc6da8bf41",
+        "/app/selfhost_models/backend.py": "59eb1aca6cd1ee9c78258d3304ee83063f818804c3df43ac1f3f58004a9fbbd1",
+        "/app/selfhost_models/schema.py": "9f6fea574f955feb236d48cc054f51619d3462099423dcaae510a7dd93f0d277",
+        "/app/selfhost_models/cli.py": "b10af88edb5e64879a91c86fc074e2037761147f29ca6e481eaf59e0cff3846c",
+        "/app/selfhost_models/capabilities.py": "242e9432fcb5ea54020f01e5d9d75b79e7dce374ee1e2a76c09ff6afa6b5c015",
+        "/app/selfhost_models/video_decoder.py": "b343087e2c837b1fc3f55f8ab579be4d39cdeb987511105f5802bf157b1cc699",
+        "/app/selfhost_models/api.py": "750c442598ae7cb04d08fef6779ac9935cdb885ba33c96b6e78aa388b59ffb95",
+        "/app/selfhost_models/video.py": "de3d0384ffe99a62225c7e15a36c20c7ec7918d1e0b51db9c908bb0a55d6b985",
+        "/app/worker/transformers_engine.py": "78da828c7f44ac294c75848f9a0bade031a5c71b95ca6d5efff8b5abc6f3dbf6",
+        "/app/worker/identity.py": "429b11762139a59b1c0c5a9298a926b6c8df5c7bc93ed20e561baeacbc650470",
+        "/app/worker/transformers_app.py": "7b21be6f82eb4c3b1055729665714731df99928f0c225c66fe8d23dcbeca161c",
+        "/app/worker/launch.py": "97b4c9d3f954fff8fd0977ecb84beefbfea368d7e3f99fd7ebdfa8875376daa6"
+      },
+      "check": "Transformers runtime and import OK"
+    }
+  ]
+}

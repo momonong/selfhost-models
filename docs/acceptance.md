@@ -2,7 +2,7 @@
 
 ## 有界影片（2026-09-16，工作分支驗收）
 
-後續版本核對：影片成果已於 `841132e1732d29e72458fd4b09d012b12e4e7792` 合併並推送 GitHub main。以下保留當時工作分支驗收狀態；截至桌機交接文件更新時，影片 images 尚未發布。桌機請依本文的 Linux 桌機章節操作。
+後續版本核對：影片成果已於 `841132e1732d29e72458fd4b09d012b12e4e7792` 合併並推送 GitHub main。以下保留當時工作分支驗收狀態；後續 0.2.0 images 發布與驗證界線見部署文件。桌機請依本文的 Linux 桌機章節操作。
 
 起點 `main@5a077e3883b3b2b6a0e817ff91f209ace6b15bd9`，`feat/video-inference`，沿用主要工作目錄，沒有額外 worktree。已和 PixelReceipt 接入任務協調排他維護，僅操作本專案 API/worker；不並載 backend、不改模型、不發布 image。[可行性與失敗紀錄](video-feasibility.md)；證據集中於 `evidence/2026-09-16-video/`。
 
@@ -64,7 +64,7 @@ uv run --locked python scripts/capture_runtime.py --output evidence/<run>/runtim
 
 ## Linux 桌機實機驗收（待執行）
 
-這是桌機尚未執行的驗收程序，不是 Linux 通過證據。先完成 [桌機交接入口](deployment.md#linux-桌機交接入口) 的來源、host、模型與獨立 state 準備。目前原始碼交付基準為 `841132e`；舊公開 `sha-4dc0a81` 不包含影片功能，下列流程從桌機 checkout 建置。
+這是桌機尚未執行的驗收程序，不是 Linux 通過證據。先完成 [桌機交接入口](deployment.md#linux-桌機交接入口) 的來源、host、模型與獨立 state 準備。發布來源為 `29bec68`；依部署文件拉取並核對 0.2.0 固定 images。下列使用 `--no-build`；若改用原始碼建置，移除選項並另記新產物與差異。
 
 先盤點 GPU／port／其他服務並安排排他維護時段。即使 ready，也不代表沒有產品正在使用服務；以下包含超載、pause/restart、解碼與暫存檢查。現有部署需先協調停機，不直接搶占。不得同時載入兩個 backend。命令於 repo 根目錄以 Bash 執行，每次使用新的 evidence 目錄；任何失敗先保存 logs 與狀態，不跳過後繼續宣稱通過。
 
@@ -84,12 +84,12 @@ uv run --locked python scripts/service_snapshot.py --output "$RUN/before.json"
 uv run --locked python scripts/video_decode_probe.py --stress --output "$RUN/decode-probe.json"
 ```
 
-CPU 測試基準為影片交付的 113 項；若來源後續變更，依實際測試與差異核對。解碼探測是 CPU 證據，不能當 GPU 驗證。`RUN` 變數需保留在同一個 shell；若換 shell，設回同一個本次目錄，不覆寫舊紀錄。
+CPU 測試基準為 0.2.0 發布的 117 項；若來源後續變更，依實際測試與差異核對。解碼探測是 CPU 證據，不能當 GPU 驗證。`RUN` 變數需保留在同一個 shell；若換 shell，設回同一個本次目錄，不覆寫舊紀錄。
 
 ### B. vLLM 文字／圖片／工具與影片
 
 ```bash
-uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 8192 --max-inflight 2 --gpu-memory 0.60
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 8192 --max-inflight 2 --gpu-memory 0.60 --no-build
 uv run --locked python scripts/chat.py --wait 600 --stream 'Reply with READY.'
 uv run --locked python scripts/acceptance.py --faults --output "$RUN/vllm-general.json"
 uv run --locked python scripts/multimodal_smoke.py --output "$RUN/vllm-image-tools.json"
@@ -107,7 +107,7 @@ uv run --locked python scripts/service_snapshot.py --before "$RUN/before.json" -
 ### C. Transformers 文字（必須先完成 B 的停止核對）
 
 ```bash
-uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend transformers --context 2048 --max-inflight 1 --gpu-memory 0.60
+uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend transformers --context 2048 --max-inflight 1 --gpu-memory 0.60 --no-build
 uv run --locked python scripts/chat.py --wait 600 --stream 'Reply with READY.'
 uv run --locked python scripts/acceptance.py --faults --output "$RUN/transformers-general.json"
 uv run --locked python scripts/transformers_smoke.py --output "$RUN/transformers-smoke.json"
@@ -134,7 +134,7 @@ Transformers 不支援影片，不加 `--video`。若本次桌機只部署 vLLM�
 請依 docs/deployment.md「Linux 桌機交接入口」及 docs/acceptance.md「Linux 桌機實機驗收」在這台桌機部署並驗收 selfhost-models。
 先讀 AGENTS.md，核對實際工作目錄、HEAD、dirty state 與其他任務／GPU／Docker 使用情況。
 影片來源基準為 841132e1732d29e72458fd4b09d012b12e4e7792；確認 checkout 包含此提交及本次交接文件，記錄實際 HEAD，不自行 reset。
-舊 Docker Hub sha-4dc0a81 不支援影片；先採固定來源本機建置，若已有更新發布紀錄則核對其來源及 digest 後再決定。
+發布來源為 29bec681f6577f88067edf8cca9952e66b58232c；checkout 須包含此提交。依部署文件拉取 0.2.0 固定 digests，使用 --no-build；若自行建置要另外記錄產物。
 建立桌機專屬模型登錄與 state/key，不複製筆電 .state。優先完成 vLLM 文字／圖片／工具／影片，再完全停止後驗證 Transformers 文字。
 可執行已協調維護時段內的本專案部署與故障驗收；驅動／Docker 主機級變更及模型下載若尚未授權，先列出具體需求。
 若缺少硬體資源或相容性不足，保存失敗證據並討論，不替換固定 runtime 或悄悄降低驗收規格。

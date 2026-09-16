@@ -4,7 +4,7 @@
 
 ## 開始使用
 
-Linux 桌機請從 [桌機交接入口](docs/deployment.md#linux-桌機交接入口) 開始，接著執行 [桌機驗收](docs/acceptance.md#linux-桌機實機驗收待執行)。影片程式已在 `main@841132e`，舊 Docker Hub `sha-4dc0a81` 不含影片功能；目前桌機路徑採原始碼建置。
+Linux 桌機請從 [桌機交接入口](docs/deployment.md#linux-桌機交接入口) 開始，接著執行 [桌機驗收](docs/acceptance.md#linux-桌機實機驗收待執行)。影片版 0.2.0 提供固定 images 與 `modelctl serve --no-build`；亦可從原始碼建置。
 
 筆電日常啟動、直接對話與 backend 切換，請看 [本機使用指南](docs/local-use.md)；其他專案接入請直接看 [Client 接入指南](docs/client-integration.md)。Linux 桌機尚未驗收，不影響已驗證的筆電使用範圍。
 

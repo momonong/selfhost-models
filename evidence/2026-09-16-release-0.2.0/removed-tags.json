@@ -1,0 +1,20 @@
+[
+  {
+    "repository": "momonong/selfhost-models-api",
+    "tag": "sha-4dc0a81",
+    "digest": "sha256:c8af47eaedc89d1b653b09d5de85dc9f0dedfa7d919bdaeb6e80e0b890e3793c",
+    "delete_status": 204
+  },
+  {
+    "repository": "momonong/selfhost-models-vllm",
+    "tag": "sha-4dc0a81",
+    "digest": "sha256:25eea1d718346c7abeb5e9730a155360812b542045e7668e31f7a1daa5134fe3",
+    "delete_status": 204
+  },
+  {
+    "repository": "momonong/selfhost-models-transformers",
+    "tag": "sha-4dc0a81",
+    "digest": "sha256:196a1a65d60c0db749a8cd5cbd5db0d937e13cb9214b1fc6d2e495dd31c1b7fd",
+    "delete_status": 204
+  }
+]

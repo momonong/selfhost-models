@@ -1,0 +1,32 @@
+[
+  {
+    "repository": "momonong/selfhost-models-api",
+    "public": true,
+    "tags": {
+      "latest": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4",
+      "0.2.0": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4"
+    },
+    "digest_pull": "passed (local layer cache)",
+    "source_commit": "29bec681f6577f88067edf8cca9952e66b58232c"
+  },
+  {
+    "repository": "momonong/selfhost-models-vllm",
+    "public": true,
+    "tags": {
+      "latest": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0",
+      "0.2.0": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0"
+    },
+    "digest_pull": "passed (local layer cache)",
+    "source_commit": "29bec681f6577f88067edf8cca9952e66b58232c"
+  },
+  {
+    "repository": "momonong/selfhost-models-transformers",
+    "public": true,
+    "tags": {
+      "latest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f",
+      "0.2.0": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f"
+    },
+    "digest_pull": "passed (local layer cache)",
+    "source_commit": "29bec681f6577f88067edf8cca9952e66b58232c"
+  }
+]
