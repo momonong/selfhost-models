@@ -20,6 +20,8 @@ uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 
 
 在桌機既有 checkout 操作前，先確認沒有其他任務使用該目錄；沒有 checkout 才 clone，不建立額外 worktree。核對 `git status --short`、`git worktree list`、`git rev-parse HEAD` 與 `git log -5 --oneline`，不要強制重設既有工作。
 
+同時安裝 Docker Desktop 與原生 Engine 時，先用 `docker context ls`、`docker --context <名稱> info` 確認目標 daemon 及 NVIDIA runtime；所有 modelctl／驗收命令透過當次 shell 的 `DOCKER_CONTEXT` 使用同一 daemon，不必改全域預設。例如已確認原生 Engine 位於 `default` context 時使用 `export DOCKER_CONTEXT=default`。另外核對 `uv --version`；PATH 中舊版不符合要求時，可指定既有合規 uv 的絕對路徑，避免更新其他專案的共用工具。
+
 ```bash
 git fetch origin
 git merge-base --is-ancestor 29bec681f6577f88067edf8cca9952e66b58232c HEAD
@@ -52,7 +54,7 @@ uv run --locked modelctl inspect Qwen/Qwen3.5-4B
 
 必須核對 revision 為 `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`。保留來源 metadata；缺 metadata 時，只有能以移轉清單等證據確認來源，才提供明確 `--revision`，不能用旗標掩蓋未知來源。移轉權重時核對檔案清單及 SHA256；不要搬動筆電正在掛載的原模型。
 
-若沒有資產，另行選擇移轉或下載。獲授權下載後使用 `uv run --locked modelctl fetch Qwen/Qwen3.5-4B --revision 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`，確認預設 `/srv/selfhost-models/models` 可寫；需要其他位置時，所有相關 modelctl 命令一致使用 `--model-root <實際目錄>`（放在子命令前）。HF 真實下載仍待桌機實測，啟動及請求不下載模型。
+若沒有資產，另行選擇移轉或下載。獲授權下載後使用 `uv run --locked modelctl fetch Qwen/Qwen3.5-4B --revision 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`，確認預設 `/srv/selfhost-models/models` 可寫；需要其他位置時，所有相關 modelctl 命令一致使用 `--model-root <實際目錄>`（放在子命令前）。固定 revision 的 HF 真實下載與權重 hash 已完成 Linux 實測；啟動及請求不下載模型。
 
 ### 3. 驗收後常駐使用
 
@@ -68,6 +70,10 @@ uv run --locked python scripts/chat.py --wait 600 --stream 'Reply with READY.'
 依 [Client 接入指南](client-integration.md) 安全讀取桌機 `.state/api-key`，檢查 `/health/ready` 及 `/v1/models` 的 model/revision/backend/videos。其他專案的設定必須改用桌機本地路徑，不沿用 Windows key 路徑。`127.0.0.1:18080` 只代表桌機自己；筆電不會因此連上桌機。本次不開放 LAN／公網，也不假設其他容器可連線。
 
 目前沒有開機自啟；主機重新啟動、Docker ready 後用 `uv run --locked modelctl restart`，再驗證 readiness。初始化失敗先保存 logs，不刪 lease journal。交接回報應分開列出：各 backend／影片驗收結果、最終運行 backend、端口、image IDs、剩餘問題；桌球品質仍需產品端人工評估。
+
+日常使用 `uv run --locked modelctl status` 查容器，`uv run --locked python scripts/chat.py --stream 'Reply with READY.'` 做合成呼叫。停止前協調使用時段並確認 lease 歸零，再執行 `uv run --locked modelctl stop`。重新開機後仍須選定原部署的 Docker context、原 checkout/state 與合規 uv，再 restart 及等待 ready。
+
+Linux backend 切換時，port 即使沒有 listener，也可能因 `TIME_WAIT` 使 modelctl 的普通 bind 預檢暫時失敗。用 `ss -ltnp '( sport = :18080 )'` 與 `ss -tan '( sport = :18080 )'` 區分 listener／殘留連線，等待釋放後重試；不停止不明服務、不刪 lease journal。完整主機 evidence 留在部署端；公開交付只保留通用操作、驗收範圍與限制。
 
 ## Host
 
@@ -307,6 +313,6 @@ uv run --locked modelctl serve Qwen/Qwen3.5-4B --backend vllm --video --context 
 uv run --locked python scripts/chat.py --wait 600 "Reply with READY."
 ```
 
-`--no-build` 仍檢查模型與 revision，建立本機 key/state/compose.env，使用 `up --no-build --pull never`；缺 image 就失敗，不 fallback 到 build。省略此選項則沿用原始碼建置。Transformers 先停止 vLLM，再使用 `--backend transformers --context 2048 --max-inflight 1 --no-build`，不加 video。CLI 契約已測試，實際桌機建立與 GPU 驗收仍待執行。
+`--no-build` 仍檢查模型與 revision，建立本機 key/state/compose.env，使用 `up --no-build --pull never`；缺 image 就失敗，不 fallback 到 build。省略此選項則沿用原始碼建置。Transformers 先停止 vLLM，再使用 `--backend transformers --context 2048 --max-inflight 1 --no-build`，不加 video。CLI 契約與 Linux 原生 Docker 的兩 backend 已驗收，範圍與限制見 [驗收文件](acceptance.md)。
 
-來源與容器驗證見 [images.json](../evidence/2026-09-16-release-0.2.0/images.json)，發布證據見 [docker-hub.json](../evidence/2026-09-16-release-0.2.0/docker-hub.json)。本次運行中的筆電容器保留原 image，發布沒有重啟服務；Linux 桌機與桌球品質仍需分別驗收。
+來源與容器驗證見 [images.json](../evidence/2026-09-16-release-0.2.0/images.json)，發布證據見 [docker-hub.json](../evidence/2026-09-16-release-0.2.0/docker-hub.json)。發布時筆電容器保留原 image，沒有重啟服務；後續 Linux 驗收另見 [驗收摘要](acceptance.md)。桌球產品品質仍未驗收。
