@@ -1,0 +1,75 @@
+{
+  "base_commit": "e55ac0fcd2b67b3fd3fc9da9dba2e03cb73f1867",
+  "source_basis": "working tree before local commit; byte hashes identify tested implementation",
+  "source_manifest_sha256": "f05e703db58a04b80b74e463e1b8283802feeed7871fa61f56b9a9f6bd88ab7b",
+  "windows": {
+    "command": "uv run --locked --no-sync pytest -q --basetemp <private-temp>",
+    "passed": 174,
+    "seconds": 15.81,
+    "exit_code": 0
+  },
+  "linux": {
+    "command": "uv run --locked --no-sync pytest -q tests/test_scheduler.py tests/test_scheduler_process.py tests/test_scheduler_boundaries.py --basetemp <native-private-temp>",
+    "passed": 57,
+    "seconds": 6.87,
+    "exit_code": 0,
+    "source_matches_current_implementation": true
+  },
+  "linux_budget_window_cli": {
+    "commands": [
+      [
+        "init"
+      ],
+      [
+        "budget-window",
+        "open",
+        "--name",
+        "final-handoff",
+        "--loads",
+        "2",
+        "--generations",
+        "8"
+      ],
+      [
+        "budget-window",
+        "status"
+      ],
+      [
+        "budget-window",
+        "close",
+        "--name",
+        "final-handoff"
+      ],
+      [
+        "status"
+      ]
+    ],
+    "all_exit_code": 0,
+    "final_lifetime": {
+      "loads": 0,
+      "generations": 0
+    },
+    "closed_window": true
+  },
+  "systemd": {
+    "command": "systemd-analyze verify <concretized-api.service> <concretized-controller.service>",
+    "exit_code": 0,
+    "installed": false,
+    "started": false,
+    "state_path": "native scratch placeholder; no production service created"
+  },
+  "resource_actions": {
+    "docker_restart": false,
+    "docker_build": false,
+    "gpu_loads": 0,
+    "gpu_generations": 0,
+    "production_api_or_controller_started": false
+  },
+  "limitations": [
+    "CPU fixtures are not GPU or quality acceptance",
+    "WSL temporary prior CPU scratch no longer existed; rebuilt isolated venv from unchanged uv.lock",
+    "Offline cache lacked av wheel; locked Python dependencies synchronized; no model or image downloads",
+    "Existing Whisper candidate contains prior host package snapshot and must be refreshed or independently attributed before deployment",
+    "Service docs refined after Linux tests; tested implementation and unit templates are byte-identical"
+  ]
+}

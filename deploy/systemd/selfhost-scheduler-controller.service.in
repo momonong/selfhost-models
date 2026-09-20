@@ -1,0 +1,25 @@
+[Unit]
+Description=Selfhost model scheduler controller
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=@USER@
+WorkingDirectory=@RELEASE@
+ExecStart=@RELEASE@/.venv/bin/modelctl --state @STATE@ scheduler controller
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+UMask=0077
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillMode=control-group
+NoNewPrivileges=true
+PrivateTmp=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -96,6 +96,10 @@ class Store:
                 CREATE TABLE IF NOT EXISTS blocked_deployments (id TEXT PRIMARY KEY, reason TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS budget (id INTEGER PRIMARY KEY CHECK(id=1), loads INTEGER NOT NULL, generations INTEGER NOT NULL);
                 INSERT OR IGNORE INTO budget VALUES(1,0,0);
+                CREATE TABLE IF NOT EXISTS budget_windows (name TEXT PRIMARY KEY, opened REAL NOT NULL,
+                    closed REAL, start_loads INTEGER NOT NULL, start_generations INTEGER NOT NULL,
+                    max_loads INTEGER NOT NULL, max_generations INTEGER NOT NULL,
+                    end_loads INTEGER, end_generations INTEGER);
                 CREATE TABLE IF NOT EXISTS artifacts (ref TEXT PRIMARY KEY, size INTEGER NOT NULL, media TEXT NOT NULL,
                     description TEXT, created REAL NOT NULL);
                 CREATE TABLE IF NOT EXISTS pins (owner TEXT NOT NULL, ref TEXT NOT NULL, PRIMARY KEY(owner,ref));
@@ -249,6 +253,7 @@ class Store:
             b = c.execute("SELECT * FROM budget WHERE id=1").fetchone()
             if b["loads"] >= self.config.max_load_attempts or b["generations"] + warmups > self.config.max_generation_attempts:
                 raise SchedulerError("lifecycle_budget_exhausted", 429)
+            self.check_budget_window(c, loads=1, generations=warmups)
             c.execute("UPDATE budget SET loads=loads+1,generations=generations+? WHERE id=1", (warmups,))
             self.event(c, "load_budget_reserved", dep.id, warmup_generation_upper_bound=warmups)
 
@@ -269,6 +274,54 @@ class Store:
     def budget_state(self):
         with contextlib.closing(self.connect()) as c:
             return dict(c.execute("SELECT loads,generations FROM budget WHERE id=1").fetchone())
+
+    def check_budget_window(self, c, *, loads=0, generations=0):
+        window = c.execute("SELECT * FROM budget_windows WHERE closed IS NULL").fetchone()
+        if window:
+            b = c.execute("SELECT * FROM budget WHERE id=1").fetchone()
+            if (b["loads"] + loads - window["start_loads"] > window["max_loads"] or
+                    b["generations"] + generations - window["start_generations"] > window["max_generations"]):
+                raise SchedulerError("budget_window_exhausted", 429)
+
+    def open_budget_window(self, name, loads, generations):
+        if (not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,64}", name) or type(loads) is not int or
+                type(generations) is not int or not 1 <= loads <= 100000 or not 1 <= generations <= 10000000):
+            raise SchedulerError("invalid_budget_window")
+        with self.tx() as c:
+            if (self.state(c)["phase"] not in ("unloaded", "ready") or
+                    c.execute("SELECT 1 FROM leases").fetchone() or
+                    c.execute("SELECT 1 FROM jobs WHERE state IN ('queued','dispatching','running','draining')").fetchone()):
+                raise SchedulerError("budget_window_requires_idle", 409)
+            if c.execute("SELECT 1 FROM budget_windows WHERE closed IS NULL OR name=?", (name,)).fetchone():
+                raise SchedulerError("budget_window_exists", 409)
+            b = c.execute("SELECT * FROM budget WHERE id=1").fetchone()
+            c.execute("INSERT INTO budget_windows VALUES(?,?,NULL,?,?,?,?,NULL,NULL)",
+                      (name, self.clock(), b["loads"], b["generations"], loads, generations))
+            self.event(c, "budget_window_opened", name, max_loads=loads, max_generations=generations)
+
+    def close_budget_window(self, name):
+        with self.tx() as c:
+            window = c.execute("SELECT * FROM budget_windows WHERE name=?", (name,)).fetchone()
+            if not window:
+                raise SchedulerError("budget_window_not_found", 404)
+            if window["closed"] is not None:
+                return  # A duplicate close cannot change its historical receipt.
+            if (self.state(c)["phase"] not in ("unloaded", "ready") or
+                    c.execute("SELECT 1 FROM leases").fetchone() or
+                    c.execute("SELECT 1 FROM jobs WHERE state IN ('queued','dispatching','running','draining')").fetchone()):
+                raise SchedulerError("budget_window_requires_idle", 409)
+            b = c.execute("SELECT * FROM budget WHERE id=1").fetchone()
+            c.execute("UPDATE budget_windows SET closed=?,end_loads=?,end_generations=? WHERE name=?",
+                      (self.clock(), b["loads"], b["generations"], name))
+            self.event(c, "budget_window_closed", name, loads=b["loads"]-window["start_loads"],
+                       generations=b["generations"]-window["start_generations"])
+
+    def budget_windows(self):
+        with contextlib.closing(self.connect()) as c:
+            b = c.execute("SELECT * FROM budget WHERE id=1").fetchone()
+            return [{**dict(w), "used_loads": (w["end_loads"] if w["closed"] is not None else b["loads"])-w["start_loads"],
+                     "used_generations": (w["end_generations"] if w["closed"] is not None else b["generations"])-w["start_generations"]}
+                    for w in c.execute("SELECT * FROM budget_windows ORDER BY opened,name")]
 
     def asset_register(self, path, expected=None):
         manifest = full_manifest(path)
@@ -514,6 +567,11 @@ class Store:
             if c.execute("SELECT generations FROM budget WHERE id=1").fetchone()[0] >= self.config.max_generation_attempts:
                 c.execute("UPDATE jobs SET state='failed',error='generation_budget_exhausted',ended=?,reservation=0 WHERE id=?", (self.clock(), jid))
                 return None
+            try:
+                self.check_budget_window(c, generations=1)
+            except SchedulerError:
+                c.execute("UPDATE jobs SET state='failed',error='budget_window_exhausted',ended=?,reservation=0 WHERE id=?", (self.clock(), jid))
+                return None
             c.execute("UPDATE budget SET generations=generations+1 WHERE id=1")
             aid, now = uuid.uuid4().hex, self.clock()
             c.execute("INSERT INTO attempts VALUES(?,?,?,?,?,?,NULL,NULL)", (aid, jid, epoch, s["worker_epoch"], dep.id, now))
@@ -546,6 +604,7 @@ class Store:
                 raise SchedulerError("overloaded", 429)
             if c.execute("SELECT generations FROM budget WHERE id=1").fetchone()[0] >= self.config.max_generation_attempts:
                 raise SchedulerError("generation_budget_exhausted", 429)
+            self.check_budget_window(c, generations=1)
             c.execute("UPDATE budget SET generations=generations+1 WHERE id=1")
             c.execute("INSERT INTO leases VALUES(?,?,?,?,?,'active',?)", (rid, "legacy", deployment, worker_epoch, owner, self.clock()))
 

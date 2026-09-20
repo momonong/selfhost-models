@@ -34,6 +34,11 @@ def add_parser(sub):
     events.add_argument("--limit", type=int, default=100)
     api = commands.add_parser("api")
     api.add_argument("--port", type=int, default=18081)
+    window = commands.add_parser("budget-window", help="operator-only temporary limits; never reset lifetime counters")
+    window.add_argument("action", choices=("open", "close", "status"))
+    window.add_argument("--name")
+    window.add_argument("--loads", type=int)
+    window.add_argument("--generations", type=int)
     for name in ("catalog", "submit", "get", "cancel", "result", "upload"):
         cli = commands.add_parser(name)
         cli.add_argument("--url", default="http://127.0.0.1:18081")
@@ -73,7 +78,15 @@ def main(args):
     elif command == "collect":
         result = store.collect()
     elif command == "status":
-        result = {**store.state(), "budget": store.budget_state()}
+        result = {**store.state(), "budget": store.budget_state(), "budget_windows": store.budget_windows()}
+    elif command == "budget-window":
+        if args.action == "open":
+            store.open_budget_window(args.name or "", args.loads, args.generations)
+        elif args.action == "close":
+            if not args.name:
+                raise SchedulerError("budget_window_name_required")
+            store.close_budget_window(args.name)
+        result = {"budget": store.budget_state(), "windows": store.budget_windows()}
     elif command == "resume-deployment":
         from filelock import FileLock
         with FileLock(str(store.root / "controller.lock"), timeout=0):

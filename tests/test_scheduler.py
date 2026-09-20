@@ -642,3 +642,107 @@ def test_crash_during_preparation_is_distinct_from_external_start_intent(tmp_pat
     s.acquire_controller()
     assert s.state()["phase"]=="unknown"
     with pytest.raises(SchedulerError,match="engine_exit_unconfirmed"):s.resume_deployment(q.id)
+
+
+def test_budget_window_load_reserves_full_warmup_atomically_and_survives_restart(tmp_path):
+    s,q,w,_=setup_store(tmp_path,capacity=2)
+    s.open_budget_window("handoff",1,3)
+    epoch=s.acquire_controller()
+    # Capacity-two Qwen requires four warmups before any job can run.
+    with pytest.raises(SchedulerError,match="budget_window_exhausted"):
+        s.reserve_load(epoch,q)
+    assert s.budget_state()=={"loads":0,"generations":0}
+    s.reserve_load(epoch,w)
+    reopened=Store(s.root)
+    with pytest.raises(SchedulerError,match="budget_window_exhausted"):
+        reopened.reserve_load(epoch,w)
+    assert reopened.budget_state()=={"loads":1,"generations":1}
+    assert reopened.budget_windows()[0]["used_loads"]==1
+
+
+def test_budget_window_durable_and_legacy_share_atomic_admission(tmp_path):
+    s,q,_,_=setup_store(tmp_path,capacity=2)
+    s.open_budget_window("handoff",2,1)
+    epoch=ready(s,q)
+    first=submit(s,q,"first")
+    attempt=s.dispatch(epoch,first["id"])
+    with pytest.raises(SchedulerError,match="budget_window_requires_idle"):
+        s.close_budget_window("handoff")
+    with pytest.raises(SchedulerError,match="budget_window_exhausted"):
+        s.legacy_admit("legacy",q.id,"worker-one","api")
+    second=submit(s,q,"second")
+    assert s.dispatch(epoch,second["id"]) is None
+    assert s.job(second["id"])["error"]=="budget_window_exhausted"
+    assert s.job(second["id"])["attempt"] is None
+    s.terminal(epoch,attempt["id"],{"text":"synthetic"})
+    s.publish(epoch,attempt["id"])
+    s.close_budget_window("handoff")
+    closed=s.budget_windows()[0]
+    s.legacy_admit("after",q.id,"worker-one","api")
+    s.legacy_terminal("after","worker-one","api",True)
+    s.close_budget_window("handoff")
+    reopened=Store(s.root)
+    assert reopened.budget_state()=={"loads":0,"generations":2}
+    assert reopened.budget_windows()==[closed]
+    assert closed["used_generations"]==1 and closed["end_generations"]==1
+    kinds=[e["kind"] for e in reopened.events()]
+    assert kinds.count("budget_window_opened")==1 and kinds.count("budget_window_closed")==1
+    with pytest.raises(SchedulerError,match="budget_window_exists"):
+        s.open_budget_window("handoff",2,2)
+
+
+def test_budget_window_concurrent_legacy_never_overspends(tmp_path):
+    s,q,_,_=setup_store(tmp_path,capacity=2)
+    s.open_budget_window("concurrent",1,1)
+    ready(s,q)
+    def admit(i):
+        try:
+            s.legacy_admit(str(i),q.id,"worker-one","api")
+            return "admitted"
+        except SchedulerError as exc:
+            return exc.code
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        results=list(pool.map(admit,range(2)))
+    assert sorted(results)==["admitted","budget_window_exhausted"]
+    assert s.budget_state()["generations"]==1 and s.lease_count()==1
+
+
+@pytest.mark.parametrize("phase",["loading","warming","draining","unloading","unknown"])
+def test_budget_window_cannot_close_across_lifecycle_boundary(tmp_path,phase):
+    s,q,_,_=setup_store(tmp_path)
+    s.open_budget_window("handoff",1,1)
+    epoch=s.acquire_controller()
+    s.phase(epoch,phase,deployment=q.id)
+    with pytest.raises(SchedulerError,match="budget_window_requires_idle"):
+        s.close_budget_window("handoff")
+    assert s.budget_windows()[0]["closed"] is None
+
+
+def test_budget_window_unknown_blocks_close_until_verified_engine_exit(tmp_path):
+    s,q,_,_=setup_store(tmp_path)
+    s.open_budget_window("handoff",1,1)
+    epoch=ready(s,q)
+    job=submit(s,q,"one")
+    with pytest.raises(SchedulerError,match="budget_window_requires_idle"):
+        s.close_budget_window("handoff")
+    attempt=s.dispatch(epoch,job["id"])
+    s.attempt_state(epoch,attempt["id"],"unknown")
+    with pytest.raises(SchedulerError,match="budget_window_requires_idle"):
+        s.close_budget_window("handoff")
+    s.engine_exited(epoch)
+    assert s.lease_count()==0 and s.state()["phase"]=="unloaded"
+    s.close_budget_window("handoff")
+    assert s.job(job["id"])["state"]=="unknown"
+    assert s.dispatch(epoch,job["id"]) is None
+    assert s.budget_state()=={"loads":0,"generations":1}
+
+
+def test_closing_temporary_window_never_bypasses_lifetime_budget(tmp_path):
+    s,q,w,_=setup_store(tmp_path,max_load_attempts=1,max_generation_attempts=1)
+    s.open_budget_window("handoff",2,2)
+    epoch=s.acquire_controller()
+    s.reserve_load(epoch,w)
+    s.close_budget_window("handoff")
+    with pytest.raises(SchedulerError,match="lifecycle_budget_exhausted"):
+        s.reserve_load(epoch,w)
+    assert s.budget_state()=={"loads":1,"generations":1}

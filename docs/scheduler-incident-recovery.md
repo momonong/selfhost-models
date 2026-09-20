@@ -1,8 +1,9 @@
-# Docker daemon 500：診斷與最小恢復提案
+# Docker daemon 500：診斷與最小恢復流程
 
-**尚未取得恢復授權，也尚未執行恢復。** main 統一協調跨專案；此 task 目前只整理
-事故證據、核對本機 CLI help 與非 Docker 交付。daemon 恢復、原 Qwen 恢復、scheduler
-D 驗收是三個不同範圍。恢復不能順便建置或啟用 scheduler 候選。
+**一次最小恢復已納入階段授權；仍等待 fresh writers／RESOURCE GO，尚未執行。**
+main 統一協調跨專案。daemon 恢復、原 Qwen 恢復、D 驗收分別保存證據；只有本流程
+成功、身份及資源核對通過後，才能依[已授權 D 窗口](scheduler-gpu-acceptance.md)繼續
+候選建置與切換。恢復失敗後不得繼續其他 Docker 操作。
 
 ## 已知時間線（2026-09-20 UTC）
 
@@ -52,7 +53,8 @@ image或weights，不重建任何原容器。
 
 ## 建議只做一次的 Docker Desktop 恢復
 
-前提：main確認各owner已停止Docker寫入，明確核定一次Desktop重啟與原Qwen恢復。
+前提：orchestrate 傳回 main 協調後的 fresh writers／RESOURCE GO 與維護截止時刻。
+正常app啟動／自動backup仍可能寫入，不以主動使用者釋放推定所有writer已靜止。
 本機`docker desktop restart --help`已證實支援`--timeout seconds`，本次help命令exit0。
 
 整個流程由同一個執行者維持單一monotonic deadline：第一個恢復命令之前設定
@@ -117,4 +119,6 @@ docker desktop restart --timeout 180
 
 整體單次恢復流程以同一480秒monotonic deadline為硬上限；後面的daemon等待、inspect、
 start與Qwen暖機都只能使用剩餘時間，因此Qwen可等的時間可能少於180秒。超時保留已知
-狀態与命令結果不確定性，下一層處置重新交main。無論恢復成功與否，D仍需獨立授權。
+狀態與命令結果不確定性，下一層處置重新交main。恢復可能新增的原Qwen load/warmup
+也納入D全局12／64 ledger的initial 1／6 reserve；未知不退額度。D階段已授權，但只有
+本流程成功且fresh資源窗口仍有效時才可繼續。

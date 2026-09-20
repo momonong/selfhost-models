@@ -1,8 +1,9 @@
-# 單機排程 D：待核定的 GPU 驗收窗口
+# 單機排程 D：GPU 驗收與 managed 交付窗口
 
-**狀態：提案，未執行。** A/B/C CPU 證據不構成此窗口授權。指定 owner、開始時間、
-現役使用者釋放、恢復責任與以下上限須由 main 核定後才開始。此文件不授權下載、
-變更 release tag、並載模型、清除未知 lease 或故障後無界重試。
+**階段已授權；仍等待 orchestrate 的 fresh RESOURCE GO，尚未執行。** 2026-09-20
+授權包含必要修正、本機建置、managed 部署與真 GPU 驗收；成功後留下持續服務。
+此文件不是 RESOURCE GO，不授權大型下載、推送、發布、並載模型、清除未知 lease
+或無界重試。現役 owner、外部 writers 與維護截止時刻須在操作前確認。
 
 ## 前置檢查
 
@@ -21,21 +22,35 @@
 
 ## 時間與硬上限
 
-窗口最長 **60 分鐘**；T+45 分鐘停止新測試，保留最後 **15 分鐘**恢復原 Qwen。
-T+15 尚未取得第一個 managed Qwen ready，或 T+30 尚未取得 Whisper ready，停止後續
-測試、保存診斷並開始恢復。不可因進度不足延長窗口。
+窗口最長 **90 分鐘**；T+60 停止新驗收，最後 **30 分鐘**只做交付或恢復。
+Deadline 取「第一次 GPU lifecycle 操作起90分鐘」與「已批准 owner 維護截止時刻」
+較早者。Desktop restart 可能自動 reload 原 Qwen，因此需要恢復時從 restart 前計時。
+GO 前準備不占 GPU 窗口；不可因晚取得 GO 延长 owner 釋放時刻。
 
-總上限 **40 次 generation、8 次 load attempt**，包含暖機、legacy route、失敗、
+總上限 **64 次 generation、12 次 load attempt**，包含暖機、legacy route、失敗、
 取消、未知結果與恢復暖機；不是僅計成功 HTTP。Health/models/query 不算 generation。
 dispatch/reserve 後不退額度，unknown 不重送。每次執行之前同時核對持久 budget 和
 窗口 ledger；所有 client requests 由唯一驗收 owner 控制。
 
-獨立驗收 state 設定 `max_load_attempts=7,max_generation_attempts=34`，另保留原 static
-Qwen 恢復 **1 次 load＋6 次暖機 generation**；因此兩模式合計最多 8／40。預定僅用
-4 次 managed load（Qwen→Whisper→Qwen→Whisper）＋1 次原 Qwen 恢復。
-兩次 managed Qwen 暖機各6次、兩次 Whisper 各1次，合計14；原 Qwen 恢復6次。
-因此預定20次暖機，測試最多20次。若故障多耗一次 load/warmup，須從剩餘測試額度扣除，
-不能突破總上限。失敗後 deployment blocked；不自動 resume/retry。
+全局 ledger 串起四個位置，不可只計 managed DB：
+
+| 分配 | load 上限 | generation 上限 |
+|---|---:|---:|
+| 初始 Desktop／原 static 恢復 | 1 | 6 |
+| 獨立驗收 state | 8 | 44 |
+| 正式 state 臨時 handoff window | 2 | 8 |
+| 原 static rollback 保留 | 1 | 6 |
+| **總計** | **12** | **64** |
+
+驗收 state 設 `max_load_attempts=8,max_generation_attempts=44`。正式 state 保留長期
+10000／100000上限，以 `scheduler budget-window open --name final-handoff --loads 2
+--generations 8` 增加臨時限制；不得修改 DB 或重設歷史計數。正式 Qwen 的6次暖機、
+Windows durable smoke一次、legacy smoke一次合計8；第二次 load 不代表可以超出8次。
+初始恢復若觸發 static 自動 reload/warmup，同樣计入1／6；未知按全額占用。
+只有授權開始前已 ready 的歷史 load 不重算。未耗 reserve 不用來新增案例；已證實
+未觸發的釋放記入 ledger。rollback 額度提前保留。
+驗收預定4次 managed load（Qwen→Whisper→Qwen→Whisper）、暖機14次、案例最多20次。
+餘額只處理既有案例，不擴張範圍；deployment 失敗後 blocked，不自動 resume/retry。
 
 測試採固定合成文字、單色 PNG、合成工具回傳、2 秒 H.264 clip，以及 1／10／30 秒
 PCM16/16kHz/mono 的靜音或音調 WAV；不用私人音訊。Chat/ASR max_tokens≤128；音訊
@@ -62,13 +77,30 @@ GPU 停止，保留 unknown 和退出證据要求。
 | Qwen 工作 dispatch 後 controller restart／受控 engine 退出 | 1 | 舊 epoch fenced、unknown 不重派、whole-container exit 前 pin/lease不釋放 |
 | 恢復到第二個 Whisper 的有界 transcribe | 1 | 只有退出證實後切換，result bytes可取、description可查 |
 | 有界餘額 | 2 | 只補既有案例的未覆蓋長度／邊界；事前登記，不用來改驗收標準 |
-| **測試合計** | **20** | **另加預定20次暖機，總計40** |
+| **測試合計** | **20** | **驗收 state 另加預定14次暖機，合計34，硬上限44** |
 
 如果模型太快而未真正觀察到 running/cancel/overlap，不把該次當作該邊界通過；只可在
 剩餘額度內補測，否則標示未覆蓋。5xx、OOM、未知結果、load/warmup 失敗或 engine
 identity 不一致即停新工作，進入受控恢復；不靠新增重試填滿成功數。
 
-## 恢復原 Qwen
+## 成功交付與狀態交接
+
+1. 停驗收新提交、保存證據並停止驗收 controller。使用該 state 的 `scheduler unload`
+   證實 worker 全退出、釋放 ownership gate；驗收 DB 原樣保留。
+2. 正式 API/controller/SQLite 使用獨立 native WSL state 與固定 source/venv；不複製
+   驗收 DB 或 static `.state/runtime`。安全複製原 public key，Windows 繼續讀原 key file。
+3. systemd 分開監督 API/controller，加 Hidden Windows WSL keepalive；驗證跨工具回合
+   與 client 結束後仍服務。未測 Windows reboot，不宣稱開機自啟。重啟 active 不等於
+   ready；保留 unknown 時必須診斷與受控 unload，不自動 adopt 或清 lease。
+4. 正式 origin 固定 `http://127.0.0.1:18080`，衝突回報。用實際 catalog deployment IDs
+   完成合成 submit/get/result/cancel、legacy smoke，最後 Qwen ready、lease=0。
+   Whisper 由 durable job 觸發切換；Whisper ready 時 legacy Chat 明確拒絕，不 fallback。
+   要切回 Qwen，提交 catalog 中 Qwen deployment 的 durable job。
+5. 正式 state 無 queued/active lease 且 phase ready 後，以 `budget-window close` 固定
+   窗口歷史、解除臨時上限，lifetime 累計保留；核對服務不受已耗盡驗收額度阻擋。
+   unknown outcome 保留且不重派；只有 engine 退出已證實、lease解除才可關閉窗口。
+
+## 失敗時恢復原 Qwen
 
 1. 禁止新 client submit；記錄最後 budget/events/jobs/result 狀態，停止 controller
    （僅停止 controller 不代表 worker 退出）。
@@ -81,12 +113,12 @@ identity 不一致即停新工作，進入受控恢復；不靠新增重試填�
 4. 依序核對 ready、authenticated models、實際原 image ID/revision/context/capacity/
    video、lease全零與記憶體；保存恢復前後差異。保留 managed 測試 state 供追溯。
 
-若 engine 退出不能證實、gate不能安全釋放、原 Qwen 恢復失敗或到 T+60，停止操作並
+若 engine 退出不能證實、gate不能安全釋放、原 Qwen 恢復失敗或達全局 deadline，停止操作並
 立即回 orchestrate/main，列明現役狀態與已用額度；不再啟動另一 engine，不宣稱恢復。
 
 ## 交付證據
 
 每個 case 保存合成輸入 hash、job/attempt/deployment/worker/controller epoch、事件
 sequence、queue/load/warmup/compute/result 時間、call/load ledger、VRAM peak與退出
-證據。另交原 Qwen 恢復核對。逐項分為 PASS／FAIL／未覆蓋；真 GPU 流程通過仍不代表
+證據。另交 managed 持續服務或失敗時原 Qwen 恢復核對。逐項分為 PASS／FAIL／未覆蓋；真 GPU 流程通過仍不代表
 中文 ASR、影片內容理解或任何產品品質已驗收。

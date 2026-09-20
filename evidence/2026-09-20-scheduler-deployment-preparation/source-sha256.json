@@ -1,0 +1,13 @@
+{
+  "selfhost_models/scheduler_store.py": "72a796d2287cf8890a85230540a518e1ca9f285b4a2da0ad8d3a3a06ca44dc98",
+  "selfhost_models/scheduler_cli.py": "7717476b9e160b1535487b230c3e01d18431d7e6738ed7a3b737ef53f2cf137c",
+  "tests/test_scheduler.py": "3a6c60a383da1d418838806d0146f76d88bb3078ed29058df3d5e8b34a0ba8f6",
+  "deploy/systemd/selfhost-scheduler-api.service.in": "19b7ba63fb9f318e25353bb24ff9666b370acd2ba52e0654d94274974219c301",
+  "deploy/systemd/selfhost-scheduler-controller.service.in": "663bbd064ed4a285a4c457ea568e33acbf309b9f4526576346d546050f63e441",
+  "docs/scheduler.md": "c70d93518a89ffd81c54cad667cbc21be2b56d95c61f1288b77bd66d6888c43b",
+  "docs/scheduler-service.md": "e8b76868895bb24aff48c2bec902fe3eefedb6061006d23ab15a7039a5f7a35f",
+  "docs/scheduler-gpu-acceptance.md": "4b3adea37dd2ccbed37d523c1fc3133478274d179cf317b026ca2c500ec74e5a",
+  "docs/scheduler-incident-recovery.md": "57bb69e27238e2c618806f0b3d2b784b493d26b057cd3ee16fe5ee3eeead127f",
+  "pyproject.toml": "8345d4b8ece2754a7103208098e3c77b739277e0a0403ff1c722ef12dcf300f2",
+  "uv.lock": "02bc6af5e9bd3d7c8dad3d2a2868b587c40355ed51d763b6c055e3a9fdaa9e8a"
+}

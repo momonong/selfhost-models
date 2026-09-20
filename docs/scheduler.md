@@ -157,6 +157,13 @@ load 前持久化，並保守預留該 profile 的完整 warmup 生成次數上�
 各占一次 generation budget，即使取消發生在 GPU dispatch 前也不退還。這是執行次數
 上界，不是成功次數。達上限不再 dispatch；重新啟動不重置計數。
 
+正式長期 state 可使用管理端 `scheduler budget-window open --name <唯一名稱> --loads N
+--generations N` 加上臨時驗收上限。所有 load/warmup、durable job 與 legacy admission
+在同一交易中同時檢查 lifetime 與臨時上限。`budget-window status` 顯示累計及窗口歷史。
+驗收結束後 `budget-window close --name <名稱>` 只解除臨時限制，不重設 lifetime；窗口
+結束計數固定保留且名稱不可重用。開關都要求 phase unloaded/ready、無 lease 與待執行
+工作；engine 退出已證實的歷史 unknown outcome 保留且不重派，不阻止關閉窗口。
+
 SQLite WAL + synchronous FULL + BEGIN IMMEDIATE 是同機 admission 權威。內容 canonical
 hash 配 unique idempotency key 處理並發與回應遺失；在 retention 刪除 job 前 key 有效。
 建立 durable dispatch intent／lease 後才呼叫 worker，該切點前後失聯可能留下 unknown；
