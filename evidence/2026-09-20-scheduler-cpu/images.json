@@ -1,0 +1,246 @@
+{
+  "cpu_probe_cleanup": "complete",
+  "cpu_probe_limits": {
+    "DeviceRequests": null,
+    "Devices": [],
+    "Memory": 8589934592,
+    "MemorySwap": 8589934592,
+    "NanoCpus": 4000000000,
+    "NetworkMode": "none",
+    "PidsLimit": 128,
+    "ReadonlyRootfs": true,
+    "Runtime": "runc"
+  },
+  "critical_source_files": [
+    {
+      "bytes": 1444,
+      "path": "docker/whisper.Dockerfile",
+      "sha256": "37f1817a35aa43df7ef654c85f213008c12557da100c6ad20fc6548485a4927e"
+    },
+    {
+      "bytes": 14089,
+      "path": "selfhost_models/scheduler_runtime.py",
+      "sha256": "485cd9c7b87cfe1a98dd7dca2a9d48918e7811e59b29f7fbfc26ba589e6cd47c"
+    },
+    {
+      "bytes": 1578,
+      "path": "worker/identity.py",
+      "sha256": "78de79f5746e67e0f0c456564df9cab23dff7f6428bda82d1e0c60d04961815f"
+    },
+    {
+      "bytes": 3911,
+      "path": "worker/relay.py",
+      "sha256": "478f6d80dd3fbdf30bb67744f60fecd98474822ed33aba5a5dbbf3bed5bb5285"
+    },
+    {
+      "bytes": 3443,
+      "path": "worker/whisper_engine.py",
+      "sha256": "5196b76fb5561b9870a6d354064fa5c0344b54639df60a0c4bba60c754aa8a03"
+    }
+  ],
+  "evidence_class": "real_Docker_CPU_only_and_synthetic_HTTP_fixture",
+  "image": "selfhost-models-whisper:scheduler-cpu-refresh-20260920",
+  "image_id": "sha256:6efb33d19194881ad17c50690bd417dacd33d1ec9968170fdcb8003fd476ddcc",
+  "image_size_bytes": 3111586396,
+  "image_source_files_verified_inside_container": 27,
+  "limitations": [
+    "No model GPU load or inference, no ASR quality evaluation",
+    "No scheduler GPU switch/cancel/restart/fault acceptance",
+    "No native Linux host acceptance",
+    "Image is a source-matched CPU candidate; no deployment or registry publication",
+    "Qwen build and CPU runtime check remain unexecuted because Docker daemon returned 500"
+  ],
+  "probe_harness_initial_failure": "missing PYTHONPATH=/app; container removed, original receipt retained under initial-harness-*; corrected harness passed with same image",
+  "qwen": {
+    "build_issued": false,
+    "cached_base_id": "sha256:c2914767605584b6d8f45686b82de173ecc99e781897aa3d0a66dacd72c51ae1",
+    "cached_base_size_bytes": 8674228795,
+    "candidate_tag_reserved_but_not_created": "selfhost-models-worker:scheduler-cpu-candidate-20260920",
+    "container_created": false,
+    "source_files": [
+      {
+        "bytes": 692,
+        "path": "docker/worker.Dockerfile",
+        "sha256": "7eb1f4348298df47067ff55ff8a703b098adbbd31f38035687bbb2ed6a71a9c4"
+      },
+      {
+        "bytes": 1578,
+        "path": "worker/identity.py",
+        "sha256": "78de79f5746e67e0f0c456564df9cab23dff7f6428bda82d1e0c60d04961815f"
+      },
+      {
+        "bytes": 1207,
+        "path": "worker/launch.py",
+        "sha256": "3f60ca98c123dc5f2bb7f39f2391558b25e43b66d84dcb99f86e093b27eae8e0"
+      },
+      {
+        "bytes": 3911,
+        "path": "worker/relay.py",
+        "sha256": "478f6d80dd3fbdf30bb67744f60fecd98474822ed33aba5a5dbbf3bed5bb5285"
+      }
+    ],
+    "source_manifest": "qwen-image-source.json",
+    "source_manifest_sha256": "5b993d571efc1c0bd284ef8c060c06c4aae6d5f083db83f19ffe9d0cde4bf518",
+    "staged_probe": "probe_qwen_cpu.py",
+    "staged_reproduction_script": "build_check_qwen.py",
+    "status": "blocked_Docker_daemon_500_before_build",
+    "workspace_source_drift_at_summary": []
+  },
+  "relay": {
+    "actual_worker_epoch": "d3404ff754b746c0858f03aa9fc1cc9a",
+    "body_bytes": 42816,
+    "body_verified_by_fake_engine": "zh, 16000 samples, max_tokens=4",
+    "cleanup": "2 fixture containers and 2 fixture networks removed; 0 volume operations",
+    "egress_direct_ipv4": {
+      "application_bytes_sent": 0,
+      "connected": false,
+      "destination": "example.com:443",
+      "elapsed_seconds": 0.0014,
+      "errno": 101,
+      "error_type": "OSError",
+      "host_resolved_ipv4": "172.66.147.243"
+    },
+    "egress_dns": {
+      "application_bytes_sent": 0,
+      "connected": false,
+      "destination": "example.com:443",
+      "elapsed_seconds": 0.0023,
+      "errno": -3,
+      "error_type": "gaierror"
+    },
+    "forwarded_epochs_match": true,
+    "http_results": {
+      "ubuntu_wsl": {
+        "allowlist_method": 404,
+        "allowlist_path": 404,
+        "bare": 401,
+        "internal_key": 200,
+        "public_as_worker_key": 401,
+        "public_bearer": 401,
+        "transcribe_body": 200,
+        "transcribe_invalid_body": 400
+      },
+      "windows": {
+        "allowlist_method": 404,
+        "allowlist_path": 404,
+        "bare": 401,
+        "internal_key": 200,
+        "public_as_worker_key": 401,
+        "public_bearer": 401,
+        "transcribe_body": 200,
+        "transcribe_invalid_body": 400
+      },
+      "worker_direct": {
+        "allowlist_method": 404,
+        "allowlist_path": 404,
+        "bare": 401,
+        "internal_key": 200,
+        "public_as_worker_key": 401,
+        "public_bearer": 401,
+        "transcribe_body": 200,
+        "transcribe_invalid_body": 400
+      }
+    },
+    "method": "production DockerProvider.start_relay imported from exact frozen snapshot",
+    "raw_evidence": "relay-fixture-20260920-8addb908/raw",
+    "relay_cpus": 1,
+    "relay_memory_bytes": 268435456,
+    "relay_networks": "ingress plus internal",
+    "secret_values_absent_from_raw_evidence": true,
+    "worker_cpus": 1,
+    "worker_memory_bytes": 536870912,
+    "worker_network": "internal only, no host published ports"
+  },
+  "runtime": {
+    "asr_quality": "not_evaluated",
+    "cuda_build_version": "13.0",
+    "cuda_initialized": false,
+    "generate_signature_options": "present",
+    "generation_config_bounds": "passed",
+    "generation_executed": false,
+    "gpu_compatibility": "unknown",
+    "model": "openai/whisper-small",
+    "model_instantiation": "meta_device_only",
+    "model_parameter_count": 241734912,
+    "model_parameters_are_meta": true,
+    "packages": {
+      "huggingface-hub": "1.31.0",
+      "numpy": "2.5.3",
+      "pydantic": "2.11.7",
+      "safetensors": "0.8.0",
+      "tokenizers": "0.23.2",
+      "uvicorn": "0.35.0"
+    },
+    "processor": "WhisperProcessor",
+    "python": "3.12.3",
+    "revision": "973afd24965f72e36ca33b3055d56a652f456b4d",
+    "shapes": [
+      {
+        "attention_mask": [
+          1,
+          3000
+        ],
+        "attention_mask_sum": 100,
+        "feature_dtype": "torch.float32",
+        "input_features": [
+          1,
+          80,
+          3000
+        ],
+        "seconds": 1
+      },
+      {
+        "attention_mask": [
+          1,
+          3000
+        ],
+        "attention_mask_sum": 1000,
+        "feature_dtype": "torch.float32",
+        "input_features": [
+          1,
+          80,
+          3000
+        ],
+        "seconds": 10
+      },
+      {
+        "attention_mask": [
+          1,
+          3000
+        ],
+        "attention_mask_sum": 3000,
+        "feature_dtype": "torch.float32",
+        "input_features": [
+          1,
+          80,
+          3000
+        ],
+        "seconds": 30
+      }
+    ],
+    "status": "passed",
+    "torch": "2.13.0+cu130",
+    "transformers": "5.16.1",
+    "validate_identity": "passed_full_weight_sha256",
+    "weight_tensors_loaded": false
+  },
+  "source_base_branch": "feat/single-host-scheduler",
+  "source_base_head": "9ae9ff37cd47511ccd509a38b91111721a490a07",
+  "source_files": 28,
+  "source_manifest": "whisper-image-source.json",
+  "source_manifest_sha256": "07dd3e37ffabbcf60ec5a643ce270984aff6d7157f9ae150407773810a3e4242",
+  "workspace_source_drift_at_summary": [],
+  "earlier_CPU_ownership_test": {
+    "Windows_WSL_same_daemon_and_volume": true,
+    "client_intervals_overlap": true,
+    "concurrent_create_calls_both_succeeded": true,
+    "formal_owner_volume_touched": false,
+    "only_label_owner_passes": true
+  },
+  "earlier_internal_only_port_result": {
+    "Docker_actual_port_mapping": "empty",
+    "ubuntu_wsl": "connection_refused_111",
+    "windows": "connection_refused_10061"
+  },
+  "raw_summary_sha256": "e587af9ebfd4b976a43acde82fb11d3df3194b2650f1832585e3658459147190"
+}

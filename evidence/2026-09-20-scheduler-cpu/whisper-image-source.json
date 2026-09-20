@@ -1,0 +1,147 @@
+{
+  "base_branch": "feat/single-host-scheduler",
+  "base_head": "9ae9ff37cd47511ccd509a38b91111721a490a07",
+  "files": [
+    {
+      "bytes": 1444,
+      "path": "docker/whisper.Dockerfile",
+      "sha256": "37f1817a35aa43df7ef654c85f213008c12557da100c6ad20fc6548485a4927e"
+    },
+    {
+      "bytes": 23,
+      "path": "selfhost_models/__init__.py",
+      "sha256": "d03eacad88bd7a33d49f0a635660e8241fa832e06a3d288fe742cf46833c1b42"
+    },
+    {
+      "bytes": 25700,
+      "path": "selfhost_models/api.py",
+      "sha256": "6e5a2df1b89f01c5e99c67738f1d4d0a26ab21da72011c14673259ba093cc9c2"
+    },
+    {
+      "bytes": 5645,
+      "path": "selfhost_models/assets.py",
+      "sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8"
+    },
+    {
+      "bytes": 5718,
+      "path": "selfhost_models/backend.py",
+      "sha256": "c717bddcee0f67680ee7d68ea373a2a0513a5abfc7fac483e0c3163c9aa97631"
+    },
+    {
+      "bytes": 2418,
+      "path": "selfhost_models/capabilities.py",
+      "sha256": "50dc71e00f5edbd254e18c96a9d9b4f0e7cbbab41270d3c37cdc74c53d0cb547"
+    },
+    {
+      "bytes": 9260,
+      "path": "selfhost_models/cli.py",
+      "sha256": "dad8373b4b5dfae516e4bece884ce999d899d58103054560f4e97b4adbabfd2f"
+    },
+    {
+      "bytes": 2316,
+      "path": "selfhost_models/gpu_ownership.py",
+      "sha256": "dabe3f31e7761e905b0bb4114ed50099258f9057c063f989c10b63df64c052c2"
+    },
+    {
+      "bytes": 4158,
+      "path": "selfhost_models/scheduler_api.py",
+      "sha256": "bf9c9f1b1c87ab3f92a5a8bce13bb17f431fd67b741220e9c5dc4b3777a89367"
+    },
+    {
+      "bytes": 7230,
+      "path": "selfhost_models/scheduler_cli.py",
+      "sha256": "89ce343bda640f45258a085572270c46b6d89b6f6bd67a2a4ae3209926093a6a"
+    },
+    {
+      "bytes": 8993,
+      "path": "selfhost_models/scheduler_controller.py",
+      "sha256": "56075164ce4177434d3a2e4aa7f46ec5ade9901bd371d0a4a0d71af40d0d154b"
+    },
+    {
+      "bytes": 14089,
+      "path": "selfhost_models/scheduler_runtime.py",
+      "sha256": "485cd9c7b87cfe1a98dd7dca2a9d48918e7811e59b29f7fbfc26ba589e6cd47c"
+    },
+    {
+      "bytes": 5507,
+      "path": "selfhost_models/scheduler_schema.py",
+      "sha256": "aaf5dcea1e53a62dd0ac0f3b8377db43c9d9b133ce1e04bda3311951d60ee5f1"
+    },
+    {
+      "bytes": 39659,
+      "path": "selfhost_models/scheduler_store.py",
+      "sha256": "bd8069555a4f44b0d0b15363597b332f65905f937131fd0fb599edf2401f0d9a"
+    },
+    {
+      "bytes": 6306,
+      "path": "selfhost_models/schema.py",
+      "sha256": "ad50bf1273f22db8d124c530d4ec4d00a2aa8acf5f9faa86d0d62bbf19794485"
+    },
+    {
+      "bytes": 435,
+      "path": "selfhost_models/storage.py",
+      "sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4"
+    },
+    {
+      "bytes": 4106,
+      "path": "selfhost_models/video.py",
+      "sha256": "11f39ac6aad5dbcb84a18e1cf34dd58f778c4a63c972046d34927f6d680fc51c"
+    },
+    {
+      "bytes": 4724,
+      "path": "selfhost_models/video_decoder.py",
+      "sha256": "d28044795ce8676972e9fb8e5e6faf15d398b54aed99bd2f3cb8abacf065801d"
+    },
+    {
+      "bytes": 966,
+      "path": "selfhost_models/wav.py",
+      "sha256": "3f08602b11ee6e95be046452c9add6eb4ac6b68d2ed00058c140ca22c55e5687"
+    },
+    {
+      "bytes": 1578,
+      "path": "worker/identity.py",
+      "sha256": "78de79f5746e67e0f0c456564df9cab23dff7f6428bda82d1e0c60d04961815f"
+    },
+    {
+      "bytes": 1207,
+      "path": "worker/launch.py",
+      "sha256": "3f60ca98c123dc5f2bb7f39f2391558b25e43b66d84dcb99f86e093b27eae8e0"
+    },
+    {
+      "bytes": 3911,
+      "path": "worker/relay.py",
+      "sha256": "478f6d80dd3fbdf30bb67744f60fecd98474822ed33aba5a5dbbf3bed5bb5285"
+    },
+    {
+      "bytes": 10230,
+      "path": "worker/transformers_app.py",
+      "sha256": "b3c9f469f7f63f534a021e88c6738cac89161bf93ca68b40b05afcdd99677047"
+    },
+    {
+      "bytes": 4232,
+      "path": "worker/transformers_engine.py",
+      "sha256": "a908ef8076aafeaa5addc0c7cab44ea467a3a09fc801a322565ca2e12d4e91c0"
+    },
+    {
+      "bytes": 5255,
+      "path": "worker/whisper_app.py",
+      "sha256": "3e0691a8bf621232152d5da982880a266fd3f15a673c7390eb5955535c4723b5"
+    },
+    {
+      "bytes": 3443,
+      "path": "worker/whisper_engine.py",
+      "sha256": "5196b76fb5561b9870a6d354064fa5c0344b54639df60a0c4bba60c754aa8a03"
+    },
+    {
+      "bytes": 432,
+      "path": "worker/transformers/pyproject.toml",
+      "sha256": "d7177c7f575cca861d245704d9b79712b79c8bda697110a3b8f68d6db94537a2"
+    },
+    {
+      "bytes": 56915,
+      "path": "worker/transformers/uv.lock",
+      "sha256": "28bdf0a9d98df9257212955abdba74bd0a236360269a42dd479e8b526cabd8fb"
+    }
+  ],
+  "kind": "final_source_cpu_refresh_snapshot_not_deployment"
+}

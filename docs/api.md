@@ -1,5 +1,9 @@
 # API 0.1 支援範圍
 
+明確啟用 managed mode 時，新增 durable jobs、catalog、artifact 與 bounded WAV
+轉錄，規格見[單機排程 API](scheduler.md#api)。下方是既有 Chat／SSE 契約；model
+清單必須反映當下實際 ready deployment，registered catalog 不代表已載入。
+
 這是 OpenAI-compatible Chat Completions 的明確子集。**不是完整 OpenAI 相容實作。** 未列參數及巢狀欄位一律 400，不靜默忽略。其他 repo 的完整設定、能力選擇、重試與連線指引見 [Client 接入指南](client-integration.md)；本頁保留協定欄位的權威規格。
 
 ## Endpoints

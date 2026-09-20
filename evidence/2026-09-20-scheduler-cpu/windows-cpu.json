@@ -1,0 +1,28 @@
+{
+  "evidence_class": "CPU_contract_tests_with_synthetic_data",
+  "start_commit": "9ae9ff37cd47511ccd509a38b91111721a490a07",
+  "branch": "feat/single-host-scheduler",
+  "command": "uv run --locked pytest -q --basetemp .state/scheduler-pytest-final",
+  "environment": {
+    "PYTHONUTF8": "1",
+    "existing_locked_environment": true,
+    "cache": ".state/scheduler-uv-cache",
+    "no_sync": true
+  },
+  "result": {
+    "passed": 164,
+    "seconds": 13.84,
+    "exit_code": 0
+  },
+  "focused_result": {
+    "passed": 47,
+    "seconds": 8.68,
+    "files": [
+      "tests/test_scheduler.py",
+      "tests/test_scheduler_process.py",
+      "tests/test_scheduler_boundaries.py"
+    ]
+  },
+  "gpu_tested": false,
+  "docker_load_tested": false
+}

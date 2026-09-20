@@ -1,5 +1,10 @@
 # Backend 契約與 Transformers 執行路徑
 
+此頁保留 static backend 契約。[單機排程模式](scheduler.md) 的 `DockerProvider`
+另負責 prepare/load/warmup/unload 與整個 container 退出確認；Qwen 沿用下方 HTTP
+backend 與 Linux 影片前處理，Whisper 走獨立固定 image 與 bounded PCM WAV worker。
+managed lease 的權威是 SQLite；不能用 frontend epoch 改變直接釋放未知工作。
+
 `selfhost_models/backend.py` 以明確的 `BACKEND=vllm|transformers` 選擇實作，不做 plugin discovery 或 fallback。未設定值時保留既有 vLLM 預設；modelctl 每次 serve 都把實際選擇寫入部署設定。
 
 `VLLMBackend` 與 `TransformersBackend` 共用四個 operation：

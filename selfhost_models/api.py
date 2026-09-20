@@ -7,6 +7,7 @@ import logging
 import os
 import time
 import uuid
+import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -18,6 +19,7 @@ from .capabilities import capabilities, validate_capabilities
 from .schema import Chat
 from .storage import atomic_json
 from .video import VideoError, find_video, prepare_video
+from .scheduler_schema import SchedulerError
 
 log = logging.getLogger("selfhost")
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -49,7 +51,7 @@ class Job:
 
 
 class Gateway:
-    def __init__(self, backend=None, *, key=None, state_file=None):
+    def __init__(self, backend=None, *, key=None, state_file=None, scheduler=None):
         self.backend = backend
         self.key = key
         self.state_file = Path(state_file or os.getenv("STATE_FILE", ".state/leases.json"))
@@ -81,11 +83,20 @@ class Gateway:
         self.tasks = set()
         self.clients = 0
         self.monitor = None
+        self.scheduler = scheduler
+        self.api_owner = uuid.uuid4().hex
+        self.deployment_id = None
 
     def save(self):
+        if self.scheduler is not None:
+            return
         atomic_json(self.state_file, {"leases": self.leases})
 
     async def startup(self):
+        if self.scheduler is None and os.getenv("SCHEDULER_STATE"):
+            from .scheduler_store import Store, require_native_state
+            require_native_state(os.environ["SCHEDULER_STATE"])
+            self.scheduler = Store(os.environ["SCHEDULER_STATE"])
         from .video import LINUX_DECODER
         if self.video_enabled and not LINUX_DECODER:
             raise ValueError("video requires the Linux decoder resource limits")
@@ -93,12 +104,56 @@ class Gateway:
             self.key = Path(os.environ["API_KEY_FILE"]).read_text().strip()
         if len(self.key) < 24:
             raise ValueError("API key must contain at least 24 characters")
+        if self.scheduler is not None:
+            from filelock import FileLock
+            self.api_lock = FileLock(str(self.scheduler.root / "api.lock"), timeout=0)
+            self.api_lock.acquire()
+            self.scheduler.legacy_restart(self.api_owner)
+            self.monitor = asyncio.create_task(self.watch_scheduler())
+            return
         if self.state_file.exists():
             self.leases = json.loads(self.state_file.read_text())["leases"]
         if self.backend is None:
             self.backend = create_backend(self.backend_name, os.getenv("WORKER_URL", "http://worker:8000"), self.capacity + 2,
                                        profile=self.profile, capacity=self.capacity, video_enabled=self.video_enabled)
         self.monitor = asyncio.create_task(self.watch())
+
+    async def watch_scheduler(self):
+        from .scheduler_runtime import DockerProvider
+        from .video import LINUX_DECODER
+        while True:
+            try:
+                state = self.scheduler.state()
+                self.ready = False
+                if state["phase"] == "ready" and self.scheduler.clock() - state["heartbeat"] <= 10:
+                    dep = self.scheduler.deployment(state["deployment"])
+                    if dep.runtime in ("vllm", "whisper"):
+                        if dep.load.video and not LINUX_DECODER:
+                            raise ValueError("video requires Linux decoder")
+                        if self.deployment_id != dep.id:
+                            if self.backend:
+                                await self.backend.close()
+                            provider = DockerProvider(self.scheduler)
+                            provider.key = provider.secret_path.read_text().strip()
+                            if provider.key == self.key:
+                                raise ValueError("worker key must differ from public key")
+                            provider.set_backend(dep)
+                            self.backend = provider.backend
+                            self.deployment_id = dep.id
+                        self.model, self.revision, self.backend_name, self.profile = dep.model, dep.revision, dep.runtime, "qwen3_5" if dep.runtime == "vllm" else "whisper"
+                        self.video_enabled, self.capacity, self.context = dep.load.video, dep.load.capacity, dep.load.context
+                        self.max_body = 25165824 if dep.load.video else 2097152
+                        self.capabilities = capabilities("vllm", "qwen3_5", dep.load.video) if dep.runtime == "vllm" else {
+                            "text": False, "stream": False, "images": False, "videos": False, "tools": False,
+                            "thinking": False, "transcribe": True, "cancellation": "drain_to_terminal",
+                            "queue_capacity": 0, "max_inflight_limit": 1, "audio_limits": {"format": "pcm16_wav", "sample_rate": 16000, "channels": 1, "max_seconds": 30, "max_bytes": 1048576}}
+                        self.epoch = state["worker_epoch"]
+                        self.ready = await self.backend.identity() == self.epoch and self.scheduler.health()["ready"]
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                self.ready = False
+            await asyncio.sleep(0.1)
 
     async def watch(self):
         while True:
@@ -205,6 +260,8 @@ class Gateway:
         except Exception as exc:
             job.failure = exc if isinstance(exc, Failure) else Failure(502, "worker_unconfirmed")
         finally:
+            if self.scheduler is not None:
+                self.scheduler.legacy_terminal(job.rid, job.epoch, self.api_owner, terminal)
             if terminal:
                 self.leases.pop(job.rid, None)
                 self.save()
@@ -302,6 +359,8 @@ class Gateway:
         del body
         if payload["model"] != self.model:
             raise Failure(404, "model_not_served")
+        if self.scheduler is not None and self.backend_name == "whisper":
+            raise Failure(400, "unsupported_operation")
         try:
             validate_capabilities(payload, self.backend_name, self.profile, self.video_enabled)
         except ValueError as exc:
@@ -310,11 +369,14 @@ class Gateway:
             payload.setdefault("chat_template_kwargs", {"enable_thinking": False})
         if not self.ready:
             raise Failure(503, "worker_not_ready")
-        if len(self.leases) >= self.capacity:
+        if self.scheduler is None and len(self.leases) >= self.capacity:
             raise Failure(429, "overloaded")
+        if self.scheduler is not None:
+            self.scheduler.legacy_admit(rid, self.deployment_id, self.epoch, self.api_owner)
         job = Job(rid, self.epoch, payload["stream"])
         job.deadline_at = started + deadline
-        self.leases[rid] = job.epoch
+        if self.scheduler is None:
+            self.leases[rid] = job.epoch
         self.save()  # Must be durable BEFORE sending to worker.
         self.jobs[rid] = job
         task = asyncio.create_task(self.produce(job, payload))
@@ -338,6 +400,8 @@ class Gateway:
             # Deliberately do NOT cancel the producer: it owns the GPU lease.
             if not job.finished.is_set():
                 job.detached = True
+                if self.scheduler is not None:
+                    self.scheduler.legacy_detach(rid, self.api_owner)
             for t in (delivery, gone):
                 t.cancel()
             await asyncio.gather(delivery, gone, return_exceptions=True)
@@ -357,7 +421,10 @@ class Gateway:
                     for task in [self.monitor, *self.tasks]:
                         task.cancel()
                     await asyncio.gather(self.monitor, *self.tasks, return_exceptions=True)
-                    await self.backend.close()
+                    if self.backend:
+                        await self.backend.close()
+                    if self.scheduler is not None:
+                        self.api_lock.release()
                     await send({"type": "lifespan.shutdown.complete"})
                     return
         if scope["type"] != "http":
@@ -367,6 +434,13 @@ class Gateway:
         try:
             path, method = scope["path"], scope["method"]
             if path in ("/health/live", "/health/ready") and method == "GET":
+                if self.scheduler is not None:
+                    health = self.scheduler.health()
+                    health["ready"] = (health["ready"] and self.ready and self.deployment_id == health["deployment_id"]
+                                       and self.epoch == health["worker_epoch"])
+                    await self.json_response(send, 200 if path.endswith("live") or health["ready"] else 503,
+                                             {**health, "version": __version__}, rid)
+                    return
                 await self.json_response(send, 200 if path.endswith("live") or self.ready else 503,
                     {"ready": self.ready, "version": __version__, "worker_epoch": self.epoch,
                      "inflight": len(self.leases), "detached": sum(j.detached for j in self.jobs.values()),
@@ -378,7 +452,15 @@ class Gateway:
                 raise Failure(429, "too_many_clients")
             self.clients += 1
             try:
+                if self.scheduler is not None:
+                    from .scheduler_api import route
+                    if await route(self, scope, receive, send, headers, rid):
+                        return
                 if path == "/v1/models" and method == "GET":
+                    if self.scheduler is not None:
+                        snapshot = self.scheduler.health()
+                        if not snapshot["ready"] or self.deployment_id != snapshot["deployment_id"] or self.epoch != snapshot["worker_epoch"]:
+                            raise Failure(503, "worker_not_ready")
                     if not self.ready:
                         raise Failure(503, "worker_not_ready")
                     await self.json_response(send, 200, {"object": "list", "data": [{
@@ -392,9 +474,11 @@ class Gateway:
                     raise Failure(404, "not_found")
             finally:
                 self.clients -= 1
-        except (Failure, TimeoutError) as exc:
-            failure = exc if isinstance(exc, Failure) else Failure(408, "body_timeout")
+        except (Failure, TimeoutError, SchedulerError) as exc:
+            failure = exc if hasattr(exc, "status") else Failure(408, "body_timeout")
             await self.json_response(send, failure.status, error(failure.code, rid), rid)
+        except (OSError, sqlite3.Error):
+            await self.json_response(send, 503, error("storage_unavailable", rid), rid)
         finally:
             log.info(json.dumps({"event": "http_end", "request_id": rid, "version": __version__,
                                  "seconds": round(time.monotonic() - started, 3)}))

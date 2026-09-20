@@ -18,6 +18,7 @@ def test_serve_release_mode_preserves_host_config(tmp_path, monkeypatch, backend
     monkeypatch.setattr(cli.socket, "socket", lambda: nullcontext(Mock()))
     monkeypatch.setattr(cli.subprocess, "check_output", lambda *a, **k: "")
     calls = []
+    monkeypatch.setattr(cli, "GPUOwnership", Mock())
     monkeypatch.setattr(cli, "compose", lambda state, args: calls.append(args))
     args = SimpleNamespace(repo="Qwen/Qwen3.5-4B", backend=backend, video=False,
                            context=2048, max_inflight=None, port=18080, gpu_memory=.6,

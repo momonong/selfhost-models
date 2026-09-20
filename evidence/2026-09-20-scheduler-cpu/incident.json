@@ -1,0 +1,213 @@
+{
+  "actions_after_recheck": "only ignored-file source/evidence preparation; no more daemon probes, builds, GPU operations, restarts, recovery, or live service mutation",
+  "cause": "unknown; no causal claim from temporal proximity",
+  "first_failure": {
+    "command": "docker buildx history ls --format json",
+    "error": "ERROR: rpc error: code = Unavailable desc = error reading from server: EOF",
+    "exact_error_timestamp": null,
+    "next_command": "docker image ls selfhost-models-worker --no-trunc --format ...",
+    "next_error": "Docker API /_ping returned 500 Internal Server Error",
+    "time_bound_after_utc": "2026-09-20T06:30:33.300360+00:00",
+    "time_bound_before_utc": "2026-09-20T06:31:49.934565+00:00"
+  },
+  "fixture_cleanup_completed": {
+    "commands_and_results": "exact argv, container/network IDs and exit codes preserved in receipt",
+    "receipt": "relay-fixture-20260920-8addb908/raw/cleanup.json",
+    "receipt_last_write_utc": "2026-09-20T06:29:54.903275+00:00",
+    "result": "2 CPU containers, 2 fixture networks removed, 0 volume operations",
+    "resources": [
+      {
+        "id": "02fa96906a13917e80267aea7e793215a7b494ff9d3fdea83ab0f58575261ad7",
+        "name": "/selfhost-scheduler-cpu-20260920-8addb908-worker-relay",
+        "labels": {
+          "selfhost.deployment": "dep_7268d1a1c983d9b8aa43f576831fc295f1deb636e7b0a9052d9f974c9761182d",
+          "selfhost.scheduler": "0b8783a9ac71340c"
+        },
+        "runtime": "runc",
+        "gpu_device_requests": null,
+        "state_at_check": {
+          "Status": "exited",
+          "Running": false,
+          "OOMKilled": false,
+          "ExitCode": 0
+        },
+        "whole_fixture_exit_confirmed": true
+      },
+      {
+        "id": "d14b61c04aa5126efb7609581c175f523fe3ff5b700ffaafb60934262809a848",
+        "name": "/selfhost-scheduler-cpu-20260920-8addb908-worker",
+        "labels": {
+          "selfhost.deployment": "dep_7268d1a1c983d9b8aa43f576831fc295f1deb636e7b0a9052d9f974c9761182d",
+          "selfhost.scheduler": "0b8783a9ac71340c"
+        },
+        "runtime": "runc",
+        "gpu_device_requests": null,
+        "state_at_check": {
+          "Status": "exited",
+          "Running": false,
+          "OOMKilled": false,
+          "ExitCode": 0
+        },
+        "whole_fixture_exit_confirmed": true
+      },
+      {
+        "id": "819fd9d1e9aa59c549a9437ff9d4028acd65fbce9d1c6482f82a762b7093068c",
+        "name": "scheduler-cpu-network-relay-20260920-8addb908-ingress",
+        "labels": {
+          "selfhost.scheduler": "0b8783a9ac71340c"
+        }
+      },
+      {
+        "id": "e6f1eb6f18e19485e74eae469a2885e50ff920e31fbc6e875148d9a55da46d8d",
+        "name": "scheduler-cpu-network-relay-20260920-8addb908",
+        "labels": {
+          "selfhost.scheduler": "0b8783a9ac71340c"
+        }
+      }
+    ],
+    "commands": [
+      {
+        "argv": [
+          "docker",
+          "inspect",
+          "02fa96906a13917e80267aea7e793215a7b494ff9d3fdea83ab0f58575261ad7"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "stop",
+          "--time",
+          "3",
+          "02fa96906a13917e80267aea7e793215a7b494ff9d3fdea83ab0f58575261ad7"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "inspect",
+          "02fa96906a13917e80267aea7e793215a7b494ff9d3fdea83ab0f58575261ad7"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "rm",
+          "02fa96906a13917e80267aea7e793215a7b494ff9d3fdea83ab0f58575261ad7"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "inspect",
+          "d14b61c04aa5126efb7609581c175f523fe3ff5b700ffaafb60934262809a848"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "stop",
+          "--time",
+          "3",
+          "d14b61c04aa5126efb7609581c175f523fe3ff5b700ffaafb60934262809a848"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "inspect",
+          "d14b61c04aa5126efb7609581c175f523fe3ff5b700ffaafb60934262809a848"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "rm",
+          "d14b61c04aa5126efb7609581c175f523fe3ff5b700ffaafb60934262809a848"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "network",
+          "inspect",
+          "819fd9d1e9aa59c549a9437ff9d4028acd65fbce9d1c6482f82a762b7093068c"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "network",
+          "rm",
+          "819fd9d1e9aa59c549a9437ff9d4028acd65fbce9d1c6482f82a762b7093068c"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "network",
+          "inspect",
+          "e6f1eb6f18e19485e74eae469a2885e50ff920e31fbc6e875148d9a55da46d8d"
+        ],
+        "returncode": 0
+      },
+      {
+        "argv": [
+          "docker",
+          "network",
+          "rm",
+          "e6f1eb6f18e19485e74eae469a2885e50ff920e31fbc6e875148d9a55da46d8d"
+        ],
+        "returncode": 0
+      }
+    ]
+  },
+  "last_build_operation": {
+    "image": "selfhost-models-whisper:scheduler-cpu-refresh-20260920",
+    "image_id": "sha256:6efb33d19194881ad17c50690bd417dacd33d1ec9968170fdcb8003fd476ddcc",
+    "log": "raw-metadata/refresh-build.log",
+    "log_last_write_utc": "2026-09-20T06:25:36.710873+00:00",
+    "result": "successful; no Qwen build issued"
+  },
+  "last_recorded_successful_Docker_response_before_failure": {
+    "base_id": "sha256:c2914767605584b6d8f45686b82de173ecc99e781897aa3d0a66dacd72c51ae1",
+    "command": "docker image inspect fixed vllm/vllm-openai base --format {{json .}}",
+    "receipt": "raw-metadata/qwen-cached-base-inspect.json",
+    "receipt_last_write_utc": "2026-09-20T06:30:33.300360+00:00"
+  },
+  "service_engine_exit": "not established by this evidence",
+  "single_read_only_recheck": {
+    "command": "docker version --format {{json .}}",
+    "receipt": "raw-metadata/qwen-daemon-health-recheck.log",
+    "result": "Server=null; Docker API /v1.51/version returned 500"
+  },
+  "status": "Docker_daemon_unavailable_observed_no_recovery_attempt",
+  "task_followup_read_only": {
+    "readiness": "5 second timeout; models not queried because ready could not be confirmed",
+    "error_type": "TaskCanceledException",
+    "gpu_total_mib": 24463,
+    "gpu_used_mib": 2256,
+    "gpu_free_mib": 21796,
+    "gpu_util_percent": 0,
+    "root_cause": "unknown",
+    "engine_exit_confirmed": false,
+    "exact_probe_timestamp": null,
+    "reported_before_utc": "2026-09-20T06:33:58Z"
+  },
+  "raw_receipts_sha256": {
+    "raw-metadata/refresh-build.log": "9d91b4e4f940040ef903454c5725490ddca623906133f6f16d67d5bdd7ac5f78",
+    "relay-fixture-20260920-8addb908/raw/cleanup.json": "bf8802bfdb92c2ae9db5f818667af2d214ee649150bc3fb893b9cfaec8508651",
+    "raw-metadata/qwen-cached-base-inspect.json": "c3a961978828799ef7e2082ebdc31ae80ad13bde7538a777ce6f3e2ca5218b85",
+    "raw-metadata/qwen-daemon-health-recheck.log": "135b49b81a579da391ccfd73fde84f64ad615ed2de87445591c1a516368e4f0b"
+  }
+}

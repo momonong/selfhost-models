@@ -1,0 +1,100 @@
+# Docker daemon 500：診斷與最小恢復提案
+
+**尚未取得恢復授權，也尚未執行恢復。** main 統一協調跨專案；此 task 目前只整理
+事故證據、核對本機 CLI help 與非 Docker 交付。daemon 恢復、原 Qwen 恢復、scheduler
+D 驗收是三個不同範圍。恢復不能順便建置或啟用 scheduler 候選。
+
+## 已知時間線（2026-09-20 UTC）
+
+| 時間 | 已知事實 |
+|---|---|
+| 05:22:58 起 | 初始唯讀 ready=true、lease=0、固定Qwen；記錄13個當時running容器及兩個selfhost的完整image/config身份 |
+| 06:25:36.710873 | 最後成功 Whisper CPU refresh build log 寫入，image `6efb33d19194…` |
+| 06:29:54.903275 | 本輪CPU relay fixture兩容器、兩network清理receipt完成，12個核對/stop/rm指令exit0；未操作volume |
+| 06:30:33.300360 | 固定vLLM base的local image inspect成功；Qwen候選尚未build |
+| 06:30:33–06:31:49 | `docker buildx history ls --format json` 首見RPC EOF，接續image ls的ping回500；沒有保存精確首錯秒數 |
+| 隨後單次重查 | `docker version --format '{{json .}}'` 回Server=null／500 |
+| 06:33:58 之前 | 現役18080 ready 5秒逾時，故未query models；GPU used2256MiB/util0%，不構成engine退出證據 |
+
+完整命令、fixture IDs/labels、exit codes、raw receipt hashes見
+[incident.json](../evidence/2026-09-20-scheduler-cpu/incident.json)。原始stdout/inspect保留
+ignored `.state/scheduler-asr-preparation`，未公開主機完整盤點、秘密或私人payload。
+Qwen build/create/run均未送出，只有固定base讀取與source snapshot準備。
+
+根因**未知**。CPU build、fixture清理與故障的時間先後，不足以認定或排除因果。
+main另回報14:34台北backend程序仍是9/16啟動、UI子程序14:32:18啟動，以及球館同時
+遇到500；這些是協調回報，不是本task重新量測或根因證明。舊owner聲明本窗口沒有
+維護動作，也不能代替daemon／host根因診斷。停止反覆probe及新增Docker寫入。
+
+## 需保護的最後已知狀態
+
+完整13個container的ID/name/image ref/CreatedAt/Compose project/service清單留於
+ignored `.state/scheduler-incident/recovery-baseline.json`。包含selfhost2個、KaChing4個、
+府城7個；不能把初始清單視為事故前最後一秒或目前狀態。其他專案若在這段時間有合法
+變更，須由其owner提供更新的比對基線，不把差異自動認成遺失或錯誤。
+
+原selfhost身份：
+
+- API：`selfhost-models-api-1`，container
+  `f35e32eed86cdbbfd436949f9d4b13e2e6d79eeca0ed5dbb769505ac0a0251b2`，image
+  `sha256:04c47cc62471c2a101bda23f911f0f00a78b6081803cadee09b4c98e2888101f`。
+- Worker：`selfhost-models-worker-1`，container
+  `5036e914ce6db9007027178596015724c5d13837f16924cdbadeb076e540fbc9`，image
+  `sha256:d209ab188d96f9bce180cf59fffefb3fe021de71e34c85dd8d0893800736491c`。
+- Compose project `selfhost-models`，API只掛原key唯讀與`.state/runtime`讀寫，worker只
+  掛原固定Qwen目錄唯讀。原inference/ingress networks、loopback18080、revision
+  `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`、context8192/capacity2/video/gpu0.60。
+  model路徑與完整非secret env/config在private baseline；API key內容不記錄。
+
+事故後僅對既有Compose設定、compose.env及journal檔做本機完整SHA256基線；不是
+事故前hash，也不是其他專案資料備份。不得刪state、journal、volume、container、
+image或weights，不重建任何原容器。
+
+## 建議只做一次的 Docker Desktop 恢復
+
+前提：main確認各owner已停止Docker寫入，明確核定一次Desktop重啟與原Qwen恢復。
+本機`docker desktop restart --help`已證實支援`--timeout seconds`，本次help命令exit0。
+
+```powershell
+docker desktop restart --timeout 180
+```
+
+只執行一次，保存開始/結束時間、exit code與有限stdout/stderr。**nonzero或180秒到期
+立即停止並回main，不再進行下方健康讀取或任何恢復步驟。**這不表示後端沒有繼續啟動；
+不得下第二個restart、stop/start、殺backend、更新Docker或`wsl --shutdown`。
+
+只有restart命令成功後，才於0／30／60秒，最多3次`docker version --format '{{json .Server}}'`，每次
+由呼叫端限時10秒；只有Server非null才查一次`docker ps -a`及待核對的原容器inspect。
+三次皆不可用即停止回main，不自行升級到WSL/host層恢復。KaChing四服務的
+`restart: unless-stopped`已由main核對；daemon恢復可能自動啟動它們並發生正常startup
+資料寫入。其writer狀態與球館automatic backup寫入狀態皆UNKNOWN，不能承諾其他app
+不啟動或零寫入。不改restart policy，也不阻止或重建其他app。
+
+## 恢復後核對與原 Qwen 啟動
+
+1. 比對原container ID、Created、image ID/ref、Compose labels、mount來源與RW旗標、
+   ports、networks。名稱相同而ID不同代表可能recreate，須停下交owner查證；network
+   endpoint/IP在daemon恢復後可變，不把它單獨當作資料損毀。
+2. 容器未recreate不代表資料沒改動。只核對selfhost原config/journal結構與hash，禁止
+   寫入或清除未知lease；其他DB/backup/migration／檔案完整性由各app owner按其基線
+   查驗。本task不替其他專案啟停、migration、backup或宣稱資料完整。
+3. 原Qwen若已running，不再次restart。若原worker/API明確exited、精確身份一致，且
+   主動恢復原Qwen已獲核定，只start當前未running的原容器，順序worker→API：
+
+   ```powershell
+   docker start 5036e914ce6db9007027178596015724c5d13837f16924cdbadeb076e540fbc9
+   docker start f35e32eed86cdbbfd436949f9d4b13e2e6d79eeca0ed5dbb769505ac0a0251b2
+   ```
+
+   每個最多一次；running者跳過。不使用`compose up`、build、pull、recreate，不建立
+   managed state／ownership gate或啟動新候選。若原container不見或不是exited/running，
+   停止交main；不按名稱重建。這段是事故修復提案，不是D切換runbook。
+4. 最多180秒、每15秒讀一次ready（每次HTTP timeout5秒）；取得ready=true後才安全
+   讀原key查models，核對image/revision/context/capacity/video和lease全零。原服務
+   自身暖機會執行GPU；不另加人工smoke、scheduler job或推論。readiness未成功、
+   unknown lease、GPU/RAM異常或identity差異即停止回報，不再restart／清state。
+5. selfhost回報原服務恢復證據；main收集球館／PixelReceipt／KaChing各自驗證後判斷
+   整體事故是否解除。其他業務驗收未完成時，不以selfhost ready宣稱全系統正常。
+
+整體單次恢復流程最多約8分鐘（Desktop180秒＋daemon確認60秒＋Qwen180秒及有界呼叫）；
+超時保留已知狀態與所有證據，下一層處置重新交main。無論恢復成功與否，D仍需獨立授權。

@@ -6,5 +6,6 @@ LABEL org.opencontainers.image.version="0.2.0" \
 # Keep the official CUDA/PyTorch/vLLM combination intact.
 COPY worker/identity.py /opt/selfhost/identity.py
 COPY worker/launch.py /opt/selfhost/launch.py
+COPY worker/relay.py /opt/selfhost/worker/relay.py
 ENTRYPOINT ["python3", "/opt/selfhost/launch.py"]
 ENV PYTHONPATH=/opt/selfhost HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 VLLM_NO_USAGE_STATS=1 DO_NOT_TRACK=1

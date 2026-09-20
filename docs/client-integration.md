@@ -1,5 +1,11 @@
 # Client 接入指南
 
+若服務擁有者明確提供 managed scheduler endpoint，durable jobs／catalog／WAV
+成果用法見[單機排程指南](scheduler.md)。此模式的 API／controller／SQLite 在同機
+Linux 或 WSL，Windows 只透過 HTTP；公開 key 與 worker key 分開。先依本頁檢查
+ready/models 取得實際能力；未 ready 時仍可查詢或提交持久工作，但不代表能立即執行。
+下方預設 18080、static Compose 與 Chat route 語義仍適用原服務，不能自行切換它。
+
 本指南供其他專案的開發者與 coding agent 接入已由 `selfhost-models` 啟動的本機模型服務。它說明接入流程、能力選擇、失敗語義與產品責任；完整欄位限制仍以 [API 0.1 支援範圍](api.md) 為準，部署與維運由服務擁有者依 [本機使用指南](local-use.md) 及 [部署文件](deployment.md) 處理。
 
 ## 接入前提與設定

@@ -1,0 +1,27 @@
+{
+  "base_branch": "feat/single-host-scheduler",
+  "base_head": "9ae9ff37cd47511ccd509a38b91111721a490a07",
+  "files": [
+    {
+      "bytes": 692,
+      "path": "docker/worker.Dockerfile",
+      "sha256": "7eb1f4348298df47067ff55ff8a703b098adbbd31f38035687bbb2ed6a71a9c4"
+    },
+    {
+      "bytes": 1578,
+      "path": "worker/identity.py",
+      "sha256": "78de79f5746e67e0f0c456564df9cab23dff7f6428bda82d1e0c60d04961815f"
+    },
+    {
+      "bytes": 1207,
+      "path": "worker/launch.py",
+      "sha256": "3f60ca98c123dc5f2bb7f39f2391558b25e43b66d84dcb99f86e093b27eae8e0"
+    },
+    {
+      "bytes": 3911,
+      "path": "worker/relay.py",
+      "sha256": "478f6d80dd3fbdf30bb67744f60fecd98474822ed33aba5a5dbbf3bed5bb5285"
+    }
+  ],
+  "kind": "isolated_qwen_cpu_candidate_source"
+}

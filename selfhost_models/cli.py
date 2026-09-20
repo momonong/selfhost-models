@@ -9,6 +9,8 @@ from pathlib import Path
 
 from .assets import Assets, default_root
 from .capabilities import capabilities
+from .gpu_ownership import GPUOwnership
+from filelock import FileLock
 
 PROJECT = Path(__file__).resolve().parents[1]
 
@@ -56,6 +58,11 @@ def compose(state, args):
 
 
 def serve(assets, args):
+    with FileLock(str(assets.state.parent / (assets.state.name + "-lifecycle.lock")), timeout=0):
+        return _serve(assets, args)
+
+
+def _serve(assets, args):
     record = assets.inspect(args.repo)
     model_type = json.loads((Path(record["path"]) / "config.json").read_text())["model_type"]
     profile = model_type if model_type in ("qwen3_5", "gemma4") else "text"
@@ -78,6 +85,7 @@ def serve(assets, args):
                                      "label=com.docker.compose.project=selfhost-models"], text=True).strip()
     if active:
         raise ValueError("selfhost-models containers already running; use status/restart/stop explicitly")
+    GPUOwnership(assets.state, "static").acquire()
     assets.state.mkdir(parents=True, exist_ok=True)
     keyfile = assets.state / "api-key"
     if not keyfile.exists():
@@ -137,22 +145,35 @@ def main():
             s.add_argument("--drain", type=float, default=120)
     for command in ("status", "stop", "restart"):
         sub.add_parser(command)
+    from . import scheduler_cli
+    from .scheduler_schema import SchedulerError
+    scheduler_cli.add_parser(sub)
     args = p.parse_args()
     assets = Assets(args.state.resolve(), args.model_root)
     try:
+        if args.command == "scheduler":
+            return scheduler_cli.main(args)
         if args.command == "doctor":
             return doctor()
         if args.command == "serve":
             serve(assets, args)
         elif args.command in ("status", "stop", "restart"):
             cmd = {"status": ["ps"], "stop": ["stop"], "restart": ["restart", "worker", "api"]}[args.command]
-            compose(assets.state, cmd)
+            if args.command == "status":
+                compose(assets.state, cmd)
+            else:
+                with FileLock(str(assets.state.parent / (assets.state.name + "-lifecycle.lock")), timeout=0):
+                    if args.command == "restart":
+                        GPUOwnership(assets.state, "static").acquire()
+                    compose(assets.state, cmd)
+                    if args.command == "stop" and (assets.state / "gpu-owner-token").exists():
+                        GPUOwnership(assets.state, "static").release()
         else:
             result = getattr(assets, args.command)(**{k: v for k, v in vars(args).items()
                       if k not in ("command", "state", "model_root")})
             print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0
-    except (ValueError, OSError, subprocess.SubprocessError) as exc:
+    except (ValueError, OSError, subprocess.SubprocessError, SchedulerError) as exc:
         print(f"modelctl: {exc}", file=sys.stderr)
         return 1
 

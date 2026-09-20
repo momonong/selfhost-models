@@ -1,5 +1,51 @@
 # 驗收方式
 
+## 單機排程 v1（2026-09-20，CPU 工程驗收）
+
+起點 `main@9ae9ff37cd47511ccd509a38b91111721a490a07`，工作分支
+`feat/single-host-scheduler`，同一主要工作目錄，未納入 Gemma 分支、未新增 worktree。
+本輪實作、使用方式與限制見[排程指南](scheduler.md)；可移植結果、完整來源 hash 與
+固定 Whisper 資產 manifest 在 [CPU 證據](../evidence/2026-09-20-scheduler-cpu/README.md)。
+原始 inspect／私人目錄／keys／SQLite／模型均留在 ignored state，沒有提交。
+
+| 層級 | 證據與結果 | 限制 |
+|---|---|---|
+| A 排程決策 | fake clock/worker：①③②、urgent 各邊界與 FIFO、有限 reuse/aging、同部署 capacity、跨部署 seal、依賴／取消／deadline | 確認決策與狀態，不是 GPU 時序 |
+| B store/API | 真 SQLite/filesystem：並發 idempotency、crash/fencing、unknown 不重派、receipt 恢復、quota/orphan/GC、full hash/pin、legacy admission、成果描述 | fault injection 與合成輸入 |
+| C lifecycle／process | load/warmup/unload 失敗與卡住、blocked＋持久 budget；真 CPU subprocess 的取消／restart／terminal／保存重試 | worker 是可控 CPU fixture |
+| Linux／WSL 接線 | production execute＋Linux video decoder＋真 TCP worker，成功／timeout／取消皆 wait/reap／清理；Windows 真 CLI 不開 DB | Ubuntu WSL，不等同原生 Linux 實體 GPU |
+| Docker CPU 邊界 | internal worker＋CPU relay、Windows/WSL auth/allowlist/body/epoch；同 daemon volume create 競爭 | 皆無 GPU device request、沒有模型 inference |
+| Whisper 資產／runtime | 11 檔 971367937 bytes 完整重讀 SHA256；固定 runtime CPU processor／形狀／EOS wrapper probe | 不載入實際權重推論；中文品質未驗證 |
+| D 真 GPU | **尚未執行，待另外授權窗口** | CPU 通過不代表 GPU 切換、VRAM 釋放或產品品質通過 |
+
+Windows 最終完整套件：`164 passed in 13.84s`；其中新增 scheduler/process/boundary
+集合 `47 passed in 8.68s`。可在獨立測試目錄重現：
+
+```powershell
+$env:PYTHONUTF8='1'
+uv run --locked pytest -q --basetemp .state/scheduler-verification
+```
+
+修正的具體故障包含：DB rollback 後 orphan bytes 未計入 quota、GC 在 commit 前刪唯一
+檔案、舊 API callback 污染新 epoch、managed legacy 的本機殘留 lease 造成永久 429、
+啟動前缺 image 被誤判成不可恢復的 unknown，以及相同 bytes 成果描述不可查回。
+這些均有針對行為與持久狀態的回歸，非僅比對實作細節。
+
+後續 D 必須先確認 fresh owner 釋放，再核對實際 image/source、固定 revision、完整
+資產、lease、GPU/host/WSL headroom；原先 CPU 盤點或舊窗口到期不能取代這些條件。
+Qwen managed image 必須包含本輪 key middleware／relay；現役 static image 不能
+直接冒充候選。所有 load／warmup／job／legacy generation 都須納入總預算，包含原
+Qwen 恢復的暖機；事件需保留 queue/load/warmup/compute/result 時間與 VRAM peak。
+未知執行、退出未證實、資源不足或預算到期即停新 dispatch，保留 evidence／lease。
+本輪未停現役 Qwen、未合併／推送／發布／部署，人工驗收亦未完成。
+具體 case、包含暖機的40次 generation／8次 load 上限、60分鐘窗口及原 Qwen 恢復
+步驟見[待核定 D runbook](scheduler-gpu-acceptance.md)。
+
+交付時另有外部阻礙：Whisper 最終 CPU build/relay 與清理已成功，但接續 Qwen candidate
+建置的前置查詢發生 Docker daemon EOF／500，實際 Qwen build 未送出。現役 readiness
+亦逾時，根因未查明；沒有自行重啟 Docker 或推定 engine 已退出。這個建置阻礙與 D
+尚未授權是不同事項，詳見 CPU 證據中的 incident 記錄。
+
 ## 有界影片（2026-09-16，工作分支驗收）
 
 後續版本核對：影片成果已於 `841132e1732d29e72458fd4b09d012b12e4e7792` 合併並推送 GitHub main。以下保留當時工作分支驗收狀態；後續 0.2.0 images 發布與驗證界線見部署文件。桌機請依本文的 Linux 桌機章節操作。

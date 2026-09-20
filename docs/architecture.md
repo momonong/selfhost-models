@@ -1,5 +1,10 @@
 # 架構與執行語義
 
+本頁既有流程描述 static Compose 模式。明確啟用的[單機排程模式](scheduler.md)
+由同機 Linux／WSL CPU API、共用 SQLite 與 host controller 管理 durable jobs；
+它另有有界隊列與跨 deployment 切換，不能套用本頁 static queue=0／單一模型的限制。
+兩種模式共用 daemon GPU ownership gate，禁止同時占用同張 GPU。
+
 ## 責任
 
 產品負責領域 prompt、產品規則、工具執行、人工校正與成效驗證。此 repo 負責固定模型資產、共用推論 API、Docker 部署與服務生命週期。
