@@ -36,17 +36,21 @@ dispatch/reserve 後不退額度，unknown 不重送。每次執行之前同時�
 
 | 分配 | load 上限 | generation 上限 |
 |---|---:|---:|
-| 初始 Desktop／原 static 恢復 | 1 | 6 |
-| 獨立驗收 state | 8 | 44 |
+| 初始 Desktop／原 static 恢復及一次定點 runtime 修復 | 2 | 12 |
+| 獨立驗收 state | 7 | 38 |
 | 正式 state 臨時 handoff window | 2 | 8 |
 | 原 static rollback 保留 | 1 | 6 |
 | **總計** | **12** | **64** |
 
-驗收 state 設 `max_load_attempts=8,max_generation_attempts=44`。正式 state 保留長期
+9/21 定點 runtime 修復的已確認配置將初始區增加1／6、驗收區減少1／6，
+總額不变；配置預留不代表已送出修復。每次實際派送、未知及尚未使用的預留，
+分開記錄在 ledger。原 start UNKNOWN 的1／6保守占用，不因新配置退回。
+
+驗收 state 設 `max_load_attempts=7,max_generation_attempts=38`。正式 state 保留長期
 10000／100000上限，以 `scheduler budget-window open --name final-handoff --loads 2
 --generations 8` 增加臨時限制；不得修改 DB 或重設歷史計數。正式 Qwen 的6次暖機、
 Windows durable smoke一次、legacy smoke一次合計8；第二次 load 不代表可以超出8次。
-初始恢復若觸發 static 自動 reload/warmup，同樣计入1／6；未知按全額占用。
+初始恢復或定點修復若觸發 static 自動 reload/warmup，各計入自己的1／6；未知按全額占用。
 只有授權開始前已 ready 的歷史 load 不重算。未耗 reserve 不用來新增案例；已證實
 未觸發的釋放記入 ledger。rollback 額度提前保留。
 驗收預定4次 managed load（Qwen→Whisper→Qwen→Whisper）、暖機14次、案例最多20次。
@@ -77,7 +81,7 @@ GPU 停止，保留 unknown 和退出證据要求。
 | Qwen 工作 dispatch 後 controller restart／受控 engine 退出 | 1 | 舊 epoch fenced、unknown 不重派、whole-container exit 前 pin/lease不釋放 |
 | 恢復到第二個 Whisper 的有界 transcribe | 1 | 只有退出證實後切換，result bytes可取、description可查 |
 | 有界餘額 | 2 | 只補既有案例的未覆蓋長度／邊界；事前登記，不用來改驗收標準 |
-| **測試合計** | **20** | **驗收 state 另加預定14次暖機，合計34，硬上限44** |
+| **測試合計** | **20** | **驗收 state 另加預定14次暖機，合計34，硬上限38** |
 
 如果模型太快而未真正觀察到 running/cancel/overlap，不把該次當作該邊界通過；只可在
 剩餘額度內補測，否則標示未覆蓋。5xx、OOM、未知結果、load/warmup 失敗或 engine

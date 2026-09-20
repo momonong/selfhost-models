@@ -8,7 +8,7 @@
 
 | UTC | 事件與證據界線 |
 |---|---|
-| 9/20 14:52:47–14:53:34 | 前一窗口的唯一 Desktop restart 回傳 exit 0；之後已核对原容器身份與退出狀態。不能改稱這次 restart 失敗。 |
+| 9/20 14:52:47–14:53:34 | 前一窗口的唯一 Desktop restart 回傳 exit 0；之後已核對原容器身份與退出狀態。不能改稱這次 restart 失敗。 |
 | 17:13–17:14 | 續作時 desktop-linux named pipe 不存在、Desktop/backend 未執行、兩個 WSL distro 停止。 |
 | 17:18:45 | 已授權的一次正常 Desktop start 送出。舊 Windows wrapper 超時後仍等待輸出；CLI 結果 UNKNOWN，沒有重送。 |
 | 17:18:59.7845055 | 新 backend log 記錄 Inference manager 初始化失敗：無法移除 `Docker/run/dockerInference`，並同時記錄 local engines stopped / shutdown complete。這是啟動錯誤證據，不是現在容器或 GPU 全部停止的證明。 |
@@ -42,7 +42,7 @@ fixture 子程序仍存活的證據是 Windows process handle wait；最後由 f
 [部署準備證據](../2026-09-20-scheduler-deployment-preparation/README.md)。
 
 私有 start/build Windows 呼叫程式已改用同一 runner、單一 deadline 及有限輸出讀取；
-inspect 在捕获前只選需要欄位，不保存 Env/secret。這些 caller 僅 AST 檢查，
+inspect 在捕獲前只選需要欄位，不保存 Env/secret。這些 caller 僅 AST 檢查，
 candidate build 沒有執行，不能把語法通過當成 Docker 執行驗證。
 
 ## 最小只讀 metadata 結果
@@ -72,3 +72,20 @@ metadata 支持將明確失敗的 `Docker/run` 保留式 rename 作為候選，�
 具體路徑、owner PID、原始 log 與 ACL/SID 留在 `.state/scheduler-deployment-20260921/`
 私有 receipts；可提交證據只保留去識別摘要與原始 receipt SHA-256。
 來源與檢查結果見 [validation.json](validation.json)、[source-sha256.json](source-sha256.json)。
+
+## 補記：定點修復於執行前遭自動批准審查拒絕
+
+17:46 UTC 前，協調路徑已确认把上述兩個普通 runtime 目錄納入同一次保留式修復，
+但實際 `exec_command` 在 **CreateProcess 前被自動批准審查拒絕**。
+本次修復的 stop／rename／start 都是 **0 次**，repair script 未啟動；沒有換工具、
+host、拆命令或以其他方式重送。這不改變較早正常 start 的 UNKNOWN。
+
+審查理由是這組動作會停止共用 Docker Desktop、移走 runtime 目錄再啟動，可能中斷
+服務，而可信使用者訊息未明確涵蓋這組具體副作用。原始拒絕已交來源 orchestrate，
+由 main 處理直接使用者批准；此證據不是該批准，也不授權重新執行。
+
+已離線同步配置：初始＋修復2 loads／12 generations、驗收7／38、正式2／8、
+rollback1／6，合計仍12／64。原 UNKNOWN 保守占用1／6；額外修復1／6只是預留，
+不是這次已耗用。時間窗口仍至台北02:48:45，新驗收截止02:18:45，沒有延長。
+新配置與準備腳本語法已核對，沒有建立 native deployment/state 或啟動 GPU。
+對應可提交摘要見 [repair-review-block.json](repair-review-block.json)。

@@ -1,0 +1,42 @@
+{
+  "at": "2026-09-20T17:47:04.823923+00:00",
+  "action": "one bounded Desktop stop, two literal same-parent retained runtime-directory renames, one bounded Desktop start and read-only verification",
+  "outcome": "automatic approval review rejected before CreateProcess",
+  "reason": "此命令會停止共享 Docker Desktop、重新命名兩個 runtime 目錄並再次啟動，可能造成服務中斷；目前可信使用者訊息未明確授權這組精確副作用，僅歷史代理訊息不足以擴張授權。",
+  "process_started": false,
+  "stop_rename_start_executed": false,
+  "workaround_attempted": false,
+  "private_rejection_receipt_sha256": "e18216a7eb7ef0b0e4a99b89eb2610dad53956c5adced0a5d965873db81aaf7e",
+  "ledger_sha256_snapshot": "1ef236edb5f0a5d8cfc8789d6dc528f3a1bf13380df01c0bba8701e8989b6722",
+  "prepared_repair_script_sha256": "0dc64dfb74fc6468b8a64a0881e8cd698454dbfe2c10adb0daf2ef53b1b65bd8",
+  "prepared_native_script_sha256": "f10bd5eb4ae42f0f684c3ca45a1bc4ff7f190a593656748c1ae190bd1da0c358",
+  "prepared_scripts_ast": "passed; neither executed after review rejection",
+  "allocations": {
+    "initial_and_repair": {
+      "loads": 2,
+      "generations": 12
+    },
+    "acceptance_state": {
+      "loads": 7,
+      "generations": 38
+    },
+    "formal_window": {
+      "loads": 2,
+      "generations": 8
+    },
+    "static_rollback": {
+      "loads": 1,
+      "generations": 6
+    }
+  },
+  "repair_reservation_consumed": false,
+  "prior_start_unknown_preserved": true,
+  "original_deadline_utc": "2026-09-20T18:48:45.041221+00:00",
+  "original_new_case_cutoff_utc": "2026-09-20T18:18:45.041221+00:00",
+  "direct_approval_question": {
+    "presented_in": "task: single-host scheduler",
+    "status_at_export": "pending"
+  },
+  "managed_deployment_complete": false,
+  "gpu_acceptance_complete": false
+}
