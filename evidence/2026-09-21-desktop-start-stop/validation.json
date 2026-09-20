@@ -1,0 +1,69 @@
+{
+  "base_commit": "bfc1f6b097f9d1c3ff529f281ec66101dbc0fb77",
+  "recorded_utc": "2026-09-20T17:42:31.353961+00:00",
+  "source_basis": "working tree byte hashes; only unused import cleanup after the observed targeted test run",
+  "source_manifest_sha256": "91ab4871f960fe2717561d28db51d6bc5486d7b69eeaf616934fdb46aa7e29b6",
+  "windows_targeted_tests": {
+    "command": "uv run --locked --no-sync pytest -q tests/test_bounded_command.py --basetemp <private-temp>",
+    "passed": 5,
+    "seconds": 3.86,
+    "exit_code": 0,
+    "evidence_kind": "observed tool execution result",
+    "actual_windows_inherited_handle_cases": 2,
+    "gpu_used": false
+  },
+  "windows_private_callers": [
+    {
+      "name": "start_once.py",
+      "sha256": "b6725be575ec66fab49d8cdf739a378dce7d7f8ff511b2ea0808055ce0ceefa3",
+      "ast_parse": "passed",
+      "executed_after_fix": false
+    },
+    {
+      "name": "build_candidates.py",
+      "sha256": "59de9fd91bfb8d8534363357e44056f80fda28851a5c8c2f8527ea146c257959",
+      "ast_parse": "passed",
+      "executed_after_fix": false
+    }
+  ],
+  "bounded_readonly_diagnostic": {
+    "started_utc": "2026-09-20T17:31:21.253896+00:00",
+    "ended_utc": "2026-09-20T17:31:30.284012+00:00",
+    "seconds": 9.03100000001723,
+    "context": "desktop-linux",
+    "local_named_pipe": true,
+    "version_client_seconds": 8.01600000000326,
+    "version_client_timed_out": true,
+    "version_client_cleanup_complete": true,
+    "outcome": "UNKNOWN / STOP",
+    "subsequent_daemon_commands": 0
+  },
+  "private_receipt_sha256": {
+    "desktop-start-once.json": "7d9418dec81faaa8c88120947c3348ccd823ee8ec660ed20a2f59692bed26414",
+    "resume-ledger.json": "4189e8003ea9a8530e33bfa32bc7761d5aa8383b503df812473f02ade37b947b",
+    "bounded-diagnostic/receipt.json": "058de0cfa199a31e7078eca8c6d872bb595646bd65cc6ef455ce67255acd471c",
+    "startup-readonly/receipt.json": "a6a529b292235717d8c52163f915835be8e33451f14603a98789d2e5d4e7e167",
+    "startup-readonly/findings.json": "4995530c95a146f5094433ae20f048c5c9eb045e7f9b32242c3d7a51535da958",
+    "runtime-metadata/runner-receipt.json": "a9014d343c14bfd31d45ca4353567b05ed87dae6faf9c81910ef1caf832e3eb5",
+    "runtime-metadata-retry/findings.json": "cf91c9dadd234598ab01954535f129e6aab8156171a921d6c21d29f889fd39a0",
+    "runtime-metadata-sibling/findings.json": "863415ee4c98cbb890f43e9b62b1abc2d056bfd92aaeee4b5afd28886741bfd1"
+  },
+  "limits": {
+    "cumulative_loads": 12,
+    "cumulative_generations": 64,
+    "conservative_initial_charge": {
+      "loads": 1,
+      "generations": 6
+    },
+    "start_after_actual_gpu_usage": "UNKNOWN",
+    "refund_unknown": false
+  },
+  "delivery": {
+    "managed_service_deployed": false,
+    "gpu_acceptance_completed": false,
+    "candidate_build_executed": false,
+    "new_lifecycle_or_rename_after_stop": false,
+    "merge": false,
+    "push": false
+  }
+}

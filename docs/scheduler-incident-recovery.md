@@ -1,6 +1,10 @@
 # Docker daemon 500：診斷與最小恢復流程
 
-**一次最小恢復已納入階段授權；仍等待 fresh writers／RESOURCE GO，尚未執行。**
+2026-09-21 更新：9/20 的唯一 Desktop restart 已成功；續作時 Desktop 已停止，
+後續單次正常 start 未取得完成結果，已記為 UNKNOWN／STOP。不得重用下列歷史授權
+自行重送 lifecycle。最新證據見 [啟動與控制程式收斂](../evidence/2026-09-21-desktop-start-stop/README.md)。
+
+**以下為 9/20 執行前保存的恢復規格；不是目前狀態或可重用的 lifecycle 授權。**
 main 統一協調跨專案。daemon 恢復、原 Qwen 恢復、D 驗收分別保存證據；只有本流程
 成功、身份及資源核對通過後，才能依[已授權 D 窗口](scheduler-gpu-acceptance.md)繼續
 候選建置與切換。恢復失敗後不得繼續其他 Docker 操作。
@@ -62,6 +66,17 @@ image或weights，不重建任何原容器。
 `timeout=min(該步上限, deadline-time.monotonic())`；剩餘時間≤0時不得送命令。
 Desktop restart的CLI `--timeout` 也不得超過剩餘總額度，外層子程序同樣限時，不能
 只依Docker內建timeout。階段等待及sleep亦計入這480秒，不在每次操作重置deadline。
+
+Windows 控制程式使用 [run_bounded](../scripts/bounded_command.py)：stdout/stderr 寫入
+新的私有檔案，使用 `Popen.wait`，不可用 `capture_output=True`／PIPE加上超時後的
+無界 `communicate()`。子孫持有輸出handle不應讓已退出CLI的等待持續。單次上限包含
+client清理，預留最多2秒給kill/wait；只操作該次Popen process handle，不殺process tree、
+Desktop/backend、WSL或其他程序。timeout即外部結果unknown，清理失敗同樣STOP。
+OS層的CreateProcess/kill若本身停滯仍不能承諾實時硬界限，須如實回報。
+
+global `deadline` 在整個恢復流程只建一次，不能每次呼叫重算480秒；`timeout_seconds`
+另傳單步180/10/30等上限。輸出檔可能仍由存活子孫寫入，hash應標為讀取時間的快照。
+file-backed capture前就以CLI格式選取所需欄位，不能先保存完整inspect再刪去Env／secret。
 
 | 操作 | 單次子程序上限 |
 |---|---:|
