@@ -55,6 +55,25 @@ image或weights，不重建任何原容器。
 前提：main確認各owner已停止Docker寫入，明確核定一次Desktop重啟與原Qwen恢復。
 本機`docker desktop restart --help`已證實支援`--timeout seconds`，本次help命令exit0。
 
+整個流程由同一個執行者維持單一monotonic deadline：第一個恢復命令之前設定
+`deadline = time.monotonic() + 480`。每個子程序以固定argv、`shell=False`執行，
+`timeout=min(該步上限, deadline-time.monotonic())`；剩餘時間≤0時不得送命令。
+Desktop restart的CLI `--timeout` 也不得超過剩餘總額度，外層子程序同樣限時，不能
+只依Docker內建timeout。階段等待及sleep亦計入這480秒，不在每次操作重置deadline。
+
+| 操作 | 單次子程序上限 |
+|---|---:|
+| `docker desktop restart` | 180秒，且不超過總剩餘時間 |
+| `docker version`、`ps`、各次 `inspect` | 各10秒，且不超過總剩餘時間 |
+| 各個原容器 `docker start` | 各30秒，且不超過總剩餘時間 |
+| HTTP ready/models | 各5秒，且不超過總剩餘時間 |
+
+**任何子程序timeout、結果遺失或不確定，立即停止下一步並回報。**外層timeout終止
+Docker CLI client，不代表daemon沒有執行命令；尤其start不能重送，不能推定container
+沒啟動或已停止。已完成的唯讀probe明確回Server=null可依下方有界次數等待；probe若
+逾時或結果未知則不再讀。只保存所需identity／mount／health欄位，禁止完整Env或key
+內容流入receipt；其他app資料payload不讀取或保存。
+
 ```powershell
 docker desktop restart --timeout 180
 ```
@@ -96,5 +115,6 @@ docker desktop restart --timeout 180
 5. selfhost回報原服務恢復證據；main收集球館／PixelReceipt／KaChing各自驗證後判斷
    整體事故是否解除。其他業務驗收未完成時，不以selfhost ready宣稱全系統正常。
 
-整體單次恢復流程最多約8分鐘（Desktop180秒＋daemon確認60秒＋Qwen180秒及有界呼叫）；
-超時保留已知狀態與所有證據，下一層處置重新交main。無論恢復成功與否，D仍需獨立授權。
+整體單次恢復流程以同一480秒monotonic deadline為硬上限；後面的daemon等待、inspect、
+start與Qwen暖機都只能使用剩餘時間，因此Qwen可等的時間可能少於180秒。超時保留已知
+狀態与命令結果不確定性，下一層處置重新交main。無論恢復成功與否，D仍需獨立授權。
