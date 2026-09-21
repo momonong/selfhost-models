@@ -1,0 +1,67 @@
+{
+  "recorded_utc": "2026-09-21T00:05:15.380238+00:00",
+  "base_commit": "845e8e0cddd457e3ad5a0eeac1cbc5ccd79a30bf",
+  "direct_user_approval_received": true,
+  "new_window": {
+    "started_utc": "2026-09-20T23:57:16.970272+00:00",
+    "deadline_utc": "2026-09-21T01:27:16.970272+00:00",
+    "new_case_cutoff_utc": "2026-09-21T00:57:16.970272+00:00",
+    "max_minutes": 90,
+    "stop_new_cases_after_minutes": 60,
+    "started_monotonic": 480367.796,
+    "deadline_monotonic": 485767.796,
+    "stop_new_cases_monotonic": 483967.796,
+    "authorization": "direct user approval, main confirmed new bounded window; cumulative counters retained"
+  },
+  "original_repair_deadline_monotonic": 480846.078,
+  "status": "STOP",
+  "stop_reason": "owner process remains: no rename",
+  "repair_seconds": 60.34299999999348,
+  "stop_client": {
+    "at": "2026-09-20T23:57:16.980954+00:00",
+    "returncode": 1,
+    "timed_out": true,
+    "cleanup_complete": true,
+    "elapsed": 58.01600000000326,
+    "stdout_sha256": "94cf0f568e59aae48b9f1c949ef789e188da8ed648ca39a49980c7c2b0d3486a",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "lifecycle_attempts": {
+    "normal_stop": 1,
+    "rename": 0,
+    "normal_start": 0
+  },
+  "owner_count_after_stop": 6,
+  "wsl_after_stop": "NAME              STATE           VERSION\r\n* Ubuntu            Stopped         2\r\n  docker-desktop    Stopped         2",
+  "static_journal_after_stop": {
+    "sha256": "de0dba4842b264e04b1d184a1e1d6de5e6be1883927ff9fadaec42f947a8bbd6",
+    "lease_count": 0,
+    "observed_utc": "2026-09-20T23:58:15.591542+00:00"
+  },
+  "new_gpu_loads_or_generations_dispatched": false,
+  "repair_reserve_consumed": false,
+  "prior_start_unknown_preserved": true,
+  "cumulative_limits": {
+    "loads": 12,
+    "generations": 64
+  },
+  "private_receipt_sha256": {
+    "runtime-repair-once/receipt.json": "7bf0fcf5bebe2427895b214908a0989751b98e5633cd3b9c621b6c07fcd20dcd",
+    "after-approval-host-readonly/receipt.json": "5e587f0d85b41356941ed8da369073bdb7f391a393a1489b043a8227795a7abc",
+    "owner-identity-after-stop/receipt.json": "074643caea4b77b36f6457599541da413b47cfd12797a01fb4aa9cf39ecfbcae",
+    "resume-ledger-expired-before-user-approval.json": "1ef236edb5f0a5d8cfc8789d6dc528f3a1bf13380df01c0bba8701e8989b6722",
+    "resume-ledger.json": "13e79680748a7d0d84f3bb3ad99bf4e03888764686e6ca6fdcd400dd7b6ff57f"
+  },
+  "prepared_source_sha256": {
+    "continue_after_manual_quit.py": "e616da5f1dd8004a1a2cbffb0b636e7e45a2f8664fb1be7d1c24fd520b56c940",
+    "repair_runtime_once.py": "5c8b62a90b85a60318e1e3f82d3d1aa1259ab87242768ccc3641283fe78209f2",
+    "runtime_metadata.py": "ff112644c7e17b2eb5c5d37b922e27db6793a8aa30c8ffba25989b8e0880bdfb"
+  },
+  "continuation_ast": "passed",
+  "continuation_executed": false,
+  "new_approval_question_presented": false,
+  "managed_deployment_complete": false,
+  "gpu_acceptance_complete": false,
+  "merge": false,
+  "push": false
+}
