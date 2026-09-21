@@ -81,6 +81,89 @@ async def test_relay_preserves_epoch_body_and_rejects_untrusted_routes():
         await app.client.aclose()
 
 
+@pytest.mark.parametrize("runtime", ["vllm", "whisper"])
+async def test_provider_relay_uses_python3_in_fixed_worker_image(tmp_path, runtime):
+    from selfhost_models.scheduler_runtime import DockerProvider
+    store, qwen, whisper, _ = setup_store(tmp_path)
+    deployment = qwen if runtime == "vllm" else whisper
+    calls = []
+
+    class RelayCommands(DockerProvider):
+        async def command(self, *args, **kwargs):
+            calls.append(args)
+            if args[:2] == ("network", "inspect"):
+                return json.dumps([{"Labels": {"selfhost.scheduler": self.namespace}}]).encode()
+            if args[0] == "create":
+                self.created = args
+                return b"synthetic-relay-id"
+            if args[:2] == ("network", "connect"):
+                return b""
+            if args[0] == "start":
+                # The fixed vLLM image exposes python3 without a python alias.
+                available = {"python3"} if runtime == "vllm" else {"python", "python3"}
+                executable = self.created[self.created.index("--entrypoint") + 1]
+                if executable not in available:
+                    raise SchedulerError("provider_command_failed", 503)
+                return b"synthetic-relay-id"
+            raise AssertionError(args)
+
+    provider = RelayCommands(store)
+    await provider.start_relay(deployment, "synthetic-worker")
+    created = next(args for args in calls if args[0] == "create")
+    assert created[-5:] == ("--entrypoint", "python3", deployment.image, "-m", "worker.relay")
+    assert "--pull=never" in created and "--gpus" not in created
+    assert calls[-2:] == [
+        ("network", "connect", provider.network, "synthetic-worker-relay"),
+        ("start", "synthetic-worker-relay"),
+    ]
+
+
+@pytest.mark.parametrize("runtime", ["vllm", "whisper"])
+async def test_provider_readonly_worker_redirects_caches_to_bounded_tmpfs(tmp_path, runtime):
+    from selfhost_models.scheduler_runtime import DockerProvider
+    store, qwen, whisper, _ = setup_store(tmp_path)
+    deployment = qwen if runtime == "vllm" else whisper
+    calls = []
+
+    class LoadCommands(DockerProvider):
+        async def command(self, *args, **kwargs):
+            calls.append(args)
+            assert args[0] == "run"
+            return b"synthetic-worker-id"
+
+        async def start_relay(self, dep, handle):
+            pass
+
+        def set_backend(self, dep):
+            pass
+
+        async def identity(self):
+            return "synthetic-worker-epoch"
+
+    provider = LoadCommands(store)
+    assert await provider.load(deployment, tmp_path / "asset", "synthetic-worker") == "synthetic-worker-epoch"
+    args, = calls
+    env = dict(args[i + 1].split("=", 1) for i, value in enumerate(args) if value == "-e")
+    expected = {
+        "XDG_CACHE_HOME": "/runtime-cache/cache",
+        "XDG_CONFIG_HOME": "/runtime-cache/config",
+        "HF_HOME": "/runtime-cache/cache/huggingface",
+        "VLLM_CACHE_ROOT": "/runtime-cache/cache/vllm",
+        "VLLM_CONFIG_ROOT": "/runtime-cache/config/vllm",
+        "TORCHINDUCTOR_CACHE_DIR": "/runtime-cache/cache/torchinductor",
+        "TRITON_CACHE_DIR": "/runtime-cache/cache/triton",
+    }
+    assert {key: env[key] for key in expected} == expected
+    assert env["HF_HUB_OFFLINE"] == env["TRANSFORMERS_OFFLINE"] == "1"
+    mounts = [args[i + 1] for i, value in enumerate(args) if value == "--tmpfs"]
+    assert mounts == [
+        "/tmp:rw,noexec,nosuid,nodev,size=128m",
+        "/runtime-cache:rw,nosuid,nodev,size=1g,uid=10001,gid=10001",
+    ]
+    assert "--read-only" in args and "--pull=never" in args
+    assert "TMPDIR" not in env  # No unverified alternate temporary-directory contract.
+
+
 class ASREngine:
     def __init__(self):
         self.entered=threading.Event();self.finish=threading.Event();self.fail=False

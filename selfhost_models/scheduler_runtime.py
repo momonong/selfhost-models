@@ -125,6 +125,12 @@ class DockerProvider:
                 "--mount", f"type=bind,source={self.secret_path},target=/run/secrets/worker_key,readonly",
                 "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=128m", "--tmpfs", "/runtime-cache:rw,nosuid,nodev,size=1g,uid=10001,gid=10001",
                 "-e", "WORKER_API_KEY_FILE=/run/secrets/worker_key", "-e", "HF_HUB_OFFLINE=1", "-e", "TRANSFORMERS_OFFLINE=1",
+                # Official runtime defaults otherwise write under the read-only home.
+                # All caches share the existing bounded, worker-writable tmpfs.
+                "-e", "XDG_CACHE_HOME=/runtime-cache/cache", "-e", "XDG_CONFIG_HOME=/runtime-cache/config",
+                "-e", "HF_HOME=/runtime-cache/cache/huggingface",
+                "-e", "VLLM_CACHE_ROOT=/runtime-cache/cache/vllm", "-e", "VLLM_CONFIG_ROOT=/runtime-cache/config/vllm",
+                "-e", "TORCHINDUCTOR_CACHE_DIR=/runtime-cache/cache/torchinductor", "-e", "TRITON_CACHE_DIR=/runtime-cache/cache/triton",
                 "-e", "MODEL_ID=" + dep.model, "-e", "MODEL_REVISION=" + dep.revision,
                 "-e", "MODEL_PROFILE=qwen3_5", "-e", "VIDEO_ENABLED=" + str(int(dep.load.video)),
                 "-e", "VLLM_USE_V2_MODEL_RUNNER=0", "-e", "GPU_MEMORY_UTILIZATION=" + str(dep.load.gpu_memory)]
@@ -163,7 +169,7 @@ class DockerProvider:
             "--security-opt", "no-new-privileges:true", "--cap-drop", "ALL",
             "--mount", f"type=bind,source={self.secret_path},target=/run/secrets/worker_key,readonly",
             "-e", "WORKER_API_KEY_FILE=/run/secrets/worker_key", "-e", "RELAY_WORKER_URL=http://" + handle + ":8000",
-            "--entrypoint", "python", dep.image, "-m", "worker.relay")
+            "--entrypoint", "python3", dep.image, "-m", "worker.relay")
         await self.command("network", "connect", self.network, relay)
         await self.command("start", relay)
 
