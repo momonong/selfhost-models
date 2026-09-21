@@ -1,0 +1,567 @@
+{
+  "recorded_at_unix": 1789961861.4959438,
+  "status": "managed_STOP_static_restored",
+  "complete_D": "NOT_PASSED",
+  "managed_formal_delivery": "NOT_DONE",
+  "component_revision": "bfc1f6b097f9d1c3ff529f281ec66101dbc0fb77",
+  "host_runtime_revision": "47af794716900d6bba6512fefcf0a6c066bee4e5",
+  "runtime_fix_commits": [
+    "ea342fd",
+    "18e9ccd",
+    "47af794"
+  ],
+  "candidate_images": {
+    "qwen": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+    "whisper": "sha256:814634fb8554ac1064de29c1abf8c5a22889350b972bb5d49a065b67fab82142"
+  },
+  "window": {
+    "started_iso": "2026-09-21T03:02:17.118277+00:00",
+    "cutoff_utc": 1789963337.118277,
+    "deadline_utc": 1789965137.118277,
+    "allocations": {
+      "initial_unknown": {
+        "loads": 1,
+        "generations": 6
+      },
+      "acceptance_state": {
+        "loads": 8,
+        "generations": 50
+      },
+      "formal_window": {
+        "loads": 2,
+        "generations": 7
+      },
+      "static_rollback": {
+        "loads": 1,
+        "generations": 6
+      },
+      "static_rollback_smoke": {
+        "loads": 0,
+        "generations": 1
+      }
+    },
+    "limits": {
+      "loads": 12,
+      "generations": 70
+    },
+    "status": "managed_STOP_static_restored_window_closed",
+    "final_conservative_usage": {
+      "loads": 6,
+      "generations": 37,
+      "parts": {
+        "initial_unknown": {
+          "loads": 1,
+          "generations": 6
+        },
+        "managed_acceptance": {
+          "loads": 4,
+          "generations": 24
+        },
+        "static_rollback": {
+          "loads": 1,
+          "generations": 6
+        },
+        "static_smoke": {
+          "loads": 0,
+          "generations": 1
+        }
+      }
+    },
+    "closed_at_unix": 1789961861.4896371
+  },
+  "acceptance_budget": {
+    "loads": 4,
+    "generations": 24,
+    "max_loads": 8,
+    "max_generations": 50,
+    "durable_compute_attempts": 0,
+    "warmup_reservations_are_not_completed_generations": true
+  },
+  "load_results": [
+    {
+      "attempt": 1,
+      "status": "FAILED",
+      "observed": "relay python executable absent; worker exit1",
+      "root_cause_of_worker_exit": "not independently captured"
+    },
+    {
+      "attempt": 2,
+      "status": "FAILED",
+      "observed": "FlashInfer readonly workspace; exit1"
+    },
+    {
+      "attempt": 3,
+      "status": "FAILED",
+      "observed": "Triton native shared object map failed; CPU comparison showed noexec tmpfs"
+    },
+    {
+      "attempt": 4,
+      "status": "FAILED",
+      "observed": "startup stalled after distributed_init/NCCL log; load180 deadline",
+      "root_cause": "UNKNOWN"
+    }
+  ],
+  "exit_proofs": {
+    "second": {
+      "container_id": "e62d77dd51e20630b38c37ad43aaec0f6085e3346525418e3d5c991359041d3e",
+      "image_id": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Pid": 0,
+        "ExitCode": 1,
+        "OOMKilled": false,
+        "StartedAt": "2026-09-21T03:08:37.922886288Z",
+        "FinishedAt": "2026-09-21T03:09:10.346816968Z"
+      },
+      "whole_container_exit_confirmed": true
+    },
+    "third": {
+      "container_id": "90795ca2516597409ae033d1d4ed2de919e55ef5852750913578186652586ebb",
+      "image_id": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Pid": 0,
+        "ExitCode": 1,
+        "OOMKilled": false,
+        "StartedAt": "2026-09-21T03:16:48.974662586Z",
+        "FinishedAt": "2026-09-21T03:17:26.016245864Z"
+      },
+      "whole_container_exit_confirmed": true
+    },
+    "fourth": {
+      "container_id": "0ddba692d357f32e6ee602f94baf0bdd55e82d7f975621d952728634fe96c3bc",
+      "image_id": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Pid": 0,
+        "ExitCode": 137,
+        "OOMKilled": false,
+        "StartedAt": "2026-09-21T03:23:07.645509144Z",
+        "FinishedAt": "2026-09-21T03:28:10.678603195Z"
+      },
+      "whole_container_exit_confirmed": true
+    },
+    "first": {
+      "evidence": "exact Docker die exit1 then destroy plus Store engine exit event; no independent pre-retirement inspect receipt"
+    }
+  },
+  "post_managed_unload": {
+    "phase": "unloaded",
+    "leases": 0,
+    "model_pins": 0,
+    "engine_cleanup": 0,
+    "ownership_released_before_rollback": true
+  },
+  "uncovered_cases": [
+    "capabilities",
+    "normal_132",
+    "urgent_FIFO",
+    "capacity",
+    "running_cancel",
+    "disconnect_drain",
+    "controller_restart",
+    "ASR",
+    "formal_managed_smoke"
+  ],
+  "cpu_probes": [
+    {
+      "id": "04a07e19df5cce0d724ccbd20337f4d7d63dd21958100fed86dc64421fceb289",
+      "image": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+      "gpu": null,
+      "returncode": 1,
+      "stdout": "WARNING 09-21 03:05:43 [interface.py:1008] Using 'pin_memory=False' as WSL is detected. This may slow down performance.\n{'VLLM_CACHE_ROOT': '/root/.cache/vllm', 'VLLM_CONFIG_ROOT': '/root/.config/vllm'}\ncache /root/.cache/vllm\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/usr/lib/python3.12/pathlib.py\", line 1313, in mkdir\n    os.mkdir(self, mode)\nOSError: [Errno 30] Read-only file system: '/root/.cache/vllm'\n"
+    },
+    {
+      "id": "0a711c2d11f064386b032ec339037ad169949d7aeb0eb7cbec0e072b6bbed2d4",
+      "image": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+      "gpu": null,
+      "returncode": 0,
+      "stdout": "WARNING 09-21 03:07:30 [interface.py:1008] Using 'pin_memory=False' as WSL is detected. This may slow down performance.\n{'VLLM_CACHE_ROOT': '/runtime-cache/cache/vllm', 'VLLM_CONFIG_ROOT': '/runtime-cache/config/vllm'}\ncache /runtime-cache/cache/vllm\nCACHE_WRITABLE_NO_GPU\n",
+      "stderr": ""
+    },
+    {
+      "id": "9f48750b688dccdd692d76c71ba150ec76d27e40de7fdca836c79c9db8d9463e",
+      "image": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+      "gpu": null,
+      "returncode": 0,
+      "stdout": "WARNING 09-21 03:10:57 [interface.py:1008] Using 'pin_memory=False' as WSL is detected. This may slow down performance.\nWARNING 09-21 03:11:05 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError(\"No module named 'vllm._C'\")\nWARNING 09-21 03:11:06 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError(\"No module named 'vllm._C'\")\nWARNING 09-21 03:11:06 [interface.py:368] Failed to import from vllm._C: ModuleNotFoundError(\"No module named 'vllm._C'\")\n{'model_class': 'Qwen3_5ForConditionalGeneration', 'workspace': '/runtime-cache/.cache/flashinfer/0.6.18', 'cuda_initialized': False}\n",
+      "stderr": "W0921 03:11:06.050000 1 torch/utils/cpp_extension.py:178] No CUDA runtime is found, using CUDA_HOME='/usr/local/cuda'\n"
+    }
+  ],
+  "cpu_validation": [
+    {
+      "revision": "ea342fd",
+      "passed": 59,
+      "scope": "related CPU tests"
+    },
+    {
+      "revision": "18e9ccd",
+      "passed": 10,
+      "scope": "targeted runtime tests"
+    },
+    {
+      "revision": "47af794",
+      "passed": 10,
+      "scope": "targeted runtime tests"
+    },
+    {
+      "revision": "47af794",
+      "passed": 17,
+      "seconds": 6.18,
+      "command": "uv run --locked --offline pytest -q tests/test_scheduler_boundaries.py tests/test_scheduler_process.py tests/test_bounded_command.py",
+      "gpu": false
+    }
+  ],
+  "ledger_history_correction": {
+    "at_unix": 1789961861.4830003,
+    "original_ledger_sha256": "96708f645479cace4d7558157521cd62c901f8926f1985313f43905458059250",
+    "original_ledger_preserved": "static-rollback/deployment-window-before-smoke.json",
+    "incorrect_fields": [
+      "allocation_history[1].prior_allocations.acceptance_state",
+      "allocation_history[1].prior_limits"
+    ],
+    "authoritative_receipt_sha256": "a4165fd5975600e7d78f24cb23d5694726f8239eb6710d2396ab0ab3f762749a",
+    "correct_before": {
+      "acceptance_max_loads": 8,
+      "acceptance_max_generations": 44,
+      "total_max_loads": 12,
+      "total_max_generations": 64
+    },
+    "correct_after": {
+      "acceptance_max_loads": 8,
+      "acceptance_max_generations": 50,
+      "total_max_loads": 12,
+      "total_max_generations": 70
+    },
+    "counters_changed": false,
+    "original_history_overwritten": false
+  },
+  "static_rollback": {
+    "restart_reserved_at": "2026-09-21T03:31:45.324767+00:00",
+    "ready_at_unix": 1789961639.3345442,
+    "ready": {
+      "status": 200,
+      "body": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "93dad9f9a0334e5786436706033dcdcc",
+        "inflight": 0,
+        "detached": 0,
+        "uncertain": 0
+      }
+    },
+    "model": {
+      "id": "Qwen/Qwen3.5-4B",
+      "object": "model",
+      "created": 0,
+      "owned_by": "selfhost",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "backend": "vllm",
+      "capabilities": {
+        "text": true,
+        "stream": true,
+        "images": true,
+        "tools": true,
+        "videos": true,
+        "video_limits": {
+          "container": "mp4",
+          "codec": "h264",
+          "max_bytes": 16777216,
+          "min_duration_seconds": 1,
+          "max_duration_seconds": 60,
+          "max_width": 1280,
+          "max_height": 720,
+          "max_fps": 60,
+          "constant_frame_rate_required": true,
+          "max_source_frames": 3600,
+          "max_sampled_frames": 120,
+          "frame_width": 256,
+          "frame_height": 256,
+          "sampling": "uniform_endpoints_2x_ceil_duration_even_v1",
+          "audio": false
+        },
+        "thinking": true,
+        "cancellation": "drain_to_terminal",
+        "queue_capacity": 0,
+        "max_inflight_limit": 2,
+        "unsupported_parameters": []
+      },
+      "max_inflight": 2,
+      "max_model_len": 8192,
+      "max_body_bytes": 25165824
+    },
+    "originals": [
+      {
+        "id": "f35e32eed86cdbbfd436949f9d4b13e2e6d79eeca0ed5dbb769505ac0a0251b2",
+        "image": "sha256:04c47cc62471c2a101bda23f911f0f00a78b6081803cadee09b4c98e2888101f",
+        "running": true,
+        "pid": 3497,
+        "started_at": "2026-09-21T03:31:46.728303586Z",
+        "mounts_unchanged": true
+      },
+      {
+        "id": "5036e914ce6db9007027178596015724c5d13837f16924cdbadeb076e540fbc9",
+        "image": "sha256:d209ab188d96f9bce180cf59fffefb3fe021de71e34c85dd8d0893800736491c",
+        "running": true,
+        "pid": 3496,
+        "started_at": "2026-09-21T03:31:46.718977725Z",
+        "mounts_unchanged": true
+      }
+    ],
+    "files_unchanged": {
+      "api-key": true,
+      "compose.env": true,
+      "runtime/leases.json": true
+    },
+    "only_original_static_running": true,
+    "gpu_owner": "original_static",
+    "smoke": {
+      "status": "PASS_synthetic_text_transport_and_inference",
+      "at_unix": 1789961683.6849937,
+      "seconds": 0.25,
+      "payload_sha256": "a5313be182050566167bb14c808ef11f82842e838ac94d3c7e8a55b8c3f0f46d",
+      "response_status": 200,
+      "request_id": "3e7a348962d34bcf99c0fc5c7aef21b0",
+      "content": "OK",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 19,
+        "total_tokens": 21,
+        "completion_tokens": 2,
+        "prompt_tokens_details": null,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "after_ready": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "93dad9f9a0334e5786436706033dcdcc",
+        "inflight": 0,
+        "detached": 0,
+        "uncertain": 0
+      }
+    },
+    "persistence": {
+      "status": "PASS_after_client_and_owned_monitors_exited",
+      "at_unix": 1789961766.7158074,
+      "ready": {
+        "ready": true,
+        "version": "0.1.0",
+        "worker_epoch": "93dad9f9a0334e5786436706033dcdcc",
+        "inflight": 0,
+        "detached": 0,
+        "uncertain": 0
+      },
+      "lease_journal_sha256": "de0dba4842b264e04b1d184a1e1d6de5e6be1883927ff9fadaec42f947a8bbd6",
+      "identity_verified_at_unix": 1789961767.770331
+    },
+    "reboot_tested": false,
+    "product_quality_claim": false
+  },
+  "resource_history": {
+    "resource-monitor": {
+      "samples": 691,
+      "invalid_lines": 0,
+      "first_unix": 1789959643.219614,
+      "last_unix": 1789960333.7923748,
+      "whole_gpu_peak_mib": 3667,
+      "windows_min_available_bytes": 29950259200,
+      "wsl_min_available_bytes": 51692408832,
+      "sample_file_sha256": "db4c8919ca0e1ebb05a4eea15ee9b5de51b5ab582d2d5bbc02505c7a30cd7e0d"
+    },
+    "resource-monitor-v2": {
+      "samples": 1243,
+      "invalid_lines": 0,
+      "first_unix": 1789960486.400229,
+      "last_unix": 1789961729.5743237,
+      "whole_gpu_peak_mib": 18050,
+      "windows_min_available_bytes": 22481465344,
+      "wsl_min_available_bytes": 47532089344,
+      "sample_file_sha256": "148858f7fe30cae9daa51717d3217ca8f5860c3e2d0c4ac17932862fc2962a15"
+    },
+    "gap_seconds_between_monitors": 152.6078541278839,
+    "gap_note": "first Windows monitor PermissionError on atomic rename; controller already inactive; no new GPU load during gap; separate monitor2 kept original evidence"
+  },
+  "cleanup": {
+    "guard": {
+      "at_unix": 1789961728.6368952,
+      "guard_disarmed": true,
+      "guard_alive": false,
+      "observer_pid": 6862,
+      "observer_exited": true,
+      "stopped_unrelated_processes": false
+    },
+    "monitor": {
+      "at_unix": 1789961733.5922801,
+      "sticky_stop": null
+    },
+    "acceptance_units": "inactive_MainPID0_disabled",
+    "formal_budget_window": "closed_used0_0",
+    "needed_wsl_keepalive": false,
+    "no_new_keepalive_created": true,
+    "other_services_stopped_by_cleanup": false
+  },
+  "delivery": {
+    "branch": "feat/single-host-scheduler",
+    "additional_worktrees": 0,
+    "merge": false,
+    "push": false,
+    "registry_publish": false,
+    "managed_deployment": false,
+    "original_static_restored": true
+  },
+  "fourth_worker_and_relay_events": [
+    {
+      "id": "0ddba692d357f32e6ee602f94baf0bdd55e82d7f975621d952728634fe96c3bc",
+      "action": "die",
+      "time": 1789961290,
+      "exit_code": "137"
+    },
+    {
+      "id": "0ddba692d357f32e6ee602f94baf0bdd55e82d7f975621d952728634fe96c3bc",
+      "action": "destroy",
+      "time": 1789961291,
+      "exit_code": null
+    },
+    {
+      "id": "75d6982fefe96d6ea00d13783e38d3299907401ae6613a71dbd645e27a990d61",
+      "action": "die",
+      "time": 1789961291,
+      "exit_code": "0"
+    },
+    {
+      "id": "75d6982fefe96d6ea00d13783e38d3299907401ae6613a71dbd645e27a990d61",
+      "action": "destroy",
+      "time": 1789961291,
+      "exit_code": null
+    }
+  ],
+  "managed_vs_static_startup_differences": {
+    "managed": {
+      "image": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+      "host_config": {
+        "ReadonlyRootfs": true,
+        "NanoCpus": 4000000000,
+        "PidsLimit": 128,
+        "Memory": 0,
+        "ShmSize": 2147483648,
+        "IpcMode": "private",
+        "CapDrop": [
+          "ALL"
+        ],
+        "CapAdd": null,
+        "SecurityOpt": [
+          "no-new-privileges:true"
+        ],
+        "Runtime": "runc",
+        "DeviceRequests": [
+          {
+            "Driver": "",
+            "Count": 0,
+            "DeviceIDs": [
+              "0"
+            ],
+            "Capabilities": [
+              [
+                "gpu"
+              ]
+            ],
+            "Options": {}
+          }
+        ],
+        "Tmpfs": {
+          "/runtime-cache": "rw,exec,nosuid,nodev,size=1g,uid=10001,gid=10001",
+          "/tmp": "rw,noexec,nosuid,nodev,size=128m"
+        },
+        "NetworkMode": "selfhost-scheduler-bfc4ddb176c12719"
+      },
+      "selected_env": {
+        "CUDA_CACHE_PATH": "/runtime-cache/cache/cuda",
+        "TMPDIR": "/runtime-cache",
+        "VIDEO_ENABLED": "1",
+        "VLLM_USE_V2_MODEL_RUNNER": "0",
+        "MODEL_PROFILE": "qwen3_5"
+      }
+    },
+    "static": {
+      "image": "sha256:d209ab188d96f9bce180cf59fffefb3fe021de71e34c85dd8d0893800736491c",
+      "host_config": {
+        "ReadonlyRootfs": false,
+        "NanoCpus": 0,
+        "PidsLimit": null,
+        "Memory": 0,
+        "ShmSize": 2147483648,
+        "IpcMode": "private",
+        "CapDrop": null,
+        "CapAdd": null,
+        "SecurityOpt": [
+          "no-new-privileges:true"
+        ],
+        "Runtime": "runc",
+        "DeviceRequests": [
+          {
+            "Driver": "nvidia",
+            "Count": 0,
+            "DeviceIDs": [
+              "0"
+            ],
+            "Capabilities": [
+              [
+                "gpu"
+              ]
+            ],
+            "Options": null
+          }
+        ],
+        "Tmpfs": null,
+        "NetworkMode": "selfhost-models_inference"
+      },
+      "selected_env": {
+        "VIDEO_ENABLED": "1",
+        "VLLM_USE_V2_MODEL_RUNNER": "0",
+        "MODEL_PROFILE": "qwen3_5"
+      }
+    },
+    "causal_attribution": "UNKNOWN; original static crossed initialization, but simultaneous image/rootfs/cache/resource/network differences prevent isolating cause"
+  },
+  "private_receipt_sha256": {
+    "candidate-build-receipt.json": "b608a70919455eb23d5f795e6d70694883f7d09b9a2e7c2e60298ad9a0305993",
+    "whisper-pathfix/receipt.json": "7390ae9af74adb1c68d8f2e36be4a4b1e38935d0505c65b18524fb9f02c3b3ae",
+    "native-preparation.json": "fb68483e38ee79e52a7beb8e3ec6ba7b4b7a745916266bc55c877d211cc88b9a",
+    "runtime-fix-release.json": "2f5dee9cbf351b12cb67cfd9f886f6ae8fa2605f2a6cdd39f4dd1e8b212f3387",
+    "flashinfer-fix-release.json": "ec52d96c96f698da2db0588597c5452feb681d4da9238cfbaf818e2953d1669a",
+    "exec-fix-release.json": "af88cdcf05fc89b9aa3bab5132b6fa624088e1e0d48895779ef30a7575478fb9",
+    "second-failure-exit.json": "436155baedc00278b868d8c4a18af12c4c9a57f2e671b379ffd0948215fdf985",
+    "third-failure-exit.json": "73883b0295bfbfa890209f6f6f5c04923d49fd4e0db345cbeda96f361be09906",
+    "fourth-failure-exit.json": "60986a63d8cf7da8a10cc62a5f2423c8130e19a49ba0ebbabf057040193b5fe5",
+    "fourth-failure-inventory.json": "e22e4f50c7ef22933bf43287de29751a0386c3412f273390548fea333c1b9da4",
+    "vllm-readonly-cpu.json": "7b83e2aac456b9016adf003fed6ea584b52fe6860454780647e8055adf9c9423",
+    "vllm-cache-fixed-cpu.json": "0ff65e69b55b8152d5c1db46c4e5bb7b5a90837402b64ae712a3af4503ffd0ac",
+    "vllm-architecture-cpu.json": "81391ad03a4d63232a42f8b3c65b075ee2515679e125f227ac38f988f7a156a9",
+    "native-exec-cpu.json": "ba0087a7f05c3b7e35b8265ec0449256f6dbec0451b2e5b37619e63bd8312f7a",
+    "effective-runtime-cpu.json": "052793c0efe5c16673a1769dc58863ed0c7c3709c97045f4d947a36cfa887eb8",
+    "budget-reallocation-receipt.json": "fcb776faa5d2255d3cb1d3b05aa0f886eec63185bca64e1e5dc5b36bbccc0cfc",
+    "budget-user-plus6-receipt.json": "a4165fd5975600e7d78f24cb23d5694726f8239eb6710d2396ab0ab3f762749a",
+    "deployment-window.json": "c4ce4ad904157838c5028eb693323769614668d5c5251f24b87b46a643cbe155",
+    "resume-ledger.json": "13e79680748a7d0d84f3bb3ad99bf4e03888764686e6ca6fdcd400dd7b6ff57f",
+    "ledger-history-correction.json": "f688037b378d109be19e6e2e044054f4f7ca837d5a8e6be9ce5a28eb867106d0",
+    "rollback-preflight.json": "32329e25bfb4c0c8464fe170bdc36b0ed99e28b196112c87eb032063470c3b02",
+    "readers-cleanup.json": "b8aed86d28f4f5b57db95c33e69120d3dbb9996cb211db09fbdd9c1baa7e3b40",
+    "acceptance-unit-final-state/0.stdout": "3fa86d0e6f024cb29bc385bd7b65539b6a46c57c757eaf4ff48cd75e7e49b64b",
+    "close-unused-formal-window/0.stdout": "203f2dde9db209eddb87c0798f5b126cdbfcce022cc8da588e3473a14cc22a33",
+    "static-rollback/restart-receipt.json": "9501550961bb4e85a6dd0980eba8158320e87d571dcc487fd01dafe64210547b",
+    "static-rollback/reservation.json": "535a4b1cf49b2a989e041da6dee170c287a680dd1715e9c7ae57a528333955d4",
+    "static-rollback/ready-models.json": "1787c2bc18c69a18992b57aebaff62ce92ba8ad818f9bfb34d2390520073a2e0",
+    "static-rollback/smoke-reservation.json": "e67e158762251be3ab0ef01132fa87b6cf1e523e5b7243722a975da56e56d16b",
+    "static-rollback/smoke-result.json": "3e03530011476b5aaf6b1e98582966302e97e2c8245463fb6858f15cc73f6de0",
+    "static-rollback/persistence.json": "f2f33f642bd3a9cdad2aa99d848422a74509a5c384eccf6ab2a11246986c2a28",
+    "static-rollback/after-cleanup.json": "d0c21e5c6724d86f50fff2a23b1366e5938cef10bc7ffd5670ccbe70d3bf1801",
+    "static-rollback/deployment-window-before-smoke.json": "96708f645479cace4d7558157521cd62c901f8926f1985313f43905458059250",
+    "container-observer/events.jsonl": "7d24e375365df22dd2a5a8ff87069548f0d08eb79ecf70343a6d73cf1ea563cf"
+  }
+}
