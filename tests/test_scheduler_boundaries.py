@@ -153,16 +153,18 @@ async def test_provider_readonly_worker_redirects_caches_to_bounded_tmpfs(tmp_pa
         "TORCHINDUCTOR_CACHE_DIR": "/runtime-cache/cache/torchinductor",
         "TRITON_CACHE_DIR": "/runtime-cache/cache/triton",
         "FLASHINFER_WORKSPACE_BASE": "/runtime-cache",
+        "CUDA_CACHE_PATH": "/runtime-cache/cache/cuda",
+        "TMPDIR": "/runtime-cache",
     }
     assert {key: env[key] for key in expected} == expected
     assert env["HF_HUB_OFFLINE"] == env["TRANSFORMERS_OFFLINE"] == "1"
     mounts = [args[i + 1] for i, value in enumerate(args) if value == "--tmpfs"]
     assert mounts == [
         "/tmp:rw,noexec,nosuid,nodev,size=128m",
-        "/runtime-cache:rw,nosuid,nodev,size=1g,uid=10001,gid=10001",
+        "/runtime-cache:rw,exec,nosuid,nodev,size=1g,uid=10001,gid=10001",
     ]
     assert "--read-only" in args and "--pull=never" in args
-    assert "TMPDIR" not in env  # No unverified alternate temporary-directory contract.
+    assert env["TMPDIR"] == "/runtime-cache"
 
 
 class ASREngine:

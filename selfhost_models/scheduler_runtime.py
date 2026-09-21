@@ -123,7 +123,7 @@ class DockerProvider:
                 "--security-opt", "no-new-privileges:true", "--cap-drop", "ALL",
                 "--mount", f"type=bind,source={path},target=/models/current,readonly",
                 "--mount", f"type=bind,source={self.secret_path},target=/run/secrets/worker_key,readonly",
-                "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=128m", "--tmpfs", "/runtime-cache:rw,nosuid,nodev,size=1g,uid=10001,gid=10001",
+                "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=128m", "--tmpfs", "/runtime-cache:rw,exec,nosuid,nodev,size=1g,uid=10001,gid=10001",
                 "-e", "WORKER_API_KEY_FILE=/run/secrets/worker_key", "-e", "HF_HUB_OFFLINE=1", "-e", "TRANSFORMERS_OFFLINE=1",
                 # Official runtime defaults otherwise write under the read-only home.
                 # All caches share the existing bounded, worker-writable tmpfs.
@@ -132,6 +132,7 @@ class DockerProvider:
                 "-e", "VLLM_CACHE_ROOT=/runtime-cache/cache/vllm", "-e", "VLLM_CONFIG_ROOT=/runtime-cache/config/vllm",
                 "-e", "TORCHINDUCTOR_CACHE_DIR=/runtime-cache/cache/torchinductor", "-e", "TRITON_CACHE_DIR=/runtime-cache/cache/triton",
                 "-e", "FLASHINFER_WORKSPACE_BASE=/runtime-cache",
+                "-e", "CUDA_CACHE_PATH=/runtime-cache/cache/cuda", "-e", "TMPDIR=/runtime-cache",
                 "-e", "MODEL_ID=" + dep.model, "-e", "MODEL_REVISION=" + dep.revision,
                 "-e", "MODEL_PROFILE=qwen3_5", "-e", "VIDEO_ENABLED=" + str(int(dep.load.video)),
                 "-e", "VLLM_USE_V2_MODEL_RUNNER=0", "-e", "GPU_MEMORY_UTILIZATION=" + str(dep.load.gpu_memory)]
