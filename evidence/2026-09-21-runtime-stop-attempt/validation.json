@@ -1,5 +1,5 @@
 {
-  "recorded_utc": "2026-09-21T00:05:15.380238+00:00",
+  "recorded_utc": "2026-09-21T00:06:36.882285+00:00",
   "base_commit": "845e8e0cddd457e3ad5a0eeac1cbc5ccd79a30bf",
   "direct_user_approval_received": true,
   "new_window": {
@@ -53,7 +53,7 @@
     "resume-ledger.json": "13e79680748a7d0d84f3bb3ad99bf4e03888764686e6ca6fdcd400dd7b6ff57f"
   },
   "prepared_source_sha256": {
-    "continue_after_manual_quit.py": "e616da5f1dd8004a1a2cbffb0b636e7e45a2f8664fb1be7d1c24fd520b56c940",
+    "continue_after_manual_quit.py": "2a462892fa32f8af10760f7ff5cfc44c59576b54970879ba17f2e8a7fb6923c7",
     "repair_runtime_once.py": "5c8b62a90b85a60318e1e3f82d3d1aa1259ab87242768ccc3641283fe78209f2",
     "runtime_metadata.py": "ff112644c7e17b2eb5c5d37b922e27db6793a8aa30c8ffba25989b8e0880bdfb"
   },

@@ -43,7 +43,8 @@ Win32關閉訊息或另一條CLI代替未批准的動作。main統一請使用�
 .state/scheduler-deployment-20260921/continue_after_manual_quit.py --after-manual-quit
 ```
 
-**只做AST檢查，沒有執行。** 入口沿用原恢復鏈absolute deadline，剩餘不足或到期即在
+**只做AST檢查，沒有執行。** 入口沿用原恢復鏈absolute deadline，至少預留260秒
+（rename20＋start180＋五個只讀命令各10＋收尾10），剩餘不足或到期即在
 建立新receipt目錄前停止；不自動延長480秒。使用者回報後仍須先只讀核對時間与owner，
 由main確認當時有效的有界續作，不能直接照抄上面的入口繞過到期條件。
 
