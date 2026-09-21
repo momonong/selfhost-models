@@ -59,6 +59,18 @@ def submit(s, dep, key, **kwargs):
     return s.submit(SubmitJob.model_validate({**value, **kwargs}), key)[0]
 
 
+def test_pid_default_does_not_rewrite_registered_resource_contract(tmp_path):
+    store, default, _, _ = setup_store(tmp_path)
+    assert default.load.pids == 256
+    explicit = default.model_copy(update={"load": default.load.model_copy(update={"pids": 128})})
+    old_id = store.register(explicit)
+    assert old_id != default.id
+
+    reopened = Store(store.root)
+    assert reopened.deployment(old_id).model_dump() == explicit.model_dump()
+    assert reopened.deployment(default.id).load.pids == 256
+
+
 class FakeProvider:
     def __init__(self):
         self.epoch = "worker-one"

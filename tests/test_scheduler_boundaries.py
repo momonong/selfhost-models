@@ -112,6 +112,7 @@ async def test_provider_relay_uses_python3_in_fixed_worker_image(tmp_path, runti
     created = next(args for args in calls if args[0] == "create")
     assert created[-5:] == ("--entrypoint", "python3", deployment.image, "-m", "worker.relay")
     assert "--pull=never" in created and "--gpus" not in created
+    assert created[created.index("--pids-limit") + 1] == "32"
     assert calls[-2:] == [
         ("network", "connect", provider.network, "synthetic-worker-relay"),
         ("start", "synthetic-worker-relay"),
@@ -119,10 +120,13 @@ async def test_provider_relay_uses_python3_in_fixed_worker_image(tmp_path, runti
 
 
 @pytest.mark.parametrize("runtime", ["vllm", "whisper"])
-async def test_provider_readonly_worker_redirects_caches_to_bounded_tmpfs(tmp_path, runtime):
+@pytest.mark.parametrize("pids", [None, 128])
+async def test_provider_readonly_worker_redirects_caches_to_bounded_tmpfs(tmp_path, runtime, pids):
     from selfhost_models.scheduler_runtime import DockerProvider
     store, qwen, whisper, _ = setup_store(tmp_path)
     deployment = qwen if runtime == "vllm" else whisper
+    if pids is not None:
+        deployment = deployment.model_copy(update={"load": deployment.load.model_copy(update={"pids": pids})})
     calls = []
 
     class LoadCommands(DockerProvider):
@@ -143,6 +147,7 @@ async def test_provider_readonly_worker_redirects_caches_to_bounded_tmpfs(tmp_pa
     provider = LoadCommands(store)
     assert await provider.load(deployment, tmp_path / "asset", "synthetic-worker") == "synthetic-worker-epoch"
     args, = calls
+    assert args[args.index("--pids-limit") + 1] == str(256 if pids is None else pids)
     env = dict(args[i + 1].split("=", 1) for i, value in enumerate(args) if value == "-e")
     expected = {
         "XDG_CACHE_HOME": "/runtime-cache/cache",

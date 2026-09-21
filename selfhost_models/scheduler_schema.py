@@ -34,7 +34,9 @@ class LoadConfig(StrictModel):
     host_memory_gib: Annotated[int, Field(ge=1, le=64)] | None = None
     shm_gib: Annotated[int, Field(ge=1, le=8)] = 2
     cpus: Annotated[int, Field(ge=1, le=6)] = 4
-    pids: Annotated[int, Field(ge=64, le=512)] = 128
+    # Linux counts runtime threads in this limit, including vLLM's paired
+    # NCCL/Gloo groups and the API process, even for a single GPU.
+    pids: Annotated[int, Field(ge=64, le=512)] = 256
 
 
 class Deployment(StrictModel):

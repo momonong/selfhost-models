@@ -195,6 +195,10 @@ static release image 未包含這些能力，不能直接冒充 managed image。
 不會啟動 GPU；建置與 GPU 窗口依各自授權執行，不以這段範例當部署授權。
 Qwen resource 預設保留 shm 2 GiB、無新增 host RAM limit；Whisper 必須明確 RAM≤8 GiB、
 capacity=1、FP16/SDPA。所有變更影響 deployment id。
+Worker 的 PID 上限也包含 Linux threads；預設為256，relay仍為32。
+固定 vLLM 的 API／engine 與多組 NCCL/Gloo 初始化已在128上限重現thread建立失敗。
+已註冊的128設定不會自動改寫；調整後須註冊新的deployment並使用新ID。
+下方Whisper範例的128是明確override；Qwen的256設定仍須在目標主機通過GPU驗收。
 
 以下可作最小 manifest；**先替換 asset_ref 與 image 的全零占位值**。asset_ref 取
 `asset-register` 回傳，image 取已建置 image 的 `docker image inspect --format '{{.Id}}'
@@ -210,7 +214,7 @@ capacity=1、FP16/SDPA。所有變更影響 deployment id。
   "image": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
   "load": {"dtype": "bfloat16", "attention": "runtime", "context": 8192,
            "capacity": 2, "video": true, "gpu_memory": 0.6,
-           "host_memory_gib": null, "shm_gib": 2, "cpus": 4, "pids": 128}
+           "host_memory_gib": null, "shm_gib": 2, "cpus": 4, "pids": 256}
 }
 ```
 
