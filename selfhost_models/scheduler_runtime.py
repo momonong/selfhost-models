@@ -131,6 +131,7 @@ class DockerProvider:
                 "-e", "HF_HOME=/runtime-cache/cache/huggingface",
                 "-e", "VLLM_CACHE_ROOT=/runtime-cache/cache/vllm", "-e", "VLLM_CONFIG_ROOT=/runtime-cache/config/vllm",
                 "-e", "TORCHINDUCTOR_CACHE_DIR=/runtime-cache/cache/torchinductor", "-e", "TRITON_CACHE_DIR=/runtime-cache/cache/triton",
+                "-e", "FLASHINFER_WORKSPACE_BASE=/runtime-cache",
                 "-e", "MODEL_ID=" + dep.model, "-e", "MODEL_REVISION=" + dep.revision,
                 "-e", "MODEL_PROFILE=qwen3_5", "-e", "VIDEO_ENABLED=" + str(int(dep.load.video)),
                 "-e", "VLLM_USE_V2_MODEL_RUNNER=0", "-e", "GPU_MEMORY_UTILIZATION=" + str(dep.load.gpu_memory)]

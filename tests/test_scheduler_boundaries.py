@@ -152,6 +152,7 @@ async def test_provider_readonly_worker_redirects_caches_to_bounded_tmpfs(tmp_pa
         "VLLM_CONFIG_ROOT": "/runtime-cache/config/vllm",
         "TORCHINDUCTOR_CACHE_DIR": "/runtime-cache/cache/torchinductor",
         "TRITON_CACHE_DIR": "/runtime-cache/cache/triton",
+        "FLASHINFER_WORKSPACE_BASE": "/runtime-cache",
     }
     assert {key: env[key] for key in expected} == expected
     assert env["HF_HUB_OFFLINE"] == env["TRANSFORMERS_OFFLINE"] == "1"
