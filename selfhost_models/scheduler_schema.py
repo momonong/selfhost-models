@@ -115,7 +115,8 @@ class SchedulerConfig(StrictModel):
     retention_seconds: Annotated[int, Field(ge=60, le=31536000)] = 604800
     reuse_dispatches: Annotated[int, Field(ge=1, le=100)] = 3
     aging_seconds: Annotated[int, Field(ge=1, le=3600)] = 60
-    load_seconds: Annotated[int, Field(ge=1, le=600)] = 180
+    # Cold, read-only vLLM startup includes profiling and runtime compilation.
+    load_seconds: Annotated[int, Field(ge=1, le=600)] = 300
     warmup_seconds: Annotated[int, Field(ge=1, le=600)] = 180
     drain_seconds: Annotated[int, Field(ge=1, le=1200)] = 600
     unload_seconds: Annotated[int, Field(ge=1, le=600)] = 60

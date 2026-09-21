@@ -199,6 +199,9 @@ Worker 的 PID 上限也包含 Linux threads；預設為256，relay仍為32。
 固定 vLLM 的 API／engine 與多組 NCCL/Gloo 初始化已在128上限重現thread建立失敗。
 已註冊的128設定不會自動改寫；調整後須註冊新的deployment並使用新ID。
 下方Whisper範例的128是明確override；Qwen的256設定仍須在目標主機通過GPU驗收。
+載入預設上限為300秒（可設定1–600秒），暖機另有180秒上限。
+固定CPU4、唯讀root與空runtime cache的Qwen冷啟動曾量到約210秒；
+PID修正後仍可能超過原180秒。逾時仍進入unknown，不自動延長、採用既有worker或重送工作。
 
 以下可作最小 manifest；**先替換 asset_ref 與 image 的全零占位值**。asset_ref 取
 `asset-register` 回傳，image 取已建置 image 的 `docker image inspect --format '{{.Id}}'
