@@ -47,6 +47,11 @@ client generation。接續 SSE detach 收到 non-200，歷史 driver 未保存 s
 身分、lease／pin、GPU／host headroom，以及新的有界窗口和預算；不得沿用舊 RESOURCE GO。
 模型 ready、HTTP 200 或 CPU 測試均不構成產品品質、人類驗收或穩定版承諾。
 
+已討論但未授權的方向：現行 `SubmitJob` 只支持 `chat`／`transcribe`，訓練尚未實作。
+二階段方向為實驗室異質 GPU、位於不同 VPN 的 workers、NAS 權重來源搭配本地 cache，
+以及可選的 pCloud 資料／結果／checkpoint；三階段方向為國網／GCP／AWS。訓練與推論
+都可能是長期需求。以上僅保存討論方向，不擴張本輪發布範圍、測試或 GPU 授權。
+
 ## 協調入口
 
 - main2：`01a0ccaf-edbe-7ca1-8815-f96bc0373d0a`，取代舊 main1，負責方向與驗收。
@@ -54,5 +59,5 @@ client generation。接續 SSE detach 收到 non-200，歷史 driver 未保存 s
 - 原 scheduler task：`01a0bd41-849b-76d1-8e93-83ec1c627911`，沿用原工作目錄及
   `feat/single-host-scheduler`，起點 `9ae9ff37cd47511ccd509a38b91111721a490a07`。
 
-未纳入 Gemma 分支，未新增 worktree。未來支援更多模型與正式 managed 服務是待決策方向，
+未納入 Gemma 分支，未新增 worktree。未來支援更多模型與正式 managed 服務是待決策方向，
 不構成本次執行授權。新的 main 應先閱讀此頁、精確發布證據，再透過 orchestrate 接續。

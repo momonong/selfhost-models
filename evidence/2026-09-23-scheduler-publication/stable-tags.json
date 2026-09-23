@@ -1,0 +1,397 @@
+{
+  "before": {
+    "observed_at": "2026-09-23T05:20:32.282157+00:00",
+    "images": [
+      {
+        "repository": "momonong/selfhost-models-api",
+        "tag": "0.2.0",
+        "status": 200,
+        "digest": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:3fc4521c7da293796984130af42540f20ac4605420c69c172127cb22429c1423",
+        "config_digest": "sha256:e02c36c3ce273ea59a3d16adac3d7deb34185db9050c6d0174aab2238423627e",
+        "labels": {
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "selfhost_models.api:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 10
+      },
+      {
+        "repository": "momonong/selfhost-models-api",
+        "tag": "latest",
+        "status": 200,
+        "digest": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:3fc4521c7da293796984130af42540f20ac4605420c69c172127cb22429c1423",
+        "config_digest": "sha256:e02c36c3ce273ea59a3d16adac3d7deb34185db9050c6d0174aab2238423627e",
+        "labels": {
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "selfhost_models.api:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 10
+      },
+      {
+        "repository": "momonong/selfhost-models-vllm",
+        "tag": "0.2.0",
+        "status": 200,
+        "digest": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:4fbc5f90d5594a440f15f5ba3127945588691cca4f1e59662e921c706dc79965",
+        "config_digest": "sha256:b2f76f993a96372918afd86476fb7df65e6b153a90dabf3160f9ba408aa5b15e",
+        "labels": {
+          "org.opencontainers.image.ref.name": "ubuntu",
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.url": "https://buildkite.com/vllm/release-v2/builds/6292",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": [
+          "python3",
+          "/opt/selfhost/launch.py"
+        ],
+        "command": null,
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 39
+      },
+      {
+        "repository": "momonong/selfhost-models-vllm",
+        "tag": "latest",
+        "status": 200,
+        "digest": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:4fbc5f90d5594a440f15f5ba3127945588691cca4f1e59662e921c706dc79965",
+        "config_digest": "sha256:b2f76f993a96372918afd86476fb7df65e6b153a90dabf3160f9ba408aa5b15e",
+        "labels": {
+          "org.opencontainers.image.ref.name": "ubuntu",
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.url": "https://buildkite.com/vllm/release-v2/builds/6292",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": [
+          "python3",
+          "/opt/selfhost/launch.py"
+        ],
+        "command": null,
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 39
+      },
+      {
+        "repository": "momonong/selfhost-models-transformers",
+        "tag": "0.2.0",
+        "status": 200,
+        "digest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:5671572c2a699d8b8350ca865bf6aadf54849e12a85d6def324f842f058a6cb2",
+        "config_digest": "sha256:0af5be4cd0719af28ec34240cf0d3b9c83d5c8e2761d3d5fd3a968186cade1b7",
+        "labels": {
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "worker.transformers_app:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 13
+      },
+      {
+        "repository": "momonong/selfhost-models-transformers",
+        "tag": "latest",
+        "status": 200,
+        "digest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:5671572c2a699d8b8350ca865bf6aadf54849e12a85d6def324f842f058a6cb2",
+        "config_digest": "sha256:0af5be4cd0719af28ec34240cf0d3b9c83d5c8e2761d3d5fd3a968186cade1b7",
+        "labels": {
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "worker.transformers_app:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 13
+      }
+    ]
+  },
+  "after": {
+    "observed_at": "2026-09-23T05:33:44.785740+00:00",
+    "images": [
+      {
+        "repository": "momonong/selfhost-models-api",
+        "tag": "0.2.0",
+        "status": 200,
+        "digest": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:3fc4521c7da293796984130af42540f20ac4605420c69c172127cb22429c1423",
+        "config_digest": "sha256:e02c36c3ce273ea59a3d16adac3d7deb34185db9050c6d0174aab2238423627e",
+        "labels": {
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "selfhost_models.api:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 10
+      },
+      {
+        "repository": "momonong/selfhost-models-api",
+        "tag": "latest",
+        "status": 200,
+        "digest": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:3fc4521c7da293796984130af42540f20ac4605420c69c172127cb22429c1423",
+        "config_digest": "sha256:e02c36c3ce273ea59a3d16adac3d7deb34185db9050c6d0174aab2238423627e",
+        "labels": {
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "selfhost_models.api:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 10
+      },
+      {
+        "repository": "momonong/selfhost-models-vllm",
+        "tag": "0.2.0",
+        "status": 200,
+        "digest": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:4fbc5f90d5594a440f15f5ba3127945588691cca4f1e59662e921c706dc79965",
+        "config_digest": "sha256:b2f76f993a96372918afd86476fb7df65e6b153a90dabf3160f9ba408aa5b15e",
+        "labels": {
+          "org.opencontainers.image.ref.name": "ubuntu",
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.url": "https://buildkite.com/vllm/release-v2/builds/6292",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": [
+          "python3",
+          "/opt/selfhost/launch.py"
+        ],
+        "command": null,
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 39
+      },
+      {
+        "repository": "momonong/selfhost-models-vllm",
+        "tag": "latest",
+        "status": 200,
+        "digest": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:4fbc5f90d5594a440f15f5ba3127945588691cca4f1e59662e921c706dc79965",
+        "config_digest": "sha256:b2f76f993a96372918afd86476fb7df65e6b153a90dabf3160f9ba408aa5b15e",
+        "labels": {
+          "org.opencontainers.image.ref.name": "ubuntu",
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.url": "https://buildkite.com/vllm/release-v2/builds/6292",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": [
+          "python3",
+          "/opt/selfhost/launch.py"
+        ],
+        "command": null,
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 39
+      },
+      {
+        "repository": "momonong/selfhost-models-transformers",
+        "tag": "0.2.0",
+        "status": 200,
+        "digest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:5671572c2a699d8b8350ca865bf6aadf54849e12a85d6def324f842f058a6cb2",
+        "config_digest": "sha256:0af5be4cd0719af28ec34240cf0d3b9c83d5c8e2761d3d5fd3a968186cade1b7",
+        "labels": {
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "worker.transformers_app:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 13
+      },
+      {
+        "repository": "momonong/selfhost-models-transformers",
+        "tag": "latest",
+        "status": 200,
+        "digest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:5671572c2a699d8b8350ca865bf6aadf54849e12a85d6def324f842f058a6cb2",
+        "config_digest": "sha256:0af5be4cd0719af28ec34240cf0d3b9c83d5c8e2761d3d5fd3a968186cade1b7",
+        "labels": {
+          "org.opencontainers.image.revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "0.2.0"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "worker.transformers_app:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 13
+      }
+    ]
+  },
+  "all_six_unchanged": true
+}

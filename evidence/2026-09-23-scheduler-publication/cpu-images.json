@@ -1,0 +1,99 @@
+{
+  "source_revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+  "scope": "CPU fixtures; no model mounts or GPU access",
+  "images": [
+    {
+      "image": "api",
+      "source_files_verified": 18,
+      "checks": [
+        "source_bytes",
+        "no_gpu_devices",
+        "api_auth",
+        "catalog_without_model",
+        "unready_models",
+        "strict_jobs",
+        "sqlite_fixture"
+      ],
+      "runtime": {
+        "python": "3.12.14",
+        "package": "0.2.0",
+        "uvicorn": "0.35.0"
+      },
+      "model_loads": 0,
+      "gpu_generations": 0,
+      "result": "PASS",
+      "image_id": "sha256:f4e410e8a097d1c53d2ea8bbb36a48767b309a548bb432dfaf9fcba253908b2a",
+      "container_id": "fd56458d8e03ca94283a9ef2b26636297e79c4d50081500bec20f647f576f4db",
+      "runtime_isolation": "runc; network none; no devices; read-only root",
+      "exit_code": 0,
+      "temporary_container_removed": true,
+      "source_manifest_raw_crlf_sha256": "4d3ea88ef5c3df6a862ad693a80a71b6618c0d7ecb704497f9720f19a791fa03",
+      "source_manifest_git_lf_sha256": "ef25d6fad5538eea6992d0dc15f607583fe272ed540ca268616a009fd96942d4"
+    },
+    {
+      "image": "vllm",
+      "source_files_verified": 3,
+      "checks": [
+        "source_bytes",
+        "no_gpu_devices",
+        "worker_secret_and_allowlist",
+        "relay_secret_body_epoch",
+        "cuda_not_initialized"
+      ],
+      "runtime": {
+        "python": "3.12.3",
+        "torch": "2.13.0+cu130",
+        "cuda_build": "13.0",
+        "vllm": "0.29.0"
+      },
+      "model_loads": 0,
+      "gpu_generations": 0,
+      "result": "PASS",
+      "image_id": "sha256:fdebb477430924ab768ce6db0d2294f2f8d5c693abd5589275fb9fcfb2819655",
+      "container_id": "5278d14a88f90917a1ba00bc3b8fa2dccbf31190eb68bc262c02f1910d67dc99",
+      "runtime_isolation": "runc; network none; no devices; read-only root",
+      "exit_code": 0,
+      "temporary_container_removed": true,
+      "source_manifest_raw_crlf_sha256": "fed22562ccdd07b99bcb4fa2b251f345a8837dac6ab327765e2735279878b9f3",
+      "source_manifest_git_lf_sha256": "d2bb0667ce98d831ffccd9b0443847887c714fe050273fc46f13fb9a86aa6583"
+    },
+    {
+      "image": "whisper",
+      "source_files_verified": 27,
+      "checks": [
+        "source_bytes",
+        "no_gpu_devices",
+        "whisper_synthetic_cancel_keeps_compute",
+        "whisper_capacity",
+        "whisper_input_bound",
+        "worker_secret_and_allowlist",
+        "relay_secret_body_epoch",
+        "cuda_not_initialized"
+      ],
+      "runtime": {
+        "python": "3.12.3",
+        "torch": "2.13.0+cu130",
+        "cuda_build": "13.0",
+        "transformers": "5.16.1"
+      },
+      "model_loads": 0,
+      "gpu_generations": 0,
+      "result": "PASS",
+      "image_id": "sha256:fcce6a4a9bdb31edbb2b2270d0bb05211ebb06bf50b68372ea966009595a4953",
+      "container_id": "11fe62ce3a61221f6607127ba2e112b1c74377225231d9568d763e5358eb2eea",
+      "runtime_isolation": "runc; network none; no devices; read-only root",
+      "exit_code": 0,
+      "temporary_container_removed": true,
+      "source_manifest_raw_crlf_sha256": "a454bc2ede3480d7737ba81df7eca18816cffebdfea20a2be78b7e1d6c8c9ca4",
+      "source_manifest_git_lf_sha256": "2c08e89506b9d595bae1d49abbab12ad15af8c9172741c50289fc03788c9de2d"
+    }
+  ],
+  "completed_at": "2026-09-23T05:31:33.080599+00:00",
+  "probe_correction": {
+    "image": "whisper",
+    "initial_exit_code": 1,
+    "reason": "The external probe script path omitted /app from sys.path; the image entrypoint uses python -m uvicorn from /app. Probe corrected to match that import context. Image source unchanged.",
+    "failed_container_removed": true,
+    "retry_result": "PASS"
+  }
+}

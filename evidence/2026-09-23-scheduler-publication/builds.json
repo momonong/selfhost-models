@@ -1,0 +1,56 @@
+{
+  "source_revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+  "tag": "scheduler-dev-20260923-c7f35e14911e",
+  "platform": "linux/amd64",
+  "channel": "candidate",
+  "gpu_acceptance": "incomplete-paused",
+  "images": [
+    {
+      "repository": "momonong/selfhost-models-api",
+      "tag": "scheduler-dev-20260923-c7f35e14911e",
+      "image_id": "sha256:f4e410e8a097d1c53d2ea8bbb36a48767b309a548bb432dfaf9fcba253908b2a",
+      "dockerfile": "docker/api.Dockerfile",
+      "seconds": 19.83,
+      "completed_at": "2026-09-23T05:28:00.671407+00:00",
+      "labels": {
+        "org.opencontainers.image.revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+        "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+        "org.opencontainers.image.version": "scheduler-dev-20260923-c7f35e14911e",
+        "org.selfhost-models.gpu-acceptance": "incomplete-paused",
+        "org.selfhost-models.release-channel": "candidate"
+      }
+    },
+    {
+      "repository": "momonong/selfhost-models-vllm",
+      "tag": "scheduler-dev-20260923-c7f35e14911e",
+      "image_id": "sha256:fdebb477430924ab768ce6db0d2294f2f8d5c693abd5589275fb9fcfb2819655",
+      "dockerfile": "docker/worker.Dockerfile",
+      "seconds": 1.86,
+      "completed_at": "2026-09-23T05:28:02.529555+00:00",
+      "labels": {
+        "org.opencontainers.image.ref.name": "ubuntu",
+        "org.opencontainers.image.revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+        "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+        "org.opencontainers.image.url": "https://buildkite.com/vllm/release-v2/builds/6292",
+        "org.opencontainers.image.version": "scheduler-dev-20260923-c7f35e14911e",
+        "org.selfhost-models.gpu-acceptance": "incomplete-paused",
+        "org.selfhost-models.release-channel": "candidate"
+      }
+    },
+    {
+      "repository": "momonong/selfhost-models-whisper",
+      "tag": "scheduler-dev-20260923-c7f35e14911e",
+      "image_id": "sha256:fcce6a4a9bdb31edbb2b2270d0bb05211ebb06bf50b68372ea966009595a4953",
+      "dockerfile": "docker/whisper.Dockerfile",
+      "seconds": 18.78,
+      "completed_at": "2026-09-23T05:28:21.303231+00:00",
+      "labels": {
+        "org.opencontainers.image.revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+        "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+        "org.opencontainers.image.version": "scheduler-dev-20260923-c7f35e14911e",
+        "org.selfhost-models.gpu-acceptance": "incomplete-paused",
+        "org.selfhost-models.release-channel": "candidate"
+      }
+    }
+  ]
+}

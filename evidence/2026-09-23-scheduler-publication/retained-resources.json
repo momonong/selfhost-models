@@ -1,0 +1,207 @@
+{
+  "before": {
+    "observed_at": "2026-09-23T05:26:40.125141+00:00",
+    "read_only": true,
+    "databases": {
+      "acceptance-repair-20260921": {
+        "controller": {
+          "epoch": 3,
+          "phase": "ready",
+          "worker_epoch": "783a13681a1c4121bc0db59897453c20",
+          "heartbeat": 1789964680.3349903
+        },
+        "budget": {
+          "loads": 2,
+          "generations": 18
+        },
+        "leases": [],
+        "jobs": [
+          {
+            "state": "failed",
+            "result_state": "none",
+            "count": 1
+          },
+          {
+            "state": "succeeded",
+            "result_state": "available",
+            "count": 1
+          }
+        ],
+        "model_pin_count": 1,
+        "engine_cleanup_count": 0
+      },
+      "managed-repair-20260921": {
+        "controller": {
+          "epoch": 0,
+          "phase": "unloaded",
+          "worker_epoch": null,
+          "heartbeat": 0.0
+        },
+        "budget": {
+          "loads": 0,
+          "generations": 0
+        },
+        "leases": [],
+        "jobs": [],
+        "model_pin_count": 0,
+        "engine_cleanup_count": 0
+      }
+    },
+    "units": {
+      "selfhost-scheduler-repair-api.service": {
+        "MainPID": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      },
+      "selfhost-scheduler-repair-controller.service": {
+        "MainPID": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    }
+  },
+  "after": {
+    "observed_at": "2026-09-23T05:32:55.186909+00:00",
+    "read_only": true,
+    "databases": {
+      "acceptance-repair-20260921": {
+        "controller": {
+          "epoch": 3,
+          "phase": "ready",
+          "worker_epoch": "783a13681a1c4121bc0db59897453c20",
+          "heartbeat": 1789964680.3349903
+        },
+        "budget": {
+          "loads": 2,
+          "generations": 18
+        },
+        "leases": [],
+        "jobs": [
+          {
+            "state": "failed",
+            "result_state": "none",
+            "count": 1
+          },
+          {
+            "state": "succeeded",
+            "result_state": "available",
+            "count": 1
+          }
+        ],
+        "model_pin_count": 1,
+        "engine_cleanup_count": 0
+      },
+      "managed-repair-20260921": {
+        "controller": {
+          "epoch": 0,
+          "phase": "unloaded",
+          "worker_epoch": null,
+          "heartbeat": 0.0
+        },
+        "budget": {
+          "loads": 0,
+          "generations": 0
+        },
+        "leases": [],
+        "jobs": [],
+        "model_pin_count": 0,
+        "engine_cleanup_count": 0
+      }
+    },
+    "units": {
+      "selfhost-scheduler-repair-api.service": {
+        "MainPID": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      },
+      "selfhost-scheduler-repair-controller.service": {
+        "MainPID": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead"
+      }
+    }
+  },
+  "counters_and_units_unchanged": true,
+  "runtime": {
+    "observed_at": "2026-09-23T05:33:07.228421+00:00",
+    "read_only": true,
+    "selfhost_containers": [
+      {
+        "id": "aa57278014b346d6ca11b420b719824e8f0981f78eb8a4d9963a4a6de0439c09",
+        "image_id": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+        "name": "selfhost-scheduler-599585822f9da374-3-8c9ac5f358c1-relay",
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Pid": 16200,
+          "StartedAt": "2026-09-21T04:17:32.495415148Z",
+          "FinishedAt": "0001-01-01T00:00:00Z",
+          "ExitCode": 0
+        },
+        "runtime": "runc",
+        "gpu_requests": 0
+      },
+      {
+        "id": "5c5d1d8489084caf6488342ed4fe9ff177078c58e2b5131331e560b75ed56129",
+        "image_id": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+        "name": "selfhost-scheduler-599585822f9da374-3-8c9ac5f358c1",
+        "state": {
+          "Status": "running",
+          "Running": true,
+          "Pid": 16128,
+          "StartedAt": "2026-09-21T04:17:31.961731884Z",
+          "FinishedAt": "0001-01-01T00:00:00Z",
+          "ExitCode": 0
+        },
+        "runtime": "runc",
+        "gpu_requests": 1
+      },
+      {
+        "id": "f35e32eed86cdbbfd436949f9d4b13e2e6d79eeca0ed5dbb769505ac0a0251b2",
+        "image_id": "sha256:04c47cc62471c2a101bda23f911f0f00a78b6081803cadee09b4c98e2888101f",
+        "name": "selfhost-models-api-1",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Pid": 0,
+          "StartedAt": "2026-09-21T03:31:46.728303586Z",
+          "FinishedAt": "2026-09-21T03:56:44.78583288Z",
+          "ExitCode": 0
+        },
+        "runtime": "runc",
+        "gpu_requests": 0
+      },
+      {
+        "id": "5036e914ce6db9007027178596015724c5d13837f16924cdbadeb076e540fbc9",
+        "image_id": "sha256:d209ab188d96f9bce180cf59fffefb3fe021de71e34c85dd8d0893800736491c",
+        "name": "selfhost-models-worker-1",
+        "state": {
+          "Status": "exited",
+          "Running": false,
+          "Pid": 0,
+          "StartedAt": "2026-09-21T03:31:46.718977725Z",
+          "FinishedAt": "2026-09-21T03:56:48.475561142Z",
+          "ExitCode": 0
+        },
+        "runtime": "runc",
+        "gpu_requests": 1
+      }
+    ],
+    "other_running_gpu_container_count": 3,
+    "gpu_query_fields": [
+      "name",
+      "memory.total_MiB",
+      "memory.used_MiB",
+      "utilization.gpu_percent"
+    ],
+    "gpu_sample": [
+      "NVIDIA GeForce RTX 5090 Laptop GPU",
+      "24463",
+      "20264",
+      "1"
+    ],
+    "default_runtime": "runc",
+    "temporary_publication_containers": []
+  },
+  "warning": "Persisted phase=ready and zero request leases are not a live readiness or GPU availability claim. No model loads, inference, restarts, or unloads in this publication."
+}

@@ -1,0 +1,23 @@
+{
+  "source_revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+  "files": [
+    {
+      "source_path": "worker/identity.py",
+      "image_path": "/opt/selfhost/identity.py",
+      "sha256": "78de79f5746e67e0f0c456564df9cab23dff7f6428bda82d1e0c60d04961815f",
+      "git_lf_sha256": "78de79f5746e67e0f0c456564df9cab23dff7f6428bda82d1e0c60d04961815f"
+    },
+    {
+      "source_path": "worker/launch.py",
+      "image_path": "/opt/selfhost/launch.py",
+      "sha256": "3f60ca98c123dc5f2bb7f39f2391558b25e43b66d84dcb99f86e093b27eae8e0",
+      "git_lf_sha256": "97b4c9d3f954fff8fd0977ecb84beefbfea368d7e3f99fd7ebdfa8875376daa6"
+    },
+    {
+      "source_path": "worker/relay.py",
+      "image_path": "/opt/selfhost/worker/relay.py",
+      "sha256": "478f6d80dd3fbdf30bb67744f60fecd98474822ed33aba5a5dbbf3bed5bb5285",
+      "git_lf_sha256": "478f6d80dd3fbdf30bb67744f60fecd98474822ed33aba5a5dbbf3bed5bb5285"
+    }
+  ]
+}

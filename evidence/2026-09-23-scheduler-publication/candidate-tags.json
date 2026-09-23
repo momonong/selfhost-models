@@ -1,0 +1,146 @@
+{
+  "before": {
+    "observed_at": "2026-09-23T05:31:59.835050+00:00",
+    "authenticated": true,
+    "images": [
+      {
+        "repository": "momonong/selfhost-models-api",
+        "tag": "scheduler-dev-20260923-c7f35e14911e",
+        "status": 404,
+        "error_codes": [
+          "MANIFEST_UNKNOWN"
+        ]
+      },
+      {
+        "repository": "momonong/selfhost-models-vllm",
+        "tag": "scheduler-dev-20260923-c7f35e14911e",
+        "status": 404,
+        "error_codes": [
+          "MANIFEST_UNKNOWN"
+        ]
+      },
+      {
+        "repository": "momonong/selfhost-models-whisper",
+        "tag": "scheduler-dev-20260923-c7f35e14911e",
+        "status": 404,
+        "error_codes": [
+          "MANIFEST_UNKNOWN"
+        ]
+      }
+    ]
+  },
+  "after": {
+    "source_revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+    "tag": "scheduler-dev-20260923-c7f35e14911e",
+    "images": [
+      {
+        "repository": "momonong/selfhost-models-api",
+        "tag": "scheduler-dev-20260923-c7f35e14911e",
+        "status": 200,
+        "digest": "sha256:f4e410e8a097d1c53d2ea8bbb36a48767b309a548bb432dfaf9fcba253908b2a",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:4e0abe9f570fc6bb104acd62ae970723a4abb4c5bee6739fca8d37b757c3fa05",
+        "config_digest": "sha256:8c4b4683fbdcc5e89172fcd81cd06b58b5a40794282f1c112dcdad5631b1c5b4",
+        "labels": {
+          "org.opencontainers.image.revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "scheduler-dev-20260923-c7f35e14911e",
+          "org.selfhost-models.gpu-acceptance": "incomplete-paused",
+          "org.selfhost-models.release-channel": "candidate"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "selfhost_models.api:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 10,
+        "seconds": 13.92,
+        "verified_at": "2026-09-23T05:32:16.022541+00:00"
+      },
+      {
+        "repository": "momonong/selfhost-models-vllm",
+        "tag": "scheduler-dev-20260923-c7f35e14911e",
+        "status": 200,
+        "digest": "sha256:fdebb477430924ab768ce6db0d2294f2f8d5c693abd5589275fb9fcfb2819655",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:e7885044b9e9700915473fe0ea066fd2a798031428a042ef28542ea30deed59f",
+        "config_digest": "sha256:1cef6a3ee8456820a1b4f168e47d8ef65bf72fa296056d76827cc605277fd208",
+        "labels": {
+          "org.opencontainers.image.ref.name": "ubuntu",
+          "org.opencontainers.image.revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.url": "https://buildkite.com/vllm/release-v2/builds/6292",
+          "org.opencontainers.image.version": "scheduler-dev-20260923-c7f35e14911e",
+          "org.selfhost-models.gpu-acceptance": "incomplete-paused",
+          "org.selfhost-models.release-channel": "candidate"
+        },
+        "entrypoint": [
+          "python3",
+          "/opt/selfhost/launch.py"
+        ],
+        "command": null,
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 40,
+        "seconds": 8.66,
+        "verified_at": "2026-09-23T05:32:24.687175+00:00"
+      },
+      {
+        "repository": "momonong/selfhost-models-whisper",
+        "tag": "scheduler-dev-20260923-c7f35e14911e",
+        "status": 200,
+        "digest": "sha256:fcce6a4a9bdb31edbb2b2270d0bb05211ebb06bf50b68372ea966009595a4953",
+        "media_type": "application/vnd.oci.image.index.v1+json",
+        "platform_digest": "sha256:6fde9443341560e93e08da832fc34d988c60269bc8ae7a9d016a716074d1cefc",
+        "config_digest": "sha256:e329cad95d9a26e55a6f5dc2b1d8c101d0e8ef1eea7d66379b0ec8cc43f5a4ac",
+        "labels": {
+          "org.opencontainers.image.revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+          "org.opencontainers.image.source": "https://github.com/momonong/selfhost-models",
+          "org.opencontainers.image.version": "scheduler-dev-20260923-c7f35e14911e",
+          "org.selfhost-models.gpu-acceptance": "incomplete-paused",
+          "org.selfhost-models.release-channel": "candidate"
+        },
+        "entrypoint": null,
+        "command": [
+          "python",
+          "-m",
+          "uvicorn",
+          "worker.whisper_app:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "8000",
+          "--workers",
+          "1",
+          "--no-access-log",
+          "--timeout-graceful-shutdown",
+          "5"
+        ],
+        "platform": {
+          "os": "linux",
+          "architecture": "amd64"
+        },
+        "layer_count": 13,
+        "seconds": 13.75,
+        "verified_at": "2026-09-23T05:32:38.428941+00:00"
+      }
+    ]
+  }
+}

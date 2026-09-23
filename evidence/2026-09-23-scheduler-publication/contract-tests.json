@@ -1,0 +1,15 @@
+{
+  "tested_source_revision": "89799facef013d439a6cd6643b092c722ab80170",
+  "candidate_source_revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+  "subsequent_changes": "documentation/evidence only",
+  "environment": {
+    "os": "Windows",
+    "python": "3.12.14",
+    "uv": "0.11.21"
+  },
+  "command": "PYTHONUTF8=1 uv run --locked --offline pytest -q --basetemp <ignored-local-test-directory>",
+  "result": "186 passed in 21.75s",
+  "exit_code": 0,
+  "raw_log_sha256": "75b37b4d1b4f0ca611f8f9ee67ef64e8e166cc861d7b82982ecef1a0d589273a",
+  "scope": "CPU contracts and controlled subprocess fixtures; not GPU acceptance"
+}

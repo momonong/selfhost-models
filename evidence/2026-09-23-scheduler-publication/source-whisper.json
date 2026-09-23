@@ -1,0 +1,167 @@
+{
+  "source_revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+  "files": [
+    {
+      "source_path": "selfhost_models/__init__.py",
+      "image_path": "/app/selfhost_models/__init__.py",
+      "sha256": "d03eacad88bd7a33d49f0a635660e8241fa832e06a3d288fe742cf46833c1b42",
+      "git_lf_sha256": "667d4a15b970b851e20d17510224670c14646cfb6d5a1e388ca6b9cc6da8bf41"
+    },
+    {
+      "source_path": "selfhost_models/api.py",
+      "image_path": "/app/selfhost_models/api.py",
+      "sha256": "6e5a2df1b89f01c5e99c67738f1d4d0a26ab21da72011c14673259ba093cc9c2",
+      "git_lf_sha256": "66baa3628c6daeaa8a08f734772927d76474e9ec3a7bb8d5fe298feaee01951a"
+    },
+    {
+      "source_path": "selfhost_models/assets.py",
+      "image_path": "/app/selfhost_models/assets.py",
+      "sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+      "git_lf_sha256": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8"
+    },
+    {
+      "source_path": "selfhost_models/backend.py",
+      "image_path": "/app/selfhost_models/backend.py",
+      "sha256": "c717bddcee0f67680ee7d68ea373a2a0513a5abfc7fac483e0c3163c9aa97631",
+      "git_lf_sha256": "59eb1aca6cd1ee9c78258d3304ee83063f818804c3df43ac1f3f58004a9fbbd1"
+    },
+    {
+      "source_path": "selfhost_models/capabilities.py",
+      "image_path": "/app/selfhost_models/capabilities.py",
+      "sha256": "50dc71e00f5edbd254e18c96a9d9b4f0e7cbbab41270d3c37cdc74c53d0cb547",
+      "git_lf_sha256": "242e9432fcb5ea54020f01e5d9d75b79e7dce374ee1e2a76c09ff6afa6b5c015"
+    },
+    {
+      "source_path": "selfhost_models/cli.py",
+      "image_path": "/app/selfhost_models/cli.py",
+      "sha256": "dad8373b4b5dfae516e4bece884ce999d899d58103054560f4e97b4adbabfd2f",
+      "git_lf_sha256": "4c3e08469206c64e706022c8e199d34ac6f3a0857476431c31ec96928e53d748"
+    },
+    {
+      "source_path": "selfhost_models/gpu_ownership.py",
+      "image_path": "/app/selfhost_models/gpu_ownership.py",
+      "sha256": "dabe3f31e7761e905b0bb4114ed50099258f9057c063f989c10b63df64c052c2",
+      "git_lf_sha256": "dabe3f31e7761e905b0bb4114ed50099258f9057c063f989c10b63df64c052c2"
+    },
+    {
+      "source_path": "selfhost_models/scheduler_api.py",
+      "image_path": "/app/selfhost_models/scheduler_api.py",
+      "sha256": "bf9c9f1b1c87ab3f92a5a8bce13bb17f431fd67b741220e9c5dc4b3777a89367",
+      "git_lf_sha256": "bf9c9f1b1c87ab3f92a5a8bce13bb17f431fd67b741220e9c5dc4b3777a89367"
+    },
+    {
+      "source_path": "selfhost_models/scheduler_cli.py",
+      "image_path": "/app/selfhost_models/scheduler_cli.py",
+      "sha256": "7717476b9e160b1535487b230c3e01d18431d7e6738ed7a3b737ef53f2cf137c",
+      "git_lf_sha256": "b85184dccdda45ee38a91dd649a34d459c0b03bd9fa2c0ef28ddf9932ebfd29f"
+    },
+    {
+      "source_path": "selfhost_models/scheduler_controller.py",
+      "image_path": "/app/selfhost_models/scheduler_controller.py",
+      "sha256": "56075164ce4177434d3a2e4aa7f46ec5ade9901bd371d0a4a0d71af40d0d154b",
+      "git_lf_sha256": "56075164ce4177434d3a2e4aa7f46ec5ade9901bd371d0a4a0d71af40d0d154b"
+    },
+    {
+      "source_path": "selfhost_models/scheduler_runtime.py",
+      "image_path": "/app/selfhost_models/scheduler_runtime.py",
+      "sha256": "a64abfb52648d9e7246502aac174d56f9ebfaf5381492a51a8a2b8d77366690b",
+      "git_lf_sha256": "a64abfb52648d9e7246502aac174d56f9ebfaf5381492a51a8a2b8d77366690b"
+    },
+    {
+      "source_path": "selfhost_models/scheduler_schema.py",
+      "image_path": "/app/selfhost_models/scheduler_schema.py",
+      "sha256": "ca09c6717514c407c5905d54eb71b9105e1d613a358b32b908f23d4c637b65e7",
+      "git_lf_sha256": "ca09c6717514c407c5905d54eb71b9105e1d613a358b32b908f23d4c637b65e7"
+    },
+    {
+      "source_path": "selfhost_models/scheduler_store.py",
+      "image_path": "/app/selfhost_models/scheduler_store.py",
+      "sha256": "72a796d2287cf8890a85230540a518e1ca9f285b4a2da0ad8d3a3a06ca44dc98",
+      "git_lf_sha256": "72a796d2287cf8890a85230540a518e1ca9f285b4a2da0ad8d3a3a06ca44dc98"
+    },
+    {
+      "source_path": "selfhost_models/schema.py",
+      "image_path": "/app/selfhost_models/schema.py",
+      "sha256": "ad50bf1273f22db8d124c530d4ec4d00a2aa8acf5f9faa86d0d62bbf19794485",
+      "git_lf_sha256": "9f6fea574f955feb236d48cc054f51619d3462099423dcaae510a7dd93f0d277"
+    },
+    {
+      "source_path": "selfhost_models/storage.py",
+      "image_path": "/app/selfhost_models/storage.py",
+      "sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+      "git_lf_sha256": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4"
+    },
+    {
+      "source_path": "selfhost_models/video.py",
+      "image_path": "/app/selfhost_models/video.py",
+      "sha256": "11f39ac6aad5dbcb84a18e1cf34dd58f778c4a63c972046d34927f6d680fc51c",
+      "git_lf_sha256": "de3d0384ffe99a62225c7e15a36c20c7ec7918d1e0b51db9c908bb0a55d6b985"
+    },
+    {
+      "source_path": "selfhost_models/video_decoder.py",
+      "image_path": "/app/selfhost_models/video_decoder.py",
+      "sha256": "d28044795ce8676972e9fb8e5e6faf15d398b54aed99bd2f3cb8abacf065801d",
+      "git_lf_sha256": "b343087e2c837b1fc3f55f8ab579be4d39cdeb987511105f5802bf157b1cc699"
+    },
+    {
+      "source_path": "selfhost_models/wav.py",
+      "image_path": "/app/selfhost_models/wav.py",
+      "sha256": "3f08602b11ee6e95be046452c9add6eb4ac6b68d2ed00058c140ca22c55e5687",
+      "git_lf_sha256": "3f08602b11ee6e95be046452c9add6eb4ac6b68d2ed00058c140ca22c55e5687"
+    },
+    {
+      "source_path": "worker/identity.py",
+      "image_path": "/app/worker/identity.py",
+      "sha256": "78de79f5746e67e0f0c456564df9cab23dff7f6428bda82d1e0c60d04961815f",
+      "git_lf_sha256": "78de79f5746e67e0f0c456564df9cab23dff7f6428bda82d1e0c60d04961815f"
+    },
+    {
+      "source_path": "worker/launch.py",
+      "image_path": "/app/worker/launch.py",
+      "sha256": "3f60ca98c123dc5f2bb7f39f2391558b25e43b66d84dcb99f86e093b27eae8e0",
+      "git_lf_sha256": "97b4c9d3f954fff8fd0977ecb84beefbfea368d7e3f99fd7ebdfa8875376daa6"
+    },
+    {
+      "source_path": "worker/relay.py",
+      "image_path": "/app/worker/relay.py",
+      "sha256": "478f6d80dd3fbdf30bb67744f60fecd98474822ed33aba5a5dbbf3bed5bb5285",
+      "git_lf_sha256": "478f6d80dd3fbdf30bb67744f60fecd98474822ed33aba5a5dbbf3bed5bb5285"
+    },
+    {
+      "source_path": "worker/transformers/pyproject.toml",
+      "image_path": "/app/worker/transformers/pyproject.toml",
+      "sha256": "d7177c7f575cca861d245704d9b79712b79c8bda697110a3b8f68d6db94537a2",
+      "git_lf_sha256": "935ddb89553cf405a104a126ace89942ba8854424ea73252012c4e0ca40e2d02"
+    },
+    {
+      "source_path": "worker/transformers/uv.lock",
+      "image_path": "/app/worker/transformers/uv.lock",
+      "sha256": "28bdf0a9d98df9257212955abdba74bd0a236360269a42dd479e8b526cabd8fb",
+      "git_lf_sha256": "f8012af39fa5ee8db35c14958477579619f48946cdfda2e92089ee56da506cde"
+    },
+    {
+      "source_path": "worker/transformers_app.py",
+      "image_path": "/app/worker/transformers_app.py",
+      "sha256": "b3c9f469f7f63f534a021e88c6738cac89161bf93ca68b40b05afcdd99677047",
+      "git_lf_sha256": "7b21be6f82eb4c3b1055729665714731df99928f0c225c66fe8d23dcbeca161c"
+    },
+    {
+      "source_path": "worker/transformers_engine.py",
+      "image_path": "/app/worker/transformers_engine.py",
+      "sha256": "a908ef8076aafeaa5addc0c7cab44ea467a3a09fc801a322565ca2e12d4e91c0",
+      "git_lf_sha256": "78da828c7f44ac294c75848f9a0bade031a5c71b95ca6d5efff8b5abc6f3dbf6"
+    },
+    {
+      "source_path": "worker/whisper_app.py",
+      "image_path": "/app/worker/whisper_app.py",
+      "sha256": "3e0691a8bf621232152d5da982880a266fd3f15a673c7390eb5955535c4723b5",
+      "git_lf_sha256": "3e0691a8bf621232152d5da982880a266fd3f15a673c7390eb5955535c4723b5"
+    },
+    {
+      "source_path": "worker/whisper_engine.py",
+      "image_path": "/app/worker/whisper_engine.py",
+      "sha256": "5196b76fb5561b9870a6d354064fa5c0344b54639df60a0c4bba60c754aa8a03",
+      "git_lf_sha256": "5196b76fb5561b9870a6d354064fa5c0344b54639df60a0c4bba60c754aa8a03"
+    }
+  ]
+}
