@@ -30,7 +30,8 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 ## 文件與驗證
 
 單機持久排程開發版：見 [模型管理與 durable jobs](docs/scheduler.md)。此為明確 opt-in
-模式，CPU／子程序驗證與 GPU 切換驗收分開；不會自動遷移或停止現役 static 服務。
+模式，完整 managed GPU 驗收未完成且目前暫停；不會自動遷移或停止現役 static 服務。
+最新目標、設計、已確認證據與待辦見 [main2 交接入口](docs/handoff-main2.md)。
 
 影片以 `--video --context 8192` 明確啟用，只支援固定 Qwen3.5-4B／vLLM。接受 1–60 秒 inline H.264 MP4（≤16 MiB、CFR、≤720p60），有界解碼後約 2fps／最多 120 幀、256²，音軌不處理；Transformers 不支援影片。這是通用影片輸入能力，桌球精彩程度與快速攻防品質尚未驗收。使用方式見 [API](docs/api.md)、[可行性與取捨](docs/video-feasibility.md)、[可重跑驗收](docs/acceptance.md)。
 

@@ -5,6 +5,9 @@ Compose／Chat／SSE 保留；啟用 managed 模式不代表已通過 GPU 切換
 首批固定 Qwen3.5-4B／vLLM 與 Whisper-small／Transformers。資產、runtime 與資源
 設定共同決定 deployment，不按模型家族或相同權重合併排程。
 
+目前 GPU 工作暫停，完整 managed 驗收未完成。候選發布、歷史證據與後續決策邊界見
+[main2 交接入口](handoff-main2.md)；發布原始碼或 image 不會啟動服務或重新開放 GPU 窗口。
+
 ## 執行位置與權限
 
 Managed API 與 host controller 在**同機 Linux 或同機 WSL、同一 OS** 執行，SQLite
@@ -138,7 +141,7 @@ urgent／dependency／timeout 是排程 metadata，不能流入 upstream generat
 | queue_timeout_seconds | 3600 秒，submit 到 dispatch 的 wall-clock deadline（包含等待 load） |
 | execution_timeout_seconds | 60 秒，dispatch 到運算等待上限；必須 ≤ drain_seconds |
 | client transport timeout | client 自己的等待，與持久工作運算生命週期無關 |
-| load_seconds / warmup_seconds | 各 180 秒，獨立預算，逾時不推定停止 |
+| load_seconds / warmup_seconds | 300／180 秒，獨立預算，逾時不推定停止 |
 | drain_seconds / unload_seconds | 600／60 秒；到期 unknown，不釋放 GPU |
 | queue_capacity / retained_jobs | 256／4096，transaction 中核對 |
 | storage_bytes | 1 GiB，input/artifact/receipt/reservation；實際 orphan bytes 也計入 |

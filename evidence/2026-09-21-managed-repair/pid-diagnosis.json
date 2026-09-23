@@ -1,0 +1,154 @@
+{
+  "scope": "WSL2 Docker Desktop; no-model runtime initialization probes, not full model acceptance",
+  "fix_commit": "2f7dec7",
+  "image_id": "sha256:abe58b238292bc17656961d62113f26c9a33e2723b8e5dcff3925910d657a603",
+  "probes": [
+    {
+      "label": "dist-128",
+      "receipt_sha256": "3c071c3ed05496a8fbbc29909cd54a8795c558081c562808f2821c0b0ed065e9",
+      "container_id": "18b0c2dbc9de79ff83ad70ea56f1fed2a2a34c9280a0fce282db6216dc0bfebc",
+      "pids_limit": 128,
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 1,
+        "Error": "",
+        "StartedAt": "2026-09-21T03:57:21.529457079Z",
+        "FinishedAt": "2026-09-21T03:57:55.9603889Z"
+      },
+      "stages": [
+        {
+          "process": "child",
+          "label": "dp_gloo_before",
+          "at": 1789963072.1514118,
+          "threads": [
+            "Threads:\t64"
+          ],
+          "pids_current": "128",
+          "pids_max": "128",
+          "pids_events": "max 0"
+        }
+      ],
+      "model_loads": 0,
+      "generations": 0
+    },
+    {
+      "label": "dist-128-events",
+      "receipt_sha256": "9c16869b9c79fa379f05b855f3ecd053828dc8e632348ff6132d1f699b013cd3",
+      "container_id": "356758716da5a8755904a988a12a007c7bf088861396ff5948c01442676c994e",
+      "pids_limit": 128,
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 1,
+        "Error": "",
+        "StartedAt": "2026-09-21T04:02:18.155412983Z",
+        "FinishedAt": "2026-09-21T04:02:54.622629115Z"
+      },
+      "stages": [
+        {
+          "process": "child",
+          "label": "dp_gloo_before",
+          "at": 1789963369.5382214,
+          "threads": [
+            "Threads:\t64"
+          ],
+          "pids_current": "128",
+          "pids_max": "128",
+          "pids_events": "max 0"
+        },
+        {
+          "process": "child",
+          "label": "dp_gloo_failed",
+          "at": 1789963369.538794,
+          "threads": [
+            "Threads:\t64"
+          ],
+          "pids_current": "128",
+          "pids_max": "128",
+          "pids_events": "max 1"
+        },
+        {
+          "process": "parent",
+          "label": "child_exited",
+          "code": 1,
+          "pids_events": "max 2"
+        }
+      ],
+      "model_loads": 0,
+      "generations": 0
+    },
+    {
+      "label": "dist-256",
+      "receipt_sha256": "519dc1f1b17d8fefd3d7954cad6bd671189fcc812d97a696e78eb835776d211e",
+      "container_id": "9e93b29a19b217d948bb8032078170eef0cbe99f77e51f1d6881c58dc382d354",
+      "pids_limit": 256,
+      "state": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-09-21T04:05:22.469090561Z",
+        "FinishedAt": "2026-09-21T04:05:55.015508528Z"
+      },
+      "stages": [
+        {
+          "process": "child",
+          "label": "dp_gloo_before",
+          "at": 1789963551.345151,
+          "threads": [
+            "Threads:\t64"
+          ],
+          "pids_current": "128",
+          "pids_max": "256",
+          "pids_events": "max 0"
+        },
+        {
+          "process": "child",
+          "label": "dp_gloo_after",
+          "at": 1789963551.345568,
+          "threads": [
+            "Threads:\t67"
+          ],
+          "pids_current": "131",
+          "pids_max": "256",
+          "pids_events": "max 0"
+        },
+        {
+          "process": "child",
+          "label": "all_groups_done",
+          "at": 1789963551.34569,
+          "threads": [
+            "Threads:\t67"
+          ],
+          "pids_current": "131",
+          "pids_max": "256",
+          "pids_events": "max 0"
+        },
+        {
+          "process": "parent",
+          "label": "child_exited",
+          "code": 0,
+          "pids_events": "max 0"
+        }
+      ],
+      "model_loads": 0,
+      "generations": 0
+    }
+  ]
+}

@@ -70,8 +70,8 @@ systemd 不設 `ExecStop=unload`，避免非預期服務停止直接操作 GPU�
 
 ## Windows client 與模型切換
 
-正式 origin 保持 `http://127.0.0.1:18080`，key 從原
-`D:\projects\selfhost-models\.state\api-key` 讀取；不開 LAN 或改 WSL 全域網路設定。
+正式 origin 保持 `http://127.0.0.1:18080`，key 從已確認專案根目錄下的
+`.state/api-key` 讀取，client 以 `--api-key-file` 指定實際位置；不開 LAN 或改 WSL 全域網路設定。
 所有 `modelctl scheduler` client 指令傳 `--url http://127.0.0.1:18080`，deployment ID
 從該服務 catalog 取用。具體可重現合成 submit/get/result/cancel 範例隨當次部署證據交付。
 Whisper ready 時舊 Chat API 不接受 Qwen 工作；以 Qwen durable job 明確切回，無自動 fallback。

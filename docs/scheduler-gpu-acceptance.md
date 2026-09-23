@@ -1,5 +1,9 @@
 # 單機排程 D：GPU 驗收與 managed 交付窗口
 
+以下開頭是 2026-09-21 11:33:59 Taipei 的第一輪停止／static 恢復快照。
+後續 PID／冷啟動修正與部分能力測試另見 [main2 交接](handoff-main2.md)；
+GPU 工作仍暫停，完整 D 未完成。歷史額度與窗口不可重用。
+
 **2026-09-21 本輪 managed 驗收已 STOP；完整 D 未完成，正式 managed 未交付。**
 四次 Qwen load 均未達 ready；驗收 state 累計4 loads／24次暖機上界預留，
 durable compute attempts=0。第四次初始化逾時的根因仍為 UNKNOWN。

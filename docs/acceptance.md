@@ -1,6 +1,10 @@
 # 驗收方式
 
-## 單機排程 v1（2026-09-20，CPU 工程驗收）
+目前單機排程是 opt-in 開發候選版，GPU 工作暫停、完整 D 未完成。最新狀態見
+[main2 交接](handoff-main2.md)。以下各節有各自版本／截止時間，不是同一部署的即時狀態；
+Linux 原生 Docker 的固定 0.2.0 static 驗收亦不代表 managed scheduler 驗收通過。
+
+## 單機排程 v1（2026-09-20，CPU 工程驗收歷史快照）
 
 起點 `main@9ae9ff37cd47511ccd509a38b91111721a490a07`，工作分支
 `feat/single-host-scheduler`，同一主要工作目錄，未納入 Gemma 分支、未新增 worktree。
