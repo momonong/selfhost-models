@@ -8,6 +8,8 @@ ready/models 取得實際能力；未 ready 時仍可查詢或提交持久工作
 
 本指南供其他專案的開發者與 coding agent 接入已由 `selfhost-models` 啟動的本機模型服務。它說明接入流程、能力選擇、失敗語義與產品責任；完整欄位限制仍以 [API 0.1 支援範圍](api.md) 為準，部署與維運由服務擁有者依 [本機使用指南](local-use.md) 及 [部署文件](deployment.md) 處理。
 
+Linux 同機 client 的預設位址同樣是 `http://127.0.0.1:18080`；由服務擁有者提供部署 checkout 下 `.state/api-key` 的實際絕對路徑，設定 `SELFHOST_MODEL_API_KEY_FILE`。不要沿用下方 Windows 範例路徑。先確認 ready，再查 models 的 id、backend、revision 與 capabilities；其他容器及遠端接入仍未驗證。
+
 ## 接入前提與設定
 
 接入方不負責啟動、重啟、切換 backend、下載模型或修改 Compose。開始前向服務擁有者確認：
@@ -118,7 +120,7 @@ SSE 中斷後，不要把已顯示文字提交成完整 assistant message，也�
 | 同一台筆電的 Ubuntu WSL | `http://127.0.0.1:18080`；已用 Linux Python client 做合成文字呼叫驗證，仍屬同一台 Windows 筆電的證據 |
 | 其他 Docker 容器 | 未驗證；容器內 `localhost` 是該容器，不能當成 Windows host。不要自行假設 `host.docker.internal`、加入共用 network 或改 Compose |
 | 遠端主機、LAN、公網 | 未開放、未驗證；目前 Compose 只 publish 到 host `127.0.0.1`。不要改成 `0.0.0.0`、加 port forward／tunnel／proxy 來繞過邊界 |
-| Linux 實體桌機 | 部署流程已有文件，但實機接入仍未驗證；完成 [Linux 桌機驗收](acceptance.md#linux-桌機實機驗收待執行) 前不可標為已支援環境 |
+| Linux 實體桌機 | 已完成原生 Docker／同機 loopback 的一般與 SSE 接入驗收；vLLM 影片與 Transformers 文字的範圍見 [驗收文件](acceptance.md)。其他 GPU／driver 組合仍須獨立驗收 |
 
 若其他容器或遠端產品確實需要接入，應另立部署／安全任務，明確設計認證、TLS、網路 ACL、secret distribution、rate limit、觀測與驗收；這不是 client 更換 hostname 就能完成的事項。
 

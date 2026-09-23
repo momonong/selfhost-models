@@ -46,6 +46,23 @@ Qwen 恢復的暖機；事件需保留 queue/load/warmup/compute/result 時間�
 亦逾時，根因未查明；沒有自行重啟 Docker 或推定 engine 已退出。這個建置阻礙與 D
 尚未授權是不同事項，詳見 CPU 證據中的 incident 記錄。
 
+## Linux 原生 Docker 驗收摘要
+
+固定 0.2.0 images 與 Qwen/Qwen3.5-4B revision `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` 已完成下列實機驗收；推論程式及依賴未修改。完整主機紀錄、容器 metadata 與原始輸出留在部署端，不納入公開 repo。下方程序供其他主機獨立重跑，結果不代表任意 GPU／driver 組合均相容。
+
+| 範圍 | 結果 |
+| --- | --- |
+| CPU 契約／鎖檔 | 117 項測試與兩份 uv lock 檢查通過 |
+| vLLM | 文字、一般／SSE、單圖、工具往返通過 |
+| vLLM 影片 | context 8192、max-inflight 2、GPU 0.60、V1 runner；2／10／30／60 秒合成 MP4 與 SSE 通過 |
+| Linux 解碼資源與生命週期 | 720p60／3,600 幀完整解碼、OS limits、timeout/cancel、child reap 與暫存清理通過 |
+| 取消／逾時／故障恢復 | 實際輸出後取消與逾時仍保留 lease；API 重啟隔離未知工作，新 worker epoch 暖機後恢復；超載拒絕通過 |
+| Transformers | vLLM 停止並確認 GPU 釋放後，完成單請求文字、SSE、能力拒絕及故障恢復；不支援影片 |
+| 模型取得／runtime | HF 固定 revision metadata、權重 SHA256 與 image digests 核對通過；容器來源與 checkout 換行正規化後一致 |
+| 最終部署 | Transformers 停止後恢復 vLLM 影片服務；loopback ready、models、一般／SSE 與 lease 歸零檢查通過 |
+
+切換 backend 時曾遇到 `Address already in use`，首次原因未捕捉；後續另觀察到停止後的 TCP `TIME_WAIT` 暫時阻擋普通 bind，等待釋放後以相同設定重試成功。未刪 journal、降低規格、切換模型或更換 runtime。Linux 服務與 HF 下載通過，不代表桌球快速攻防、精彩程度或產品品質通過；LAN、公網、其他容器接入與 V2 runner 未驗證。
+
 ## 有界影片（2026-09-16，工作分支驗收）
 
 後續版本核對：影片成果已於 `841132e1732d29e72458fd4b09d012b12e4e7792` 合併並推送 GitHub main。以下保留當時工作分支驗收狀態；後續 0.2.0 images 發布與驗證界線見部署文件。桌機請依本文的 Linux 桌機章節操作。
@@ -108,9 +125,11 @@ uv run --locked python scripts/capture_runtime.py --output evidence/<run>/runtim
 
 本次重驗一般部署、backend 切換、新 client 與實際暖機失敗後恢復；沒有重跑未變更 serving 的全部 pause／超載故障案例，先前整合與來源分支證據仍保留。未配置開機自啟，未實際重開 Windows；筆電喚醒且 Docker Desktop 運行是可用條件。LAN／公網接入、Linux 實體桌機、HF 實際下載仍未由本次驗證。日常操作見 [本機使用指南](local-use.md)。
 
-## Linux 桌機實機驗收（待執行）
+<a id="linux-桌機實機驗收待執行"></a>
 
-這是桌機尚未執行的驗收程序，不是 Linux 通過證據。先完成 [桌機交接入口](deployment.md#linux-桌機交接入口) 的來源、host、模型與獨立 state 準備。發布來源為 `29bec68`；依部署文件拉取並核對 0.2.0 固定 images。下列使用 `--no-build`；若改用原始碼建置，移除選項並另記新產物與差異。
+## Linux 桌機實機驗收
+
+以下為可重跑程序，當次 Linux 實機結果見本文開頭。先完成 [桌機交接入口](deployment.md#linux-桌機交接入口) 的來源、host、模型與獨立 state 準備。發布來源為 `29bec68`；依部署文件拉取並核對 0.2.0 固定 images。下列使用 `--no-build`；若改用原始碼建置，移除選項並另記新產物與差異。
 
 先盤點 GPU／port／其他服務並安排排他維護時段。即使 ready，也不代表沒有產品正在使用服務；以下包含超載、pause/restart、解碼與暫存檢查。現有部署需先協調停機，不直接搶占。不得同時載入兩個 backend。命令於 repo 根目錄以 Bash 執行，每次使用新的 evidence 目錄；任何失敗先保存 logs 與狀態，不跳過後繼續宣稱通過。
 

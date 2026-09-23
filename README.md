@@ -6,7 +6,7 @@
 
 Linux 桌機請從 [桌機交接入口](docs/deployment.md#linux-桌機交接入口) 開始，接著執行 [桌機驗收](docs/acceptance.md#linux-桌機實機驗收待執行)。影片版 0.2.0 提供固定 images 與 `modelctl serve --no-build`；亦可從原始碼建置。
 
-筆電日常啟動、直接對話與 backend 切換，請看 [本機使用指南](docs/local-use.md)；其他專案接入請直接看 [Client 接入指南](docs/client-integration.md)。Linux 桌機尚未驗收，不影響已驗證的筆電使用範圍。
+筆電日常啟動、直接對話與 backend 切換，請看 [本機使用指南](docs/local-use.md)；Linux 原生 Docker 的部署與操作見 [部署文件](docs/deployment.md#linux-桌機交接入口)。其他專案接入請看 [Client 接入指南](docs/client-integration.md)。
 
 uv 0.11.21–0.12.x、Docker Compose、可用的 NVIDIA GPU container 環境。Python 預設 3.12（支援 3.11–3.13），由 uv 管理：
 
@@ -46,7 +46,7 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 
 上述整合驗收使用獨立 state 與 port 18082／18083，結束後正常停機並清理 WSL worktree。後續筆電交付新增 UTF-8 對話 client，Windows CPU 測試 **87 項通過**，兩 backend 再次依序通過一般／SSE 與 smoke；交付時 vLLM／API 保持在 `127.0.0.1:18080` ready，使用 `.state`。目前即時狀態請以 `modelctl status` 與 `/health/ready` 為準。
 
-API 與 Transformers worker 的來源有 CRLF／LF 差異，只能稱換行正規化後一致。Linux 實體桌機、Linux Transformers 與 HF 實際下載仍未驗證；詳細結果、桌機驗收步驟及限制見 [驗收文件](docs/acceptance.md)。公開 images 與固定版本使用方式見 [部署文件](docs/deployment.md#docker-hub-images)。
+Linux 原生 Docker 已完成固定 0.2.0 images 的 vLLM 文字／圖片／工具／影片、Transformers 文字與故障恢復驗收，CPU 契約 117 項通過；HF 固定 revision 下載與權重 SHA256 核對通過。發布 images 與 Linux checkout 的來源僅 CRLF／LF 差異，換行正規化後一致。驗收範圍與可重跑程序見 [驗收文件](docs/acceptance.md)，固定 images 見 [部署文件](docs/deployment.md#docker-hub-images)。
 
 ```bash
 uv run --locked pytest -q
