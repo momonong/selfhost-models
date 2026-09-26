@@ -1,5 +1,11 @@
 # 單機排程開發候選版：main2 交接
 
+2026-09-23 原生 Linux 後續：已修正同 deployment／epoch 健康探測期間的ready閃斷，
+主機 CPU 為192 passed／2 Windows-only skipped。第一輪preflight受阻並回復static；
+資源前置條件確認後，第二輪完成managed Qwen／Whisper GPU工程驗收與loopback正式服務。詳見 [兩輪證據](../evidence/2026-09-23-linux-managed/README.md)。
+下文是較早的發布／WSL交接歷史，不把其暫停状态套用到這次原生Linux交付；
+產品品質、人工接受與其他主機相容性仍須分別判斷。
+
 2026-09-23：本次授權是整理文件、CPU 驗證、合併／推送 GitHub，以及必要 Docker Hub
 候選 image 發布。**GPU 工作維持暫停，完整 managed D 驗收未完成，未通過人工驗收。**
 候選 image 不更新 `0.2.0`／`latest`，也不代表部署或恢復服務。發布結果與精確版本另記於

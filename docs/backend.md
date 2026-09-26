@@ -59,3 +59,5 @@ worker 同時至多一個執行工作，等待佇列 0。獨立持有的 asyncio
 SSE 最多緩衝 16 段文字；緩衝溢位或 socket 寫出逾時時停止交付、保留運算直到完成，沒有成功 terminal 就不送 `[DONE]`。一般回應不受 SSE buffer 溢位影響。CUDA/engine 例外使 worker health 失敗並回泛化錯誤，gateway 保留未知 lease，須重啟 worker 產生新 epoch 並重新暖機；不在同 epoch 自動重試。process 的 epoch 與其 thread/CUDA context 一起消亡；不支援外接 engine、多 frontend 或多 process。
 
 worker `/health` 表示權重已載入且 engine 無故障；對外 API `/health/ready` 還要求 durable warmup 成功。API 重啟而 worker 未重啟時，journal 中未決工作仍隔離，即使 worker 後來完成，也不能憑健康 probe 釋放未知 lease。
+
+多執行端registry、持久維護、等待原因與安全GC見 [操作與契約](multi-executor-operations.md)；CPU多程序驗證與實際GPU驗收分開回報。

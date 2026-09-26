@@ -84,6 +84,8 @@ class Gateway:
         self.clients = 0
         self.monitor = None
         self.scheduler = scheduler
+        self.control_store = scheduler
+        self.fleet = None
         self.api_owner = uuid.uuid4().hex
         self.deployment_id = None
 
@@ -108,7 +110,19 @@ class Gateway:
             from filelock import FileLock
             self.api_lock = FileLock(str(self.scheduler.root / "api.lock"), timeout=0)
             self.api_lock.acquire()
-            self.scheduler.legacy_restart(self.api_owner)
+            self.control_store = self.scheduler
+            from .fleet_store import Fleet
+            from .execution_retention import ControlRetention
+            fleet = Fleet(self.control_store)
+            if fleet.enabled():
+                self.fleet = fleet
+                for worker in fleet.workers():
+                    worker.legacy_restart(self.api_owner)
+                    ControlRetention(worker).abandon_legacy(self.api_owner)
+                self.scheduler = fleet.primary()
+            else:
+                self.scheduler.legacy_restart(self.api_owner)
+                ControlRetention(self.scheduler).abandon_legacy(self.api_owner)
             self.monitor = asyncio.create_task(self.watch_scheduler())
             return
         if self.state_file.exists():
@@ -119,26 +133,39 @@ class Gateway:
         self.monitor = asyncio.create_task(self.watch())
 
     async def watch_scheduler(self):
-        from .scheduler_runtime import DockerProvider
         from .video import LINUX_DECODER
         while True:
             try:
                 state = self.scheduler.state()
-                self.ready = False
+                # Keep a verified identity available during its periodic HTTP
+                # probe. A lifecycle/epoch change invalidates it immediately.
+                self.ready = (self.ready and state["phase"] == "ready"
+                              and self.scheduler.clock() - state["heartbeat"] <= 10
+                              and self.deployment_id == state["deployment"]
+                              and self.epoch == state["worker_epoch"])
                 if state["phase"] == "ready" and self.scheduler.clock() - state["heartbeat"] <= 10:
                     dep = self.scheduler.deployment(state["deployment"])
                     if dep.runtime in ("vllm", "whisper"):
-                        if dep.load.video and not LINUX_DECODER:
+                        remote = self.scheduler.execution_binding() is not None
+                        if dep.load.video and not remote and not LINUX_DECODER:
                             raise ValueError("video requires Linux decoder")
                         if self.deployment_id != dep.id:
                             if self.backend:
                                 await self.backend.close()
-                            provider = DockerProvider(self.scheduler)
-                            provider.key = provider.secret_path.read_text().strip()
-                            if provider.key == self.key:
-                                raise ValueError("worker key must differ from public key")
-                            provider.set_backend(dep)
-                            self.backend = provider.backend
+                            if remote:
+                                from .execution_client import RemoteBackend
+                                binding = self.scheduler.execution_binding()
+                                if Path(binding['key_file']).read_text().strip() == self.key:
+                                    raise ValueError("executor key must differ from public key")
+                                self.backend = RemoteBackend(self.scheduler, dep)
+                            else:
+                                from .scheduler_runtime import DockerProvider
+                                provider = DockerProvider(self.scheduler)
+                                provider.key = provider.secret_path.read_text().strip()
+                                if provider.key == self.key:
+                                    raise ValueError("worker key must differ from public key")
+                                provider.set_backend(dep)
+                                self.backend = provider.backend
                             self.deployment_id = dep.id
                         self.model, self.revision, self.backend_name, self.profile = dep.model, dep.revision, dep.runtime, "qwen3_5" if dep.runtime == "vllm" else "whisper"
                         self.video_enabled, self.capacity, self.context = dep.load.video, dep.load.capacity, dep.load.context
@@ -148,7 +175,11 @@ class Gateway:
                             "thinking": False, "transcribe": True, "cancellation": "drain_to_terminal",
                             "queue_capacity": 0, "max_inflight_limit": 1, "audio_limits": {"format": "pcm16_wav", "sample_rate": 16000, "channels": 1, "max_seconds": 30, "max_bytes": 1048576}}
                         self.epoch = state["worker_epoch"]
-                        self.ready = await self.backend.identity() == self.epoch and self.scheduler.health()["ready"]
+                        identity = await self.backend.identity()
+                        health = self.scheduler.health()
+                        self.ready = (identity == self.epoch and health["ready"]
+                                      and health["deployment_id"] == self.deployment_id
+                                      and health["worker_epoch"] == self.epoch)
             except asyncio.CancelledError:
                 raise
             except Exception:
@@ -191,7 +222,7 @@ class Gateway:
         terminal = False
         started = time.monotonic()
         try:
-            if find_video(payload):
+            if find_video(payload) and not getattr(self.backend, "remote_execution", False):
                 try:
                     job.video = await prepare_video(payload)
                 except VideoError as exc:
@@ -258,7 +289,12 @@ class Gateway:
             job.failure = Failure(503, "gateway_shutdown")
             raise
         except Exception as exc:
-            job.failure = exc if isinstance(exc, Failure) else Failure(502, "worker_unconfirmed")
+            from .execution_protocol import TerminalRejection
+            if isinstance(exc, TerminalRejection):
+                terminal = True
+                job.failure = Failure(exc.status, exc.code)
+            else:
+                job.failure = exc if isinstance(exc, Failure) else Failure(502, "worker_unconfirmed")
         finally:
             if self.scheduler is not None:
                 self.scheduler.legacy_terminal(job.rid, job.epoch, self.api_owner, terminal)
@@ -372,7 +408,8 @@ class Gateway:
         if self.scheduler is None and len(self.leases) >= self.capacity:
             raise Failure(429, "overloaded")
         if self.scheduler is not None:
-            self.scheduler.legacy_admit(rid, self.deployment_id, self.epoch, self.api_owner)
+            self.scheduler.legacy_admit(rid, self.deployment_id, self.epoch, self.api_owner,
+                                        execution_limit=max(.001, deadline - (time.monotonic() - started)))
         job = Job(rid, self.epoch, payload["stream"])
         job.deadline_at = started + deadline
         if self.scheduler is None:

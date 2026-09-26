@@ -14,6 +14,9 @@ import sys
 import time
 import uuid
 from pathlib import Path
+from urllib.parse import urlsplit
+
+from filelock import FileLock, Timeout as LockTimeout
 
 from .scheduler_schema import Deployment, SchedulerConfig, SchedulerError, SubmitJob, canonical, digest
 
@@ -121,6 +124,10 @@ class Store:
                     kind TEXT NOT NULL, ref TEXT, detail TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS garbage (kind TEXT NOT NULL, ref TEXT NOT NULL, PRIMARY KEY(kind,ref));
                 CREATE TABLE IF NOT EXISTS engine_cleanup (handle TEXT PRIMARY KEY, state TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS execution_binding (id INTEGER PRIMARY KEY CHECK(id=1),
+                    control_id TEXT NOT NULL, executor_id TEXT NOT NULL, url TEXT NOT NULL, key_file TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS execution_grants (attempt TEXT PRIMARY KEY, envelope TEXT NOT NULL,
+                    receipt TEXT, acked INTEGER NOT NULL DEFAULT 0);
                 INSERT OR IGNORE INTO controller VALUES(1,0,'unloaded',NULL,NULL,NULL,0,0,0);
             ''')
             # Preserve state made by earlier v1 development snapshots.
@@ -144,6 +151,88 @@ class Store:
         c.execute("PRAGMA synchronous=FULL")
         c.execute("PRAGMA busy_timeout=10000")
         return c
+
+    def execution_binding(self, c=None):
+        if c is None:
+            with contextlib.closing(self.connect()) as db:
+                return self.execution_binding(db)
+        row = c.execute("SELECT control_id,executor_id,url,key_file FROM execution_binding WHERE id=1").fetchone()
+        return dict(row) if row else None
+
+    def bind_execution(self, control_id, executor_id, url, key_file):
+        if any(not isinstance(value, str) or not re.fullmatch(r"[A-Za-z0-9_-]{8,80}", value)
+               for value in (control_id, executor_id)):
+            raise SchedulerError("invalid_execution_identity")
+        try:
+            endpoint = urlsplit(url)
+            endpoint.port  # Validate malformed/out-of-range ports, including optional default ports.
+            valid = (endpoint.scheme in ("http", "https") and endpoint.hostname
+                     and not endpoint.username and not endpoint.password and not endpoint.query
+                     and not endpoint.fragment and endpoint.path in ("", "/"))
+        except (ValueError, TypeError):
+            valid = False
+        if not valid or not isinstance(key_file, (str, Path)) or not str(key_file):
+            raise SchedulerError("invalid_execution_binding")
+        binding = dict(control_id=control_id, executor_id=executor_id, url=url.rstrip("/"),
+                       key_file=str(Path(key_file).resolve()))
+        try:
+            with FileLock(str(self.root / "api.lock"), timeout=0), FileLock(str(self.root / "controller.lock"), timeout=0):
+                with self.tx() as c:
+                    if (self.state(c)["phase"] != "unloaded" or c.execute("SELECT 1 FROM leases").fetchone()
+                            or c.execute("SELECT 1 FROM pins WHERE owner='model'").fetchone()
+                            or c.execute("SELECT 1 FROM engine_cleanup").fetchone()
+                            or c.execute("SELECT 1 FROM jobs WHERE state IN ('queued','dispatching','running','draining')").fetchone()):
+                        raise SchedulerError("execution_binding_requires_idle", 409)
+                    old = self.execution_binding(c)
+                    if old and old != binding:
+                        raise SchedulerError("execution_binding_conflict", 409)
+                    c.execute("INSERT OR IGNORE INTO execution_binding VALUES(1,?,?,?,?)",
+                              (control_id, executor_id, binding["url"], binding["key_file"]))
+        except LockTimeout:
+            raise SchedulerError("execution_binding_requires_offline", 409) from None
+        return binding
+
+    def execution_grant(self, attempt, c=None):
+        if c is None:
+            with contextlib.closing(self.connect()) as db:
+                return self.execution_grant(attempt, db)
+        row = c.execute("SELECT envelope FROM execution_grants WHERE attempt=?", (attempt,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def execution_pending(self):
+        with contextlib.closing(self.connect()) as c:
+            return [json.loads(row[0]) for row in c.execute(
+                "SELECT envelope FROM execution_grants WHERE acked=0 ORDER BY rowid")]
+
+    def execution_ack(self, attempt):
+        with self.tx() as c:
+            row = c.execute("SELECT receipt FROM execution_grants WHERE attempt=?", (attempt,)).fetchone()
+            if not row or row[0] is None:
+                raise SchedulerError("execution_receipt_not_saved", 409)
+            c.execute("UPDATE execution_grants SET acked=1 WHERE attempt=?", (attempt,))
+
+    def _execution_grant(self, c, attempt, owner, kind, started, execution_limit):
+        binding = self.execution_binding(c)
+        if binding is None:
+            return None
+        state = self.state(c)
+        grant = {"authority": binding["control_id"], "executor": binding["executor_id"],
+                 "fence": state["epoch"], "handle": state["handle"], "deployment": state["deployment"],
+                 "worker_epoch": state["worker_epoch"], "attempt": attempt, "owner": owner,
+                 "kind": kind, "started": float(started), "execution_limit": execution_limit}
+        from .execution_retention import reserve_execution_grant
+        reserve_execution_grant(c, grant)
+        c.execute("INSERT INTO execution_grants(attempt,envelope) VALUES(?,?)", (attempt, canonical(grant).decode()))
+        return grant
+
+    def _execution_receipt(self, c, attempt, result, error):
+        row = c.execute("SELECT receipt FROM execution_grants WHERE attempt=?", (attempt,)).fetchone()
+        if row is None:
+            return
+        marker = canonical({"result_hash": digest(result), "error": error}).decode()
+        if row[0] is not None and row[0] != marker:
+            raise SchedulerError("receipt_conflict", 409)
+        c.execute("UPDATE execution_grants SET receipt=? WHERE attempt=?", (marker, attempt))
 
     @contextlib.contextmanager
     def tx(self):
@@ -288,6 +377,8 @@ class Store:
                 type(generations) is not int or not 1 <= loads <= 100000 or not 1 <= generations <= 10000000):
             raise SchedulerError("invalid_budget_window")
         with self.tx() as c:
+            from .fleet_store import check_fleet_budget_idle
+            check_fleet_budget_idle(c)
             if (self.state(c)["phase"] not in ("unloaded", "ready") or
                     c.execute("SELECT 1 FROM leases").fetchone() or
                     c.execute("SELECT 1 FROM jobs WHERE state IN ('queued','dispatching','running','draining')").fetchone()):
@@ -306,6 +397,8 @@ class Store:
                 raise SchedulerError("budget_window_not_found", 404)
             if window["closed"] is not None:
                 return  # A duplicate close cannot change its historical receipt.
+            from .fleet_store import check_fleet_budget_idle
+            check_fleet_budget_idle(c)
             if (self.state(c)["phase"] not in ("unloaded", "ready") or
                     c.execute("SELECT 1 FROM leases").fetchone() or
                     c.execute("SELECT 1 FROM jobs WHERE state IN ('queued','dispatching','running','draining')").fetchone()):
@@ -335,11 +428,44 @@ class Store:
             c.execute("INSERT OR IGNORE INTO assets VALUES(?,?,?)", (ref, str(Path(path).resolve()), canonical(manifest).decode()))
         return ref
 
+    def assets_import(self, manifest):
+        if not isinstance(manifest, dict) or len(manifest) > 10000 or "config.json" not in manifest or not any(
+                isinstance(name, str) and name.endswith(".safetensors") for name in manifest):
+            raise SchedulerError("asset_files_missing")
+        for name, entry in manifest.items():
+            if (not isinstance(name, str) or not name or name.startswith("/") or ":" in name or "\\" in name
+                    or any(part in ("", ".", "..") for part in name.split("/")) or "\x00" in name
+                    or not isinstance(entry, dict) or set(entry) != {"size", "sha256"}
+                    or type(entry["size"]) is not int or entry["size"] < 0
+                    or not isinstance(entry["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", entry["sha256"])):
+                raise SchedulerError("invalid_asset_manifest")
+        if len(canonical(manifest)) > 2097152:
+            raise SchedulerError("invalid_asset_manifest")
+        ref = "asset_" + digest(manifest)
+        with self.tx() as c:
+            if self.execution_binding(c) is None:
+                raise SchedulerError("execution_binding_required", 409)
+            # An imported manifest never replaces an existing local asset path.
+            c.execute("INSERT OR IGNORE INTO assets VALUES(?,'',?)", (ref, canonical(manifest).decode()))
+        return ref
+
+    def asset_manifest(self, ref):
+        with contextlib.closing(self.connect()) as c:
+            row = c.execute("SELECT manifest FROM assets WHERE ref=?", (ref,)).fetchone()
+        if not row:
+            raise SchedulerError("asset_not_found", 404)
+        manifest = json.loads(row[0])
+        if "asset_" + digest(manifest) != ref:
+            raise SchedulerError("asset_hash_mismatch")
+        return manifest
+
     def asset_verify(self, ref):
         with contextlib.closing(self.connect()) as c:
             row = c.execute("SELECT * FROM assets WHERE ref=?", (ref,)).fetchone()
         if not row:
             raise SchedulerError("asset_not_found", 404)
+        if not row["path"]:
+            raise SchedulerError("asset_requires_executor", 409)
         if full_manifest(row["path"]) != json.loads(row["manifest"]):
             raise SchedulerError("asset_hash_mismatch")
         return Path(row["path"])
@@ -354,7 +480,10 @@ class Store:
         # Never deletes an operator's model directory.
 
     def register(self, deployment):
-        self.asset_verify(deployment.asset_ref)
+        if self.execution_binding():
+            self.asset_manifest(deployment.asset_ref)
+        else:
+            self.asset_verify(deployment.asset_ref)
         with self.tx() as c:
             c.execute("INSERT OR IGNORE INTO deployments VALUES(?,?)", (deployment.id, canonical(deployment.model_dump()).decode()))
         return deployment.id
@@ -430,6 +559,8 @@ class Store:
                 if old["content_hash"] != h:
                     raise SchedulerError("idempotency_conflict", 409)
                 return self.public_job(old), False
+            from .fleet_store import check_admission
+            check_admission(c)
             dep = self.deployment(spec.deployment_id, c)
             if c.execute("SELECT 1 FROM blocked_deployments WHERE id=?", (dep.id,)).fetchone():
                 raise SchedulerError("deployment_blocked", 503)
@@ -578,6 +709,7 @@ class Store:
             c.execute("INSERT INTO leases VALUES(?,?,?,?,?,'active',?)", (aid, "job", dep.id, s["worker_epoch"], str(epoch), now))
             c.execute("UPDATE jobs SET state='dispatching',attempt=? WHERE id=?", (aid, jid))
             c.execute("UPDATE controller SET reuse_count=reuse_count+1 WHERE id=1")
+            self._execution_grant(c, aid, epoch, "job", now, row["execution_limit"])
             self.event(c, "dispatch_intent", jid, attempt=aid, owner=epoch, worker_epoch=s["worker_epoch"])
             return dict(c.execute("SELECT * FROM attempts WHERE id=?", (aid,)).fetchone())
 
@@ -593,7 +725,10 @@ class Store:
                 if leased:
                     c.execute("UPDATE controller SET phase='unknown' WHERE worker_epoch=?", (row["worker_epoch"],))
 
-    def legacy_admit(self, rid, deployment, worker_epoch, owner):
+    def legacy_admit(self, rid, deployment, worker_epoch, owner, execution_limit=None):
+        execution_limit = self.config.drain_seconds if execution_limit is None else execution_limit
+        if (type(execution_limit) not in (int, float) or not 0 < execution_limit <= self.config.drain_seconds):
+            raise SchedulerError("execution_limit_exceeds_drain")
         with self.tx() as c:
             s = self.state(c)
             if (s["phase"] != "ready" or s["deployment"] != deployment or s["worker_epoch"] != worker_epoch or
@@ -606,7 +741,9 @@ class Store:
                 raise SchedulerError("generation_budget_exhausted", 429)
             self.check_budget_window(c, generations=1)
             c.execute("UPDATE budget SET generations=generations+1 WHERE id=1")
-            c.execute("INSERT INTO leases VALUES(?,?,?,?,?,'active',?)", (rid, "legacy", deployment, worker_epoch, owner, self.clock()))
+            now = self.clock()
+            c.execute("INSERT INTO leases VALUES(?,?,?,?,?,'active',?)", (rid, "legacy", deployment, worker_epoch, owner, now))
+            return self._execution_grant(c, rid, owner, "legacy", now, execution_limit)
 
     def legacy_terminal(self, rid, worker_epoch, owner, terminal):
         with self.tx() as c:
@@ -651,7 +788,56 @@ class Store:
                 durable_write(path, canonical(receipt))
             self.fault("after_receipt")
             self._accept_receipt(c, a, receipt)
+            self._execution_receipt(c, attempt, result, error)
         self.publish(epoch, attempt)
+
+    def import_executor_receipt(self, current_epoch, attempt, result, error, grant):
+        if len(canonical(result)) > self.config.result_bytes:
+            raise SchedulerError("result_too_large")
+        with self.tx() as c:
+            self.fenced(c, current_epoch)
+            saved = self.execution_grant(attempt, c)
+            if saved is None or canonical(saved) != canonical(grant):
+                raise SchedulerError("execution_grant_mismatch", 409)
+            binding = self.execution_binding(c)
+            if (saved["attempt"] != attempt or saved["authority"] != binding["control_id"]
+                    or saved["executor"] != binding["executor_id"]):
+                raise SchedulerError("execution_grant_mismatch", 409)
+            if saved["kind"] == "job":
+                a = c.execute("SELECT * FROM attempts WHERE id=?", (attempt,)).fetchone()
+                job = c.execute("SELECT execution_limit FROM jobs WHERE attempt=?", (attempt,)).fetchone()
+                if (not a or not job or any(saved[k] != a[k] for k in ("owner", "deployment", "worker_epoch", "started"))
+                        or saved["fence"] != a["owner"] or saved["execution_limit"] != job[0]):
+                    raise SchedulerError("execution_grant_mismatch", 409)
+                # The current controller may receive an old attempt's terminal
+                # proof; retain its original owner in the immutable receipt.
+                receipt = {"attempt": attempt, "job": a["job"], "worker_epoch": a["worker_epoch"],
+                           "owner": a["owner"], "result": result, "error": error, "terminal_at": self.clock()}
+                path = self.receipt_path(attempt)
+                if path.exists():
+                    receipt = json.loads(path.read_bytes())
+                    if receipt["result"] != result or receipt["error"] != error:
+                        raise SchedulerError("receipt_conflict", 409)
+                else:
+                    self.fault("receipt_write")
+                    durable_write(path, canonical(receipt))
+                self.fault("after_receipt")
+                self._accept_receipt(c, a, receipt)
+            elif saved["kind"] == "legacy":
+                lease = c.execute("SELECT * FROM leases WHERE id=?", (attempt,)).fetchone()
+                if lease and any(saved[k] != lease[k] for k in ("kind", "owner", "deployment", "worker_epoch")):
+                    raise SchedulerError("execution_grant_mismatch", 409)
+                # Legacy delivery may have released this exact lease already.
+                # Persist the control receipt marker even in that case, so a
+                # repeated reconciliation can safely acknowledge the executor.
+                self.fault("receipt_write")
+                c.execute("DELETE FROM leases WHERE id=? AND kind='legacy' AND owner=? AND worker_epoch=?",
+                          (attempt, saved["owner"], saved["worker_epoch"]))
+            else:
+                raise SchedulerError("execution_grant_mismatch", 409)
+            self._execution_receipt(c, attempt, result, error)
+        if saved["kind"] == "job":
+            self.publish(current_epoch, attempt)
 
     def _accept_receipt(self, c, a, receipt):
         if any(receipt[k] != a[k] for k in ("job", "worker_epoch", "owner")) or receipt["attempt"] != a["id"]:
@@ -675,7 +861,9 @@ class Store:
             for a in pending:
                 path = self.receipt_path(a["id"])
                 if path.exists():
-                    self._accept_receipt(c, a, json.loads(path.read_bytes()))
+                    receipt = json.loads(path.read_bytes())
+                    self._accept_receipt(c, a, receipt)
+                    self._execution_receipt(c, a["id"], receipt["result"], receipt["error"])
         for a in pending:
             if self.receipt_path(a["id"]).exists():
                 self.publish(epoch, a["id"])
@@ -724,6 +912,8 @@ class Store:
             cutoff = self.clock() - self.config.retention_seconds
             rows = c.execute("""SELECT * FROM jobs j WHERE ended<? AND state IN ('succeeded','failed','canceled','expired','dependency_failed')
                 AND result_state IN ('none','available') AND NOT EXISTS (SELECT 1 FROM dependencies WHERE parent=j.id)""", (cutoff,)).fetchall()
+            from .execution_retention import can_collect_attempt
+            rows = [row for row in rows if not row["attempt"] or can_collect_attempt(c, row["attempt"])]
             for row in rows:
                 if row["attempt"]:
                     c.execute("INSERT OR IGNORE INTO garbage VALUES('receipt',?)", (row["attempt"],))

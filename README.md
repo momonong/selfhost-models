@@ -1,5 +1,7 @@
 # selfhost-models
 
+0.3.0rc1 控制端／多 worker 候選版的交付形態、相容性與限制見 [發布紀錄](docs/releases/0.3.0rc1.md)。既有 0.2.0／latest 保持不變。
+
 共用模型推論與 Docker 部署管理。提供固定 HF revision 的模型管理、vLLM 與 Transformers serving，業務 prompt、工具執行與產品規則留在各產品。
 
 ## 開始使用
@@ -30,7 +32,9 @@ API 在 `http://127.0.0.1:18080`；待 `/health/ready` 回 200，再以 `.state/
 ## 文件與驗證
 
 單機持久排程開發版：見 [模型管理與 durable jobs](docs/scheduler.md)。此為明確 opt-in
-模式，完整 managed GPU 驗收未完成且目前暫停；不會自動遷移或停止現役 static 服務。
+模式；原生 Linux managed GPU 工程驗收見 [桌機紀錄](evidence/2026-09-23-linux-managed/README.md)，
+不會自動遷移或停止現役 static 服務。
+控制端／執行端分離的範圍與驗證狀態見 [分離協定](docs/split-execution-plane.md)。
 最新目標、設計、已確認證據與待辦見 [main2 交接入口](docs/handoff-main2.md)。
 
 影片以 `--video --context 8192` 明確啟用，只支援固定 Qwen3.5-4B／vLLM。接受 1–60 秒 inline H.264 MP4（≤16 MiB、CFR、≤720p60），有界解碼後約 2fps／最多 120 幀、256²，音軌不處理；Transformers 不支援影片。這是通用影片輸入能力，桌球精彩程度與快速攻防品質尚未驗收。使用方式見 [API](docs/api.md)、[可行性與取捨](docs/video-feasibility.md)、[可重跑驗收](docs/acceptance.md)。
@@ -55,3 +59,5 @@ uv run --locked python scripts/acceptance.py --faults
 ```
 
 第二個指令需要已 ready 的真實服務，會對本專案容器作受控 pause/restart。契約測試不取代 GPU 驗收。
+
+多執行端registry、持久維護、等待原因與安全GC見 [操作與契約](docs/multi-executor-operations.md)；CPU多程序驗證與實際GPU驗收分開回報。

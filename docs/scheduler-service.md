@@ -1,4 +1,4 @@
-# WSL managed 服務的程序監督
+# Linux／WSL managed 服務的程序監督
 
 此文件是部署與操作方式；當次實際狀態與 deployment IDs 以交付證據為準。
 API、controller、SQLite 必須在同機 native Linux filesystem。部署使用固定版本的
@@ -16,7 +16,6 @@ source/venv，不能讓服務直接跟著開發 working tree 更新。原 static
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable selfhost-scheduler-api selfhost-scheduler-controller
 sudo systemctl start selfhost-scheduler-api selfhost-scheduler-controller
 systemctl is-active selfhost-scheduler-api selfhost-scheduler-controller
 journalctl -u selfhost-scheduler-api -u selfhost-scheduler-controller -n 100 --no-pager
@@ -27,6 +26,17 @@ journalctl -u selfhost-scheduler-api -u selfhost-scheduler-controller -n 100 --n
 `Restart=on-failure` 最多每分鐘3次；只是程序監督，不是 GPU 自動恢復 ready。
 故障／重啟後 controller 使用新 epoch，未知 attempt 不重送；engine 仍活時保留 unknown。
 日誌不可包含 public/worker secret 或私人 payload。
+
+上述只啟動當次服務，不安裝開機自啟。原生 Linux 不需要 Windows keepalive。
+沒有 system-level unit 安裝權限時，可用 `systemd-run --user` 建立 transient units，
+保留固定 release/state、重啟次數上限與 API Docker socket 遮蔽；不要使用 `--scope`
+把服務生命週期綁在呼叫工具上。controller 的 `DOCKER_CONTEXT`／執行路徑須明確固定
+到核對過的 daemon，不依賴互動 shell 的預設 context。user manager、登出與重開機的
+生命週期另行驗證；工具／client 結束後仍存活，不代表登出或開機自啟已驗證。
+
+2026-09-23 原生 Linux 第二輪已確認 transient API/controller、socket 遮蔽、
+Qwen／Whisper真GPU切換與跨工具存活。
+第一輪preflight失敗也保留於 [Linux managed窗口](../evidence/2026-09-23-linux-managed/README.md)。
 
 WSL 的 systemd services 本身不保證 distro 持續存活，參閱
 [Microsoft 文件](https://learn.microsoft.com/en-us/windows/wsl/systemd)。本輪可由 Windows

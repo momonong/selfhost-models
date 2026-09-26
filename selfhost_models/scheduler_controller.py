@@ -11,7 +11,7 @@ class Controller:
     def __init__(self, store, provider):
         self.store, self.provider = store, provider
         self.epoch = None
-        self.lock = FileLock(str(store.root / "controller.lock"), timeout=0)
+        self.lock = FileLock(str(store.root / getattr(store, "controller_lock_name", "controller.lock")), timeout=0)
         self.tasks = {}
         self.stopped = False
         self.pending_results = {}
@@ -22,6 +22,10 @@ class Controller:
             # Providers check conflicting managed/static GPU owners before any mutation.
             await self.provider.preflight()
             self.epoch = self.store.acquire_controller()
+            if hasattr(self.provider, "fence"):
+                await self.provider.fence(self.epoch)
+            if hasattr(self.provider, "reconcile"):
+                await self.provider.reconcile(self.epoch)
             self.store.recover_receipts(self.epoch)
             s = self.store.state()
             if s["phase"] == "unknown" and await self.provider.exited(s):
@@ -42,12 +46,18 @@ class Controller:
                 return
             else:
                 del self.pending_results[aid]
+                await self.acknowledge(aid)
+        if hasattr(self.provider, "reconcile"):
+            await self.provider.reconcile(self.epoch)
         self.store.recover_receipts(self.epoch)
         s = self.store.state()
         if s["phase"] == "unknown":
             if await self.provider.exited(s):
                 self.store.engine_exited(self.epoch)
                 await self.cleanup_exited()
+            return
+        if hasattr(self.store, "should_drain") and self.store.should_drain():
+            await self.unload_idle()
             return
         row = self.store.next_job(self.epoch)
         if row is None:
@@ -80,7 +90,10 @@ class Controller:
             dep = self.store.deployment(row["deployment"])
             self.store.phase(self.epoch, "loading", deployment=dep.id)
             try:
-                asset_path = await asyncio.to_thread(self.store.asset_verify, dep.asset_ref)
+                if hasattr(self.provider, "verify_asset"):
+                    asset_path = await self.provider.verify_asset(dep.asset_ref)
+                else:
+                    asset_path = await asyncio.to_thread(self.store.asset_verify, dep.asset_ref)
                 self.store.reserve_load(self.epoch, dep)
                 # Preparation cannot start a GPU engine. A failure here needs no
                 # engine-exit acknowledgment; the load budget is still consumed.
@@ -125,6 +138,34 @@ class Controller:
             self.tasks[attempt["id"]] = task
             task.add_done_callback(lambda _, aid=attempt["id"]: self.tasks.pop(aid, None))
 
+    async def unload_idle(self, *, operator=False):
+        state = self.store.state()
+        if state["phase"] == "unloaded":
+            await self.cleanup_exited()
+            return
+        if state["phase"] == "unknown" and not operator:
+            if await self.provider.exited(state):
+                self.store.engine_exited(self.epoch)
+                await self.cleanup_exited()
+            return
+        if state["phase"] != "draining":
+            self.store.phase(self.epoch, "draining")
+        if self.store.lease_count() and not operator:
+            return
+        # Explicit offline operator recovery may stop an exact owned engine
+        # with unresolved work. The leases remain until whole-engine exit proof.
+        if not self.store.lease_count():
+            self.store.phase(self.epoch, "unloading")
+        try:
+            async with asyncio.timeout(self.store.config.unload_seconds):
+                await self.provider.unload(self.store.state())
+                if not await self.provider.exited(self.store.state()):
+                    raise SchedulerError("engine_exit_unconfirmed", 503)
+            self.store.engine_exited(self.epoch)
+            await self.cleanup_exited()
+        except Exception:
+            self.store.phase(self.epoch, "unknown")
+
     async def execute(self, attempt):
         aid = attempt["id"]
         running = None
@@ -145,6 +186,7 @@ class Controller:
             try:
                 self.store.terminal(self.epoch, aid, result, error)
                 del self.pending_results[aid]
+                await self.acknowledge(aid)
             except (OSError, sqlite3.Error):
                 # Do not overwrite terminal with unknown or discard sole output.
                 pass
@@ -157,6 +199,17 @@ class Controller:
             if running and not running.done():
                 running.cancel()  # Close transport, NOT a GPU release acknowledgment.
                 await asyncio.gather(running, return_exceptions=True)
+
+    async def acknowledge(self, attempt):
+        if not hasattr(self.provider, "ack"):
+            return
+        try:
+            await self.provider.ack(attempt)
+        except Exception:
+            # A transport failure cannot undo a saved terminal receipt. The
+            # unacknowledged grant remains available for reconciliation.
+            with self.store.tx() as db:
+                self.store.event(db, "executor_ack_pending", attempt)
 
     async def cleanup_exited(self):
         if not hasattr(self.provider, "retire"):
