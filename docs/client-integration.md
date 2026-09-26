@@ -274,3 +274,5 @@ curl 範例便於人工 smoke，不會替你解析 SSE error 或驗證 `[DONE]`�
 
 完成時以合成、非敏感文字驗證 ready、models、一般回應、SSE 完整結束與錯誤 key 401；回報實測環境、request ID、能力快照及未驗證項目。不要重啟服務、切 backend、做故障注入或宣稱產品品質已驗證。
 ```
+
+多執行端registry、持久維護、等待原因與安全GC見 [操作與契約](multi-executor-operations.md)；CPU多程序驗證與實際GPU驗收分開回報。

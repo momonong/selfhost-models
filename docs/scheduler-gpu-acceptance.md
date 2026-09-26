@@ -1,5 +1,11 @@
 # 單機排程 D：GPU 驗收與 managed 交付窗口
 
+2026-09-23 原生 Linux 兩輪已結束：第一輪managed preflight因GPU ownership衝突
+而拒絕（managed0／0）並回復static；資源前置條件確認後，第二輪完成
+managed GPU工程驗收並保留正式Qwen影片服務。CPU修正、完整案例、失敗、配額修訂
+與資源限制见 [兩輪證據](../evidence/2026-09-23-linux-managed/README.md)。
+以下是歷史WSL規格與結果，舊上限不適用於新窗口。
+
 以下開頭是 2026-09-21 11:33:59 Taipei 的第一輪停止／static 恢復快照。
 後續 PID／冷啟動修正與部分能力測試另見 [main2 交接](handoff-main2.md)；
 GPU 工作仍暫停，完整 D 未完成。歷史額度與窗口不可重用。
@@ -25,6 +31,11 @@ client／临時監看程序退出後的跨工具回合存活檢查通過，lease
 - Fresh owner 回覆沒有外部推論使用者，依序讀 ready → authenticated models → lease；
   盤點實際 API/worker image ID、runtime、mounts、Compose 設定 hash、GPU/host/WSL RAM。
   公開結果不保存 key、完整 inspect 或主機個人路徑。
+- **停止 static 之前**，以目標 Docker context 檢查所有運行容器的
+  `HostConfig.DeviceRequests` 與 `HostConfig.Devices`。沒有當前 GPU compute process
+  不表示沒有 GPU ownership 衝突；既有 preflight 保守拒絕外部 device 容器。
+  此檢查在 controller 啟動及每次模型 prepare 都執行。若外部 GPU-capable 服務
+  在驗收後恢復運行，managed 下一次切換仍可能被拒；不得把短暫停用當作日常共存方案。
 - 保存原 static 容器識別與復原命令；保留原 image、模型與 state。原 API/worker
   若不符合已知 Qwen context8192/capacity2/video/gpu0.60 設定，停止並先核對。
 - 確認 native Linux state、controller/API 唯一程序、測試 ports 可用；完整資產 hash

@@ -1,0 +1,70 @@
+{
+  "source_start": "aaa296ff13737503380649a8e6a8b2d2d1a90392",
+  "runtime_source": "369ee39f292c78cddce0c10a4a5e0c6a377f5268",
+  "worker_image_source": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+  "cpu": {
+    "passed": 192,
+    "skipped": 2,
+    "seconds": 16.07,
+    "os": "Ubuntu 24.04",
+    "python": "3.12.3",
+    "uv": "0.11.21"
+  },
+  "round1": {
+    "managed_loads": 0,
+    "managed_generations": 0,
+    "rollback_loads": 1,
+    "rollback_generations": 7,
+    "outcome": "resource_blocked_static_restored"
+  },
+  "round2": {
+    "acceptance_loads": 6,
+    "acceptance_generations": 44,
+    "formal_loads": 1,
+    "formal_generations": 9,
+    "rollback_loads": 0,
+    "rollback_generations": 0,
+    "approved_max_loads": 8,
+    "approved_max_generations": 63,
+    "outcome": "managed_engineering_accepted"
+  },
+  "final": {
+    "backend": "vllm",
+    "model": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "context": 8192,
+    "capacity": 2,
+    "videos": true,
+    "gpu_memory": 0.6,
+    "api_bind": "127.0.0.1:18080",
+    "leases": 0,
+    "supervision": "systemd user transient",
+    "boot_autostart_installed": false,
+    "logout_tested": false,
+    "reboot_tested": false,
+    "product_quality_tested": false
+  },
+  "cases": {
+    "fresh_132": "pass",
+    "cold_132": "failed_premise_aged_fifo_123",
+    "urgent_fifo": "pass",
+    "whisper_running_cancel": "pass",
+    "text_image_tools_video_sse": "pass",
+    "detach_initial_observation": "not_observed",
+    "detach_bounded_observation": "pass",
+    "shared_capacity": "pass",
+    "api_controller_restart_unknown": "pass",
+    "engine_exit_pin_reclaim": "pass",
+    "whisper_recovery_no_redispatch": "pass",
+    "result_storage_failure": "cpu_contract_reused",
+    "formal_durable_json_sse": "pass",
+    "cross_tool_survival": "pass"
+  },
+  "not_performed": [
+    "public_push",
+    "main_merge",
+    "image_publication",
+    "other_service_configuration_change",
+    "network_exposure"
+  ]
+}

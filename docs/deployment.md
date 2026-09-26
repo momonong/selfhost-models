@@ -1,5 +1,7 @@
 # 模型資產與部署
 
+0.3.0rc1 控制端／多 worker 候選版的交付形態、相容性與限制見 [發布紀錄](releases/0.3.0rc1.md)。既有 0.2.0／latest 保持不變。
+
 ## 影片 opt-in 部署
 
 先協調共用服務的使用時段、確認既有 lease 歸零。停止現有部署後才執行：
@@ -316,3 +318,5 @@ uv run --locked python scripts/chat.py --wait 600 "Reply with READY."
 `--no-build` 仍檢查模型與 revision，建立本機 key/state/compose.env，使用 `up --no-build --pull never`；缺 image 就失敗，不 fallback 到 build。省略此選項則沿用原始碼建置。Transformers 先停止 vLLM，再使用 `--backend transformers --context 2048 --max-inflight 1 --no-build`，不加 video。CLI 契約與 Linux 原生 Docker 的兩 backend 已驗收，範圍與限制見 [驗收文件](acceptance.md)。
 
 來源與容器驗證見 [images.json](../evidence/2026-09-16-release-0.2.0/images.json)，發布證據見 [docker-hub.json](../evidence/2026-09-16-release-0.2.0/docker-hub.json)。發布時筆電容器保留原 image，沒有重啟服務；後續 Linux 驗收另見 [驗收摘要](acceptance.md)。桌球產品品質仍未驗收。
+
+多執行端registry、持久維護、等待原因與安全GC見 [操作與契約](multi-executor-operations.md)；CPU多程序驗證與實際GPU驗收分開回報。

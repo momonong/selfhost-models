@@ -478,3 +478,12 @@ uv 0.12.15 + Python 3.12.14：舊 `requirements.lock` 的 30 個套件版本與 
 - Docker event 查詢未保留對應的原始退出事件；應用程式日誌没有該結束時間的直接退出原因。
 
 **255 的直接原因仍無法確定。** 上述時序不能證明是應用程式崩潰、CUDA OOM 或特定 Docker bug，也不能將 daemon 恢復時寫下的時間直接當成實際程序終止時間。本次不據此更換 runtime 或加入自動重啟政策。
+
+
+## 2026-09-25 單機維護與多執行端架構驗證
+
+來源與完整範圍見 [多執行端操作](multi-executor-operations.md#本輪驗證範圍)。
+291項CPU回歸通過、2項平台跳過；兩個真正CPU executor＋control分別以HTTP及Landlock驗證
+並行與故障隔離。單4090另驗Qwen/Whisper固定部署、共享admission、維護、取消、GC及重啟，
+4 loads／35 generation attempts後保留Qwen影片ready，最終JSON/SSE呼叫成功。
+這不代表多GPU或產品品質驗收；原始主機證據保留本機，不納入公開Git。

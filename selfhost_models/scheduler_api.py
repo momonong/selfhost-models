@@ -35,17 +35,25 @@ async def body_json(gateway, receive, headers, limit):
 
 async def route(gateway, scope, receive, send, headers, rid):
     path, method = scope["path"], scope["method"]
-    if path not in ("/v1/catalog", "/v1/jobs", "/v1/artifacts", "/v1/scheduler") and not path.startswith(("/v1/jobs/", "/v1/artifacts/")):
+    if path not in ("/v1/catalog", "/v1/jobs", "/v1/artifacts", "/v1/scheduler", "/v1/executors") and not path.startswith(("/v1/jobs/", "/v1/artifacts/")):
         return False
-    store = gateway.scheduler
+    store = gateway.control_store or gateway.scheduler
     status = 200
     try:
         if path == "/v1/catalog" and method == "GET":
             result = {"object": "list", "data": store.catalog()}
+        elif path == "/v1/executors" and method == "GET":
+            result = {"object": "list", "data": gateway.fleet.views() if gateway.fleet else [],
+                      "legacy_executor": gateway.scheduler.execution_binding()["executor_id"]
+                          if gateway.scheduler.execution_binding() else None}
         elif path == "/v1/scheduler" and method == "GET":
-            state = store.state()
+            state = gateway.scheduler.state()
             result = {k: state[k] for k in ("phase", "deployment", "worker_epoch", "heartbeat")}
             result["inflight"] = store.lease_count()
+            if gateway.fleet:
+                workers = gateway.fleet.views()
+                result.update(executors=workers, all_ready=bool(workers) and all(w["ready"] for w in workers),
+                              ready_executors=sum(w["ready"] for w in workers))
         elif path == "/v1/jobs" and method == "POST":
             spec = SubmitJob.model_validate(await body_json(gateway, receive, headers, store.config.input_bytes))
             result, created = store.submit(spec, headers.get(b"idempotency-key", b"").decode("ascii"))
@@ -78,6 +86,12 @@ async def route(gateway, scope, receive, send, headers, rid):
                 raise SchedulerError("not_found", 404)
         else:
             raise SchedulerError("not_found", 404)
+        if gateway.fleet and path.startswith("/v1/jobs"):
+            if isinstance(result, dict) and result.get("id", "").startswith("job_"):
+                result["scheduling"] = gateway.fleet.explain(result["id"])
+            elif path == "/v1/jobs" and method == "GET":
+                for item in result["data"]:
+                    item["scheduling"] = gateway.fleet.explain(item["id"])
         await gateway.json_response(send, status, result, rid)
     except (ValidationError, ValueError, UnicodeError, RecursionError):
         raise SchedulerError("invalid_request") from None

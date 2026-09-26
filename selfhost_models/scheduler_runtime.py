@@ -1,9 +1,13 @@
 """Fixed local execution provider. No client-selected shell, paths or Docker args."""
 import asyncio
+import copy
+from contextlib import asynccontextmanager
+from pathlib import Path
 import json
 import os
 import secrets
 import sys
+import time
 import uuid
 
 import httpx
@@ -14,14 +18,16 @@ from .scheduler_store import durable_write
 from .video import find_video, prepare_video
 
 
-class DockerProvider:
-    def __init__(self, store):
-        self.store = store
-        self.namespace = digest(str(store.root))[:16]
+class DockerRuntime:
+    """Executor-local runtime; never opens or depends on the control Store."""
+
+    def __init__(self, root, config):
+        self.root, self.config = Path(root).resolve(), config
+        self.namespace = digest(str(self.root))[:16]
         self.network = "selfhost-scheduler-" + self.namespace
-        self.secret_path = store.root / "worker-key"
+        self.secret_path = self.root / "worker-key"
         self.backend = None
-        self.url = f"http://127.0.0.1:{store.config.worker_port}"
+        self.url = f"http://127.0.0.1:{self.config.worker_port}"
         self.key = None
 
     async def command(self, *args, timeout=30):
@@ -39,16 +45,34 @@ class DockerProvider:
             raise SchedulerError("provider_response_too_large", 503)
         return out
 
+    async def inventory_identity(self):
+        # The runtime currently exposes one physical GPU. Reject an ambiguous
+        # multi-GPU host instead of advertising several independent aliases.
+        proc = await asyncio.create_subprocess_exec(
+            "nvidia-smi", "--query-gpu=uuid", "--format=csv,noheader",
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        try:
+            out, _ = await asyncio.wait_for(proc.communicate(), 10)
+        except BaseException:
+            if proc.returncode is None:
+                proc.kill()
+            await proc.wait()
+            raise
+        devices = out.decode().strip().splitlines()
+        if proc.returncode or len(devices) != 1 or not devices[0].startswith("GPU-"):
+            raise SchedulerError("single_gpu_identity_required", 503)
+        return {"resource_id": "gpu:" + devices[0], "kind": "gpu"}
+
     async def preflight(self):
         if sys.platform != "linux":
             raise SchedulerError("managed_runtime_requires_linux", 503)
         # SQLite must live on the local Linux filesystem, not drvfs/9p/NAS.
-        proc = await asyncio.create_subprocess_exec("stat", "-f", "-c", "%T", str(self.store.root), stdout=asyncio.subprocess.PIPE)
+        proc = await asyncio.create_subprocess_exec("stat", "-f", "-c", "%T", str(self.root), stdout=asyncio.subprocess.PIPE)
         fs, _ = await proc.communicate()
         if proc.returncode or fs.strip() not in (b"ext2/ext3", b"xfs", b"btrfs"):
             raise SchedulerError("state_requires_local_linux_filesystem", 503)
         from .gpu_ownership import GPUOwnership
-        self.ownership = GPUOwnership(self.store.root, "managed")
+        self.ownership = GPUOwnership(self.root, "managed")
         # Do not strand a new gate while a pre-existing unmanaged owner is live.
         await self.check_other_gpu_owners()
         await asyncio.to_thread(self.ownership.acquire)
@@ -59,7 +83,7 @@ class DockerProvider:
         if len(self.key) < 32:
             raise SchedulerError("invalid_worker_secret", 503)
         # Parent directory is private; mounted file readable by fixed worker UID.
-        os.chmod(self.store.root, 0o700)
+        os.chmod(self.root, 0o700)
         os.chmod(self.secret_path, 0o444)
 
     async def check_other_gpu_owners(self):
@@ -84,6 +108,8 @@ class DockerProvider:
         labels = info.get("Config", {}).get("Labels", {})
         if labels.get("selfhost.scheduler") != self.namespace or labels.get("selfhost.deployment") != state["deployment"]:
             raise SchedulerError("engine_ownership_mismatch", 503)
+        if not state['handle'].endswith('-relay') and state.get('container_id') and info['Id'] != state['container_id']:
+            raise SchedulerError("engine_identity_unconfirmed", 503)
         return info
 
     async def exited(self, state):
@@ -166,7 +192,7 @@ class DockerProvider:
         relay = handle + "-relay"
         await self.command("create", "--pull=never", "--name", relay,
             "--label", "selfhost.scheduler=" + self.namespace, "--label", "selfhost.deployment=" + dep.id,
-            "--network", ingress, "-p", f"127.0.0.1:{self.store.config.worker_port}:8000",
+            "--network", ingress, "-p", f"127.0.0.1:{self.config.worker_port}:8000",
             "--read-only", "--memory", "256m", "--cpus", "1", "--pids-limit", "32",
             "--security-opt", "no-new-privileges:true", "--cap-drop", "ALL",
             "--mount", f"type=bind,source={self.secret_path},target=/run/secrets/worker_key,readonly",
@@ -179,9 +205,10 @@ class DockerProvider:
         self.backend = VLLMBackend(self.url, dep.load.capacity + 2, profile="qwen3_5", capacity=dep.load.capacity, video_enabled=dep.load.video)
         self.backend.client.headers["x-selfhost-worker-key"] = self.key
 
-    async def identity(self):
+    async def identity(self, dep=None):
         if self.backend is None:
-            dep = self.store.deployment(self.store.state()["deployment"])
+            if dep is None:
+                raise SchedulerError("deployment_required", 409)
             self.set_backend(dep)
         return await self.backend.identity()
 
@@ -194,28 +221,33 @@ class DockerProvider:
             if response.headers.get("x-worker-epoch") != epoch or response.json().get("terminal") is not True:
                 raise SchedulerError("warmup_unconfirmed", 503)
 
-    async def execute(self, dep, spec, attempt, store):
+    async def execute_payload(self, dep, payload, request_id, worker_epoch, result_bytes, deadline=None, *, cancelled=None):
+        """Execute transferred bytes; deadline is an absolute Unix timestamp.
+
+        Expiration before dispatch is a known non-start. Once dispatched the
+        transport must drain to terminal; deadline never proves engine exit.
+        """
+        payload = copy.deepcopy(payload)
+        video = None
+        if (deadline is not None and time.time() >= deadline) or (cancelled and cancelled()):
+            return {"canceled_before_gpu": True}, "canceled_before_gpu"
+        if dep.runtime == "vllm" and find_video(payload):
+            video = await prepare_video(payload)
+        if (deadline is not None and time.time() >= deadline) or (cancelled and cancelled()):
+            return {"canceled_before_gpu": True}, "canceled_before_gpu"
+        return await self._execute_prepared(dep, payload, request_id, worker_epoch, result_bytes, video)
+
+    async def _execute_prepared(self, dep, payload, request_id, worker_epoch, result_bytes, video=None):
         if self.backend is None:
             self.set_backend(dep)
-        payload = spec.input.model_dump(exclude_none=True)
-        video = None
         if dep.runtime == "vllm":
             payload.setdefault("chat_template_kwargs", {"enable_thinking": False})
-            if find_video(payload):
-                video = await prepare_video(payload)
-                # Decoder was reaped. Cancellation here means no GPU dispatch.
-                row = store.job(attempt["job"], True)
-                if row["cancel_requested"] or store.clock() >= attempt["started"] + row["execution_limit"]:
-                    return {"canceled_before_gpu": True}, "canceled_before_gpu"
-            context = self.backend.generate(payload, attempt["id"])
+            context = self.backend.generate(payload, request_id)
         else:
-            import base64
-            data, _ = store.artifact(spec.input.audio_ref)
-            payload.pop("audio_ref")
-            payload.update(model=dep.model, audio_base64=base64.b64encode(data).decode())
+            payload["model"] = dep.model
             context = self.backend.client.stream("POST", "/internal/transcribe", json=payload)
         async with context as response:
-            if response.headers.get("x-worker-epoch") != attempt["worker_epoch"]:
+            if response.headers.get("x-worker-epoch") != worker_epoch:
                 raise SchedulerError("worker_changed", 503)
             if response.status_code in (400, 404, 422):
                 return {"error": "worker_rejected"}, "worker_rejected"
@@ -223,7 +255,7 @@ class DockerProvider:
             result = bytearray()
             async for chunk in response.aiter_bytes():
                 result.extend(chunk)
-                if len(result) > store.config.result_bytes:
+                if len(result) > result_bytes:
                     raise SchedulerError("result_too_large", 503)
             data = json.loads(result)
             terminal = (bool(data.get("choices")) and all(c.get("finish_reason") is not None for c in data["choices"])) if dep.runtime == "vllm" else data.get("terminal") is True
@@ -233,10 +265,34 @@ class DockerProvider:
                 data["video"] = video
             return data, None
 
+    @asynccontextmanager
+    async def generate_stream(self, dep, payload, request_id, worker_epoch, *, deadline=None, cancelled=None):
+        """Yield the verified worker response for the executor's durable spool.
+
+        The caller owns terminal/SSE validation and result limits. It must keep
+        consuming independently of its client connection; closing this context
+        is not evidence that GPU execution stopped.
+        """
+        if dep.runtime != "vllm":
+            raise SchedulerError("unsupported_operation")
+        payload = copy.deepcopy(payload)
+        video = await prepare_video(payload) if find_video(payload) else None
+        if (deadline is not None and time.time() >= deadline) or (cancelled and cancelled()):
+            raise SchedulerError("canceled_before_gpu", 409)
+        payload.setdefault("chat_template_kwargs", {"enable_thinking": False})
+        if self.backend is None:
+            self.set_backend(dep)
+        async with self.backend.generate(payload, request_id) as response:
+            if response.headers.get("x-worker-epoch") != worker_epoch:
+                raise SchedulerError("worker_changed", 503)
+            if video:
+                response.extensions["selfhost_video"] = video
+            yield response
+
     async def unload(self, state):
         info = await self.inspect(state)
         if info["State"]["Running"]:
-            await self.command("stop", "--time", str(self.store.config.unload_seconds - 1), info["Id"], timeout=self.store.config.unload_seconds)
+            await self.command("stop", "--time", str(self.config.unload_seconds - 1), info["Id"], timeout=self.config.unload_seconds)
         # Relay owns no GPU. Verify labels before stopping its deterministic name.
         relay_state = {**state, "handle": state["handle"] + "-relay"}
         relay = await self.inspect(relay_state)
@@ -264,7 +320,48 @@ class DockerProvider:
                 await self.command("stop", "--time", "2", info["Id"])
             await self.command("rm", info["Id"])
 
-    async def release_ownership(self):
-        if self.store.state()["phase"] != "unloaded" or self.store.lease_count():
+    async def release_ownership(self, *, engine_unloaded=False, leases_resolved=False):
+        # The executor journal must establish both facts before requesting gate
+        # release. GPUOwnership additionally checks actual Docker GPU owners.
+        if engine_unloaded is not True or leases_resolved is not True:
             raise SchedulerError("gpu_exit_unconfirmed", 409)
+        if not hasattr(self, "ownership"):
+            from .gpu_ownership import GPUOwnership
+            self.ownership = GPUOwnership(self.root, "managed")
         await asyncio.to_thread(self.ownership.release)
+
+
+class DockerProvider(DockerRuntime):
+    """Compatibility adapter for the original single-host controller/API."""
+
+    def __init__(self, store):
+        self.store = store
+        super().__init__(store.root, store.config)
+
+    async def identity(self, dep=None):
+        if dep is None and self.backend is None:
+            dep = self.store.deployment(self.store.state()["deployment"])
+        return await super().identity(dep)
+
+    async def execute(self, dep, spec, attempt, store):
+        payload = spec.input.model_dump(exclude_none=True)
+        video = None
+        if dep.runtime == "vllm" and find_video(payload):
+            video = await prepare_video(payload)
+            # Preserve the local adapter's authoritative cancellation/clock
+            # check after decoding and before any GPU dispatch.
+            row = store.job(attempt["job"], True)
+            if row["cancel_requested"] or store.clock() >= attempt["started"] + row["execution_limit"]:
+                return {"canceled_before_gpu": True}, "canceled_before_gpu"
+        elif dep.runtime == "whisper":
+            import base64
+            data, _ = store.artifact(spec.input.audio_ref)
+            payload.pop("audio_ref")
+            payload["audio_base64"] = base64.b64encode(data).decode()
+        return await self._execute_prepared(dep, payload, attempt["id"], attempt["worker_epoch"], store.config.result_bytes, video)
+
+    async def release_ownership(self):
+        await super().release_ownership(
+            engine_unloaded=self.store.state()["phase"] == "unloaded",
+            leases_resolved=self.store.lease_count() == 0,
+        )

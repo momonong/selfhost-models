@@ -1,7 +1,8 @@
 FROM python:3.12-slim-bookworm@sha256:782412e85d0f0984994c290652577d4018aff08145c85b262bb63dc0c7522254
 ARG SOURCE_REVISION=unknown
-LABEL org.opencontainers.image.version="0.2.0" \
+LABEL org.opencontainers.image.version="0.3.0rc1" \
       org.opencontainers.image.revision=$SOURCE_REVISION \
+      org.selfhost-models.release-channel="candidate" \
       org.opencontainers.image.source="https://github.com/momonong/selfhost-models"
 COPY --from=ghcr.io/astral-sh/uv:0.12.15@sha256:62f8c047d0a0e9ece6b53fc63df902585a67a47a7f318ddec4a37db586edc8e3 /uv /usr/local/bin/uv
 WORKDIR /app

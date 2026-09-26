@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import concurrent.futures
+import contextlib
 import io
 import json
 import os
@@ -465,6 +466,126 @@ async def test_api_served_models_qwen_whisper_and_authoritative_health(tmp_path,
     finally:
         monitor.cancel()
         await asyncio.gather(monitor,return_exceptions=True)
+
+
+class ProbedBackend:
+    def __init__(self):
+        self.probes = asyncio.Queue()
+        self.finish = asyncio.Event()
+
+    async def identity(self):
+        result, done = asyncio.get_running_loop().create_future(), asyncio.Event()
+        self.probes.put_nowait((result, done))
+        try:
+            return await result
+        finally:
+            done.set()
+
+    async def close(self):
+        pass
+
+    @contextlib.asynccontextmanager
+    async def generate(self, payload, rid):
+        finish = self.finish
+        class Chunks(httpx.AsyncByteStream):
+            async def __aiter__(self):
+                yield b'data: {"choices": [{"delta": {"content": "OK"}}]}\n\n'
+                await finish.wait()
+                yield b'data: [DONE]\n\n'
+        yield httpx.Response(200, headers={"x-worker-epoch": "worker-one"}, stream=Chunks())
+
+
+def probed_gateway(tmp_path, monkeypatch):
+    from selfhost_models import scheduler_runtime
+    s, q, w, clock = setup_store(tmp_path)
+    epoch = ready(s, q)
+    (s.root / "worker-key").write_text("internal" * 8)
+    backend = ProbedBackend()
+    class Provider:
+        def __init__(self, store): self.secret_path = store.root / "worker-key"
+        def set_backend(self, dep): self.backend = backend
+    monkeypatch.setattr(scheduler_runtime, "DockerProvider", Provider)
+    return Gateway(key="public" * 8, scheduler=s), backend, s, q, w, clock, epoch
+
+
+async def complete_probe(backend, *, error=False):
+    result, done = await asyncio.wait_for(backend.probes.get(), 1)
+    if error:
+        result.set_exception(RuntimeError("identity unavailable"))
+    else:
+        result.set_result("worker-one")
+    await asyncio.wait_for(done.wait(), 1)
+
+
+async def test_managed_readiness_probe_keeps_sse_admission_and_detached_lease(tmp_path, monkeypatch):
+    g, backend, s, q, _, _, _ = probed_gateway(tmp_path, monkeypatch)
+    monitor = asyncio.create_task(g.watch_scheduler())
+    handler = None
+    try:
+        await complete_probe(backend)
+        # Hold the next periodic identity check while the existing engine is ready.
+        await asyncio.wait_for(backend.probes.get(), 1)
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(g), base_url="http://test",
+                                     headers={"Authorization": "Bearer " + "public" * 8}) as client:
+            assert (await client.get("/health/ready")).status_code == 200
+            assert (await client.get("/v1/models")).status_code == 200
+        events, sent, started = asyncio.Queue(), [], asyncio.Event()
+        await events.put({"type": "http.request", "body": json.dumps({
+            "model": q.model, "messages": [{"role": "user", "content": "synthetic"}], "stream": True}).encode()})
+        async def send(event):
+            sent.append(event)
+            if event["type"] == "http.response.start": started.set()
+        handler = asyncio.create_task(g({"type": "http", "method": "POST", "path": "/v1/chat/completions",
+            "headers": [(b"authorization", ("Bearer " + "public" * 8).encode()),
+                        (b"content-type", b"application/json")]}, events.get, send))
+        await asyncio.wait_for(started.wait(), 1)
+        assert sent[0]["status"] == 200 and s.lease_count() == 1
+        assert s.budget_state()["generations"] == 1
+        await events.put({"type": "http.disconnect"})
+        await asyncio.wait_for(handler, 1)
+        assert s.health()["detached"] == 1 and s.lease_count() == 1
+        backend.finish.set()
+        await asyncio.gather(*g.tasks)
+        assert s.lease_count() == 0
+    finally:
+        backend.finish.set()
+        monitor.cancel()
+        if handler: handler.cancel()
+        await asyncio.gather(monitor, *([handler] if handler else []), *g.tasks, return_exceptions=True)
+
+
+@pytest.mark.parametrize("change", ["initial", "draining", "unknown", "epoch", "deployment", "heartbeat", "identity"])
+async def test_managed_readiness_probe_fails_closed(tmp_path, monkeypatch, change):
+    g, backend, s, q, w, clock, epoch = probed_gateway(tmp_path, monkeypatch)
+    monitor = asyncio.create_task(g.watch_scheduler())
+    try:
+        if change != "initial":
+            await complete_probe(backend)
+        result, done = await asyncio.wait_for(backend.probes.get(), 1)
+        if change in ("draining", "unknown"):
+            s.phase(epoch, change)
+        elif change in ("epoch", "deployment"):
+            s.engine_exited(epoch)
+            s.phase(epoch, "loading", deployment=w.id if change == "deployment" else q.id)
+            s.phase(epoch, "ready", worker_epoch="worker-two")
+        elif change == "heartbeat":
+            clock.now += 11
+        if change != "initial":
+            if change == "identity": result.set_exception(RuntimeError("identity unavailable"))
+            else: result.set_result("worker-one")
+            await asyncio.wait_for(done.wait(), 1)
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(g), base_url="http://test",
+                                     headers={"Authorization": "Bearer " + "public" * 8}) as client:
+            assert (await client.get("/health/ready")).status_code == 503
+            assert (await client.get("/v1/models")).status_code == 503
+            response = await client.post("/v1/chat/completions", json={
+                "model": q.model, "messages": [{"role": "user", "content": "synthetic"}], "stream": True})
+            assert response.status_code == 503
+            assert response.json()["error"]["code"] == "worker_not_ready"
+        assert not g.ready and s.lease_count() == 0 and s.budget_state()["generations"] == 0
+    finally:
+        monitor.cancel()
+        await asyncio.gather(monitor, return_exceptions=True)
 
 
 def test_concurrent_upload_quota_and_pending_result_retention(tmp_path):

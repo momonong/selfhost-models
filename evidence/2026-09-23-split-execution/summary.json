@@ -1,0 +1,88 @@
+{
+  "source_commit": "19c4b89d4b576b92b976dd177e8722e08f69c906",
+  "cpu": {
+    "passed": 232,
+    "skipped": 2,
+    "skip_scope": "Windows-only",
+    "seconds": 22.49
+  },
+  "process_isolation": {
+    "real_processes": true,
+    "transport": "loopback HTTP",
+    "filesystem": "Landlock",
+    "denied_cross_plane_reads": 6,
+    "passed": true
+  },
+  "migration_copy": {
+    "original_tables_unchanged": true,
+    "production_db_migrated": false
+  },
+  "gpu": {
+    "qwen": [
+      "text",
+      "image",
+      "tools",
+      "synthetic_video_decode",
+      "json",
+      "sse",
+      "video_sse"
+    ],
+    "whisper": [
+      "transferred_wav",
+      "running_cancel",
+      "recovery"
+    ],
+    "shared_admission": true,
+    "unknown_replay": false,
+    "fault_exit": {
+      "code": 137,
+      "oom": false
+    }
+  },
+  "budget": {
+    "limits": {
+      "loads": 8,
+      "generations": 70,
+      "seconds": 5400
+    },
+    "actual": {
+      "loads": 5,
+      "generations": 44,
+      "seconds": 782.36
+    },
+    "acceptance": {
+      "loads": 4,
+      "generations": 35
+    },
+    "formal": {
+      "loads": 1,
+      "generations": 9
+    },
+    "rollback_used": false,
+    "windows_closed": true
+  },
+  "final": {
+    "backend": "vllm",
+    "model": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "video": true,
+    "loopback_port": 18080,
+    "context": 8192,
+    "capacity": 2,
+    "gpu_fraction": 0.6,
+    "ready": true,
+    "inflight": 0,
+    "detached": 0,
+    "uncertain": 0,
+    "boot_autostart": false
+  },
+  "unvalidated": [
+    "multi-host",
+    "LAN/public",
+    "other OS",
+    "logout/reboot",
+    "product quality",
+    "rollback execution",
+    "journal GC"
+  ]
+}

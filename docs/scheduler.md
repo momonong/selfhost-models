@@ -5,8 +5,10 @@ Compose／Chat／SSE 保留；啟用 managed 模式不代表已通過 GPU 切換
 首批固定 Qwen3.5-4B／vLLM 與 Whisper-small／Transformers。資產、runtime 與資源
 設定共同決定 deployment，不按模型家族或相同權重合併排程。
 
-目前 GPU 工作暫停，完整 managed 驗收未完成。候選發布、歷史證據與後續決策邊界見
-[main2 交接入口](handoff-main2.md)；發布原始碼或 image 不會啟動服務或重新開放 GPU 窗口。
+2026-09-23 原生 Linux 單台 RTX4090 已完成 [managed工程驗收](../evidence/2026-09-23-linux-managed/README.md)，
+保留loopback Qwen影片服務；此結果不代表其他主機、歷史WSL或產品品質也通過。
+候選發布、歷史證據與後續決策邊界見 [main2交接入口](handoff-main2.md)；
+發布原始碼或image本身不會啟動服務或重新開放GPU窗口。
 
 ## 執行位置與權限
 
