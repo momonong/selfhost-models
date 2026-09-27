@@ -1,0 +1,136 @@
+{
+  "version": "0.3.0rc1",
+  "channel": "candidate",
+  "published_date": "2026-09-27",
+  "source_commit": "9b44d42818a5faf1eda25bd2977897a4ffe73d0e",
+  "source_tree": "72a231661b93e054a6587bb62133c8c94b07deac",
+  "code_merge": "eb36ba3998527739cae3aa177d37f50503673c02",
+  "code_pr": "https://github.com/momonong/selfhost-models/pull/2",
+  "images": {
+    "api": {
+      "repository": "momonong/selfhost-models-api",
+      "tag": "0.3.0rc1",
+      "digest": "sha256:463376273acfdd79e94229b17f65852fb6e9bf671a20c3732312463371153eca",
+      "platform_digest": "sha256:463376273acfdd79e94229b17f65852fb6e9bf671a20c3732312463371153eca",
+      "config_digest": "sha256:241aaed6c6da8ae8f01aa6447333326fe481da3ce57272d1fe55535693f595aa",
+      "platform": "linux/amd64",
+      "oci_revision": "9b44d42818a5faf1eda25bd2977897a4ffe73d0e",
+      "oci_version": "0.3.0rc1",
+      "publication": "rebuilt"
+    },
+    "vllm": {
+      "repository": "momonong/selfhost-models-vllm",
+      "tag": "0.3.0rc1",
+      "digest": "sha256:fdebb477430924ab768ce6db0d2294f2f8d5c693abd5589275fb9fcfb2819655",
+      "platform_digest": "sha256:e7885044b9e9700915473fe0ea066fd2a798031428a042ef28542ea30deed59f",
+      "config_digest": "sha256:1cef6a3ee8456820a1b4f168e47d8ef65bf72fa296056d76827cc605277fd208",
+      "platform": "linux/amd64",
+      "oci_revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+      "oci_version": "scheduler-dev-20260923-c7f35e14911e",
+      "publication": "unchanged_digest_alias"
+    },
+    "whisper": {
+      "repository": "momonong/selfhost-models-whisper",
+      "tag": "0.3.0rc1",
+      "digest": "sha256:fcce6a4a9bdb31edbb2b2270d0bb05211ebb06bf50b68372ea966009595a4953",
+      "platform_digest": "sha256:6fde9443341560e93e08da832fc34d988c60269bc8ae7a9d016a716074d1cefc",
+      "config_digest": "sha256:e329cad95d9a26e55a6f5dc2b1d8c101d0e8ef1eea7d66379b0ec8cc43f5a4ac",
+      "platform": "linux/amd64",
+      "oci_revision": "c7f35e14911eb8a4bb12458b0c79bb2ef72f6351",
+      "oci_version": "scheduler-dev-20260923-c7f35e14911e",
+      "publication": "unchanged_digest_alias"
+    },
+    "static_transformers": {
+      "repository": "momonong/selfhost-models-transformers",
+      "tag": "0.2.0",
+      "digest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f",
+      "platform_digest": "sha256:5671572c2a699d8b8350ca865bf6aadf54849e12a85d6def324f842f058a6cb2",
+      "platform": "linux/amd64",
+      "oci_revision": "29bec681f6577f88067edf8cca9952e66b58232c",
+      "oci_version": "0.2.0",
+      "publication": "unchanged_existing_release"
+    }
+  },
+  "validation": {
+    "cpu": {
+      "passed": 291,
+      "skipped": 2,
+      "skip_scope": "Windows-only",
+      "seconds": 35.92
+    },
+    "api_image": {
+      "exact_source_modules": 24,
+      "version_and_source_labels_match": true,
+      "uid": 10001,
+      "network": "none",
+      "read_only": true,
+      "gpu": false,
+      "docker_socket": false,
+      "torch": false,
+      "cpu_limit": 2,
+      "memory_gib": 2,
+      "pids_limit": 128,
+      "cli_and_controller_start": true,
+      "asgi_live": 200,
+      "unloaded_ready": 503,
+      "unauthenticated": 401,
+      "authenticated_fleet_views": 200,
+      "registry_pull_matches_tested_image": true
+    },
+    "workers_effective_source_unchanged": true,
+    "gpu": {
+      "evidence": "native Linux single RTX 4090; see multi-executor-operations.md",
+      "runtime_source": "6f1046531c08fa56be7f14be4e5b0ea4067e9a53",
+      "published_runtime_equivalent_except_package_version": true,
+      "new_api_image_gpu_suite_rerun": false,
+      "multi_gpu_validated": false,
+      "product_quality_validated": false
+    },
+    "github_actions_test_build_runs": 0,
+    "code_pr_gitguardian": "success",
+    "anonymous_registry_readback": true
+  },
+  "preserved_stable_tags": {
+    "api": {
+      "0.2.0": {
+        "status": 200,
+        "digest": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4"
+      },
+      "latest": {
+        "status": 200,
+        "digest": "sha256:83ff47579c8b95a45c4448cce2ceba876d755ba9df95066e5237c535e065c5f4"
+      }
+    },
+    "vllm": {
+      "0.2.0": {
+        "status": 200,
+        "digest": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0"
+      },
+      "latest": {
+        "status": 200,
+        "digest": "sha256:8d3662676caf1539203644e67fc90188cfc6898c623daac871281f24e5fb59e0"
+      }
+    },
+    "transformers": {
+      "0.2.0": {
+        "status": 200,
+        "digest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f"
+      },
+      "latest": {
+        "status": 200,
+        "digest": "sha256:ae2fee7b2386ec9640eb56a7d95aea8e540331c437616fd5746d63de5ab93e0f"
+      }
+    }
+  },
+  "deployment_changed_by_publication": false,
+  "models": {
+    "qwen": {
+      "id": "Qwen/Qwen3.5-4B",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
+    },
+    "whisper": {
+      "id": "openai/whisper-small",
+      "revision": "973afd24965f72e36ca33b3055d56a652f456b4d"
+    }
+  }
+}
