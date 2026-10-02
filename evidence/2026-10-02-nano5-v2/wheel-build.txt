@@ -1,0 +1,138 @@
+Building wheel...
+running egg_info
+writing selfhost_models.egg-info/PKG-INFO
+writing dependency_links to selfhost_models.egg-info/dependency_links.txt
+writing entry points to selfhost_models.egg-info/entry_points.txt
+writing requirements to selfhost_models.egg-info/requires.txt
+writing top-level names to selfhost_models.egg-info/top_level.txt
+reading manifest file 'selfhost_models.egg-info/SOURCES.txt'
+writing manifest file 'selfhost_models.egg-info/SOURCES.txt'
+running bdist_wheel
+running build
+running build_py
+copying selfhost_models/fleet_controller.py -> build/lib/selfhost_models
+copying selfhost_models/batch_cli.py -> build/lib/selfhost_models
+copying selfhost_models/execution_retention.py -> build/lib/selfhost_models
+copying selfhost_models/scheduler_store.py -> build/lib/selfhost_models
+copying selfhost_models/cli.py -> build/lib/selfhost_models
+copying selfhost_models/capabilities.py -> build/lib/selfhost_models
+copying selfhost_models/fleet_store.py -> build/lib/selfhost_models
+copying selfhost_models/gpu_ownership.py -> build/lib/selfhost_models
+copying selfhost_models/batch.py -> build/lib/selfhost_models
+copying selfhost_models/batch_app.py -> build/lib/selfhost_models
+copying selfhost_models/scheduler_runtime.py -> build/lib/selfhost_models
+copying selfhost_models/batch_projects.py -> build/lib/selfhost_models
+copying selfhost_models/scheduler_controller.py -> build/lib/selfhost_models
+copying selfhost_models/schema.py -> build/lib/selfhost_models
+copying selfhost_models/wav.py -> build/lib/selfhost_models
+copying selfhost_models/scheduler_cli.py -> build/lib/selfhost_models
+copying selfhost_models/scheduler_api.py -> build/lib/selfhost_models
+copying selfhost_models/api.py -> build/lib/selfhost_models
+copying selfhost_models/assets.py -> build/lib/selfhost_models
+copying selfhost_models/execution_client.py -> build/lib/selfhost_models
+copying selfhost_models/executor.py -> build/lib/selfhost_models
+copying selfhost_models/scheduler_schema.py -> build/lib/selfhost_models
+copying selfhost_models/execution_protocol.py -> build/lib/selfhost_models
+copying selfhost_models/video_decoder.py -> build/lib/selfhost_models
+copying selfhost_models/video.py -> build/lib/selfhost_models
+copying selfhost_models/backend.py -> build/lib/selfhost_models
+copying selfhost_models/__init__.py -> build/lib/selfhost_models
+copying selfhost_models/storage.py -> build/lib/selfhost_models
+running egg_info
+writing selfhost_models.egg-info/PKG-INFO
+writing dependency_links to selfhost_models.egg-info/dependency_links.txt
+writing entry points to selfhost_models.egg-info/entry_points.txt
+writing requirements to selfhost_models.egg-info/requires.txt
+writing top-level names to selfhost_models.egg-info/top_level.txt
+reading manifest file 'selfhost_models.egg-info/SOURCES.txt'
+writing manifest file 'selfhost_models.egg-info/SOURCES.txt'
+copying selfhost_models/batch_static/index.html -> build/lib/selfhost_models/batch_static
+copying selfhost_models/batch_static/app.js -> build/lib/selfhost_models/batch_static
+copying selfhost_models/batch_static/style.css -> build/lib/selfhost_models/batch_static
+copying selfhost_models/batch_static/app.js -> build/lib/selfhost_models/batch_static
+copying selfhost_models/batch_static/index.html -> build/lib/selfhost_models/batch_static
+copying selfhost_models/batch_static/style.css -> build/lib/selfhost_models/batch_static
+warning: build_py: byte-compiling is disabled, skipping.
+
+installing to build/bdist.linux-x86_64/wheel
+running install
+running install_lib
+creating build/bdist.linux-x86_64/wheel
+creating build/bdist.linux-x86_64/wheel/selfhost_models
+copying build/lib/selfhost_models/fleet_controller.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/batch_cli.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/execution_retention.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/scheduler_store.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/cli.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/capabilities.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/fleet_store.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/gpu_ownership.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/batch.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/batch_app.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/scheduler_runtime.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/batch_projects.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/scheduler_controller.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/schema.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/wav.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/scheduler_cli.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/scheduler_api.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+creating build/bdist.linux-x86_64/wheel/selfhost_models/batch_static
+copying build/lib/selfhost_models/batch_static/index.html -> build/bdist.linux-x86_64/wheel/./selfhost_models/batch_static
+copying build/lib/selfhost_models/batch_static/app.js -> build/bdist.linux-x86_64/wheel/./selfhost_models/batch_static
+copying build/lib/selfhost_models/batch_static/style.css -> build/bdist.linux-x86_64/wheel/./selfhost_models/batch_static
+copying build/lib/selfhost_models/api.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/assets.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/execution_client.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/executor.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/scheduler_schema.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/execution_protocol.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/video_decoder.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/video.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/backend.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/__init__.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+copying build/lib/selfhost_models/storage.py -> build/bdist.linux-x86_64/wheel/./selfhost_models
+warning: install_lib: byte-compiling is disabled, skipping.
+
+running install_egg_info
+Copying selfhost_models.egg-info to build/bdist.linux-x86_64/wheel/./selfhost_models-0.3.0rc1-py3.12.egg-info
+running install_scripts
+creating build/bdist.linux-x86_64/wheel/selfhost_models-0.3.0rc1.dist-info/WHEEL
+creating '/tmp/nano5-v2-wheel/.tmp-vgd3c5k2/selfhost_models-0.3.0rc1-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+adding 'selfhost_models/__init__.py'
+adding 'selfhost_models/api.py'
+adding 'selfhost_models/assets.py'
+adding 'selfhost_models/backend.py'
+adding 'selfhost_models/batch.py'
+adding 'selfhost_models/batch_app.py'
+adding 'selfhost_models/batch_cli.py'
+adding 'selfhost_models/batch_projects.py'
+adding 'selfhost_models/capabilities.py'
+adding 'selfhost_models/cli.py'
+adding 'selfhost_models/execution_client.py'
+adding 'selfhost_models/execution_protocol.py'
+adding 'selfhost_models/execution_retention.py'
+adding 'selfhost_models/executor.py'
+adding 'selfhost_models/fleet_controller.py'
+adding 'selfhost_models/fleet_store.py'
+adding 'selfhost_models/gpu_ownership.py'
+adding 'selfhost_models/scheduler_api.py'
+adding 'selfhost_models/scheduler_cli.py'
+adding 'selfhost_models/scheduler_controller.py'
+adding 'selfhost_models/scheduler_runtime.py'
+adding 'selfhost_models/scheduler_schema.py'
+adding 'selfhost_models/scheduler_store.py'
+adding 'selfhost_models/schema.py'
+adding 'selfhost_models/storage.py'
+adding 'selfhost_models/video.py'
+adding 'selfhost_models/video_decoder.py'
+adding 'selfhost_models/wav.py'
+adding 'selfhost_models/batch_static/app.js'
+adding 'selfhost_models/batch_static/index.html'
+adding 'selfhost_models/batch_static/style.css'
+adding 'selfhost_models-0.3.0rc1.dist-info/METADATA'
+adding 'selfhost_models-0.3.0rc1.dist-info/WHEEL'
+adding 'selfhost_models-0.3.0rc1.dist-info/entry_points.txt'
+adding 'selfhost_models-0.3.0rc1.dist-info/top_level.txt'
+adding 'selfhost_models-0.3.0rc1.dist-info/RECORD'
+removing build/bdist.linux-x86_64/wheel
+Successfully built /tmp/nano5-v2-wheel/selfhost_models-0.3.0rc1-py3-none-any.whl

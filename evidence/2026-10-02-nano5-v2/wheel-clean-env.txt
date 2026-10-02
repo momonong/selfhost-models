@@ -1,0 +1,14 @@
+Python 3.12.3
+Installed module: /tmp/nano5-v2-clean/lib/python3.12/site-packages/selfhost_models/batch_app.py
+batch.py 830aac757d1e5cee1f9a6c103a002d793f9d873a84e396aecc9d702da71fb76c source = wheel = installed
+batch_app.py ceb509cfc4addadccf6afa488932e6cf5bd7953431ba888163f1b73b2fdc75f9 source = wheel = installed
+batch_cli.py 206cab87b3bd5d847b88cc4cb3ddeae5aaf9e89afd04fa6755f6228587b302a9 source = wheel = installed
+batch_projects.py 2f27b7cd7265a43046c2e52ddbca2fb43856da6508fd3c7ca04729332c090784 source = wheel = installed
+batch_static/index.html cbf4cdfe40fddf9e9d8d134d9b941d53cd631fb82fb34d048522e889305d2626 source = wheel = installed
+batch_static/app.js 5c90bc526dce5a2b434dcd8f4abc491ba6f9786bd59dd7b26378d9f3f0a92d8a source = wheel = installed
+batch_static/style.css 2ba854f70b4a8511b2c8bbe4102092d8b578fffe163d1447e3cde0e42c72cba3 source = wheel = installed
+asset / 200 13392
+asset /app.js 200 33970
+asset /style.css 200 14922
+Installed wheel project/snapshot/clone and unknown -> import -> success preserve bytes: passed
+wheel sha256 426e991e096c8e8e05e85fbf92d682e44492ca5efd1358a008f4d87c4fdf77a6

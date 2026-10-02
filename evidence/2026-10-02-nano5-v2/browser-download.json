@@ -1,0 +1,10 @@
+{
+  "path": "/home/ubuntu/Downloads/batch_65bff9ae853e43ec8f0e10c39656acf0-results.zip",
+  "bytes": 293,
+  "sha256": "511cce65a54cf3f501dd8c6d2e1c739b3bb7b14e4eb05850f027ec06ad14c5eb",
+  "entries": [
+    "日誌.txt",
+    "輸出/中文結果.csv"
+  ],
+  "crc_ok": true
+}

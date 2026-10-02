@@ -1,8 +1,23 @@
 # selfhost-models
 
-0.3.0rc1 控制端／多 worker 候選版的交付形態、相容性與限制見 [發布紀錄](docs/releases/0.3.0rc1.md)。既有 0.2.0／latest 保持不變。
+來源與 Python package 版本為 **0.3.0rc2**，新增個人國網操作筆記、手動流程紀錄與保留的離線工具，見 [rc2 版本紀錄](docs/releases/0.3.0rc2.md)。既有控制端／多 worker 候選 images 的交付形態與限制仍見 [0.3.0rc1 發布紀錄](docs/releases/0.3.0rc1.md)；本輪不發布或重標 images，既有 0.2.0／latest 保持不變。
 
 共用模型推論與 Docker 部署管理。提供固定 HF revision 的模型管理、vLLM 與 Transformers serving，業務 prompt、工具執行與產品規則留在各產品。
+
+## 國網個人操作
+
+先看 [我的國網操作筆記](docs/nchc-personal.md)：以本機終端／CLI 與手動實測為主，Ubuntu、macOS、Windows 具備 `ssh`／`sftp` 客戶端即可登入與下載；樣本建立及提交命令在已登入 Nano5 的遠端 Bash 終端執行，本機不需要 Python／uv 或安裝這個 repo。從 [55 最小測試](examples/nchc-smoke/README.md) 開始，再依研究需求準備 Slurm job。研究程式留在原研究 repo。2026-10-03 使用者完成 Nano5 手動流程 smoke：Job 369175 成功、結果 55 並下載核對，見 [測試紀錄與證據來源](docs/nchc-personal.md#nano5-手動測試紀錄)。GPU 運算、研究環境、所有 OS 實機與 UI 真實提交仍未驗收。
+
+### Nano5 離線 UI 原型（保留，停止擴充）
+
+既有專案與 job 導向介面見 [Nano5 工作管理](docs/nano5-batch.md)，功能、資料與驗證證據保留。完整程式專案設定一次，再選專案建立工作；環境與國網資料位置可重用，每個工作保存不可變版本快照。首頁管理工作與結果，離線示範另列；**國網連線與提交硬性停用**。小型程式快照上限 16 MiB／100 檔，大型 dataset／checkpoint 尚不支援搬運。獨立工具不需要 Docker/GPU，不改既有推論 API。日常操作依上方個人筆記，以下命令僅供查看離線原型。
+
+```bash
+uv sync --locked
+uv run --locked nano5-batch --state .state/nano5-batch --port 18771
+```
+
+瀏覽器開啟 `http://127.0.0.1:18771`。實際 CPU、瀏覽器、wheel 證據與真機未驗證邊界見 [v2 驗證與備份](evidence/2026-10-02-nano5-v2/README.md)。
 
 ## 開始使用
 

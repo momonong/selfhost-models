@@ -1,0 +1,16 @@
+{
+  "scope": "local_fixed_sample_only",
+  "python": "3.12.3",
+  "sum": 55,
+  "result_sha256": "566774a5a7ebfeb173ee1401abdc257bdcea403bb0613fb7e0ac3d1d5722afa7",
+  "json_readable": true,
+  "overwrite_refused_and_bytes_preserved": true,
+  "wrong_and_missing_input_nonzero": true,
+  "missing_account_placeholder_unconfirmed_wallet_refused": true,
+  "wallet_verified_account_accepted": true,
+  "bash_syntax_passed": true,
+  "non_slurm_execution_refused": true,
+  "remote_connected": false,
+  "submitted": false,
+  "gpu_computation": false
+}

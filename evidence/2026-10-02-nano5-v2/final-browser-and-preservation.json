@@ -1,0 +1,35 @@
+{
+  "observed_utc": "2026-10-02T02:36:54.519697+00:00",
+  "preview_pid": 1350277,
+  "port": 18771,
+  "state": "/home/ubuntu/projects/selfhost-models/.state/nano5-batch-preview",
+  "legacy_preservation": {
+    "drafts": {
+      "legacy_rows": 4,
+      "all_original_columns_bytes_unchanged": true
+    },
+    "draft_files": {
+      "legacy_rows": 8,
+      "all_original_columns_bytes_unchanged": true
+    },
+    "jobs": {
+      "legacy_rows": 3,
+      "all_original_columns_bytes_unchanged": true
+    },
+    "result_files": {
+      "legacy_rows": 9,
+      "all_original_columns_bytes_unchanged": true
+    }
+  },
+  "integrity": "ok",
+  "foreign_key_violations": [],
+  "two_original_project_jobs_package_and_snapshot_unchanged": true,
+  "latest_project_revision": 4,
+  "new_job": "batch_0fc4330fb622403b8a9067373df84660",
+  "new_job_README_and_readonly_asset_bind_verified": true,
+  "clone_draft": "draft_95126cbdf6fd4dc1befd3a0a9298e119",
+  "clone_original_program_revision": 2,
+  "manual_result_keeps_prepared_state": true,
+  "runtime_static_assets_equal_source": true,
+  "live_enabled": false
+}
