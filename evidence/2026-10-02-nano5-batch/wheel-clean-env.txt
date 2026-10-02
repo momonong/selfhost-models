@@ -1,0 +1,14 @@
+Python 3.12.3 / locked dependencies installed in fresh /tmp environment
+Installed module: /tmp/nano5-clean-venv/lib/python3.12/site-packages/selfhost_models/batch_app.py
+batch.py d262dcf5460b9fa37616ded612b087dd321308ca43586dda62fb4a4a1296eaf9 source = wheel = installed
+batch_app.py 55423bd133868a4f75b5af5deb2946c0afcbf4c2324f50dc195ee5b12fb9148a source = wheel = installed
+batch_cli.py 206cab87b3bd5d847b88cc4cb3ddeae5aaf9e89afd04fa6755f6228587b302a9 source = wheel = installed
+batch_static/index.html 067b19f476bad3cd0a9a7b28dfb9f6f6dda2c7e17733547245471022c6c5196d source = wheel = installed
+batch_static/app.js dab7b03629eb7deac46fc70051f76d0c5e2be33a174bc395f2db1c6353316863 source = wheel = installed
+batch_static/style.css 8b6d4fdb7fd734f3e90097dcd066750fec66ebd8eaf4db794aec38e5bf87803c source = wheel = installed
+asset / 200 text/html; charset=utf-8 9730
+asset /app.js 200 text/javascript; charset=utf-8 26896
+asset /style.css 200 text/css; charset=utf-8 19091
+wheel final-state smoke: unknown -> import -> success preserves downloadable bytes
+wheel sha256 f91a1ee2e0e65f9d49f8b726509e6826acf839ee50dc845719ad6591455c9d64
+offline guard: DNS and outbound connect denied before network calls

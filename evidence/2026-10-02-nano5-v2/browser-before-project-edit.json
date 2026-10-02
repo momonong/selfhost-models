@@ -1,0 +1,99 @@
+[
+  {
+    "id": "batch_65bff9ae853e43ec8f0e10c39656acf0",
+    "snapshot": {
+      "project_id": "project_b6d84f2c716b4680a7a4c2661c8a1d27",
+      "project_revision": 2,
+      "project_name": "多檔研究專案（本機驗收）",
+      "working_dir": "",
+      "entrypoint": "main.py",
+      "environment": {
+        "id": null,
+        "name": "待核對環境",
+        "sif_path": "",
+        "verified": false
+      },
+      "locations": []
+    },
+    "input_manifest": [
+      {
+        "path": "code/README.txt",
+        "size": 116,
+        "sha256": "9f282b22a1962f1e67ea24d42153980592ccc0e4c0d4c9bdad2486751b4c51bd"
+      },
+      {
+        "path": "code/config/settings.json",
+        "size": 19,
+        "sha256": "6ee6cfdc9555f69dd19bcd35373e6742dac54cc1aeee6037f800e2b93b6ba9d7"
+      },
+      {
+        "path": "code/main.py",
+        "size": 304,
+        "sha256": "cc0ab6035b52cff51c8419a4c7fca61ea9441be8ea264e359c7d5d73d0e64161"
+      },
+      {
+        "path": "code/package/__init__.py",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "code/package/calc.py",
+        "size": 42,
+        "sha256": "3251dbf18617cd67c47707cb9bd1611dbac212ff0ee9814a75b8ce1f34b85aad"
+      }
+    ],
+    "package_sha256": "356a98231791d09a55b30e8ea7bf696fee1cfd00d494089317c83af83c77991e",
+    "arguments": [],
+    "partition": "dev"
+  },
+  {
+    "id": "batch_fd4cc2967f5a4eb99cc49c607c058dbf",
+    "snapshot": {
+      "project_id": "project_b6d84f2c716b4680a7a4c2661c8a1d27",
+      "project_revision": 2,
+      "project_name": "多檔研究專案（本機驗收）",
+      "working_dir": "",
+      "entrypoint": "main.py",
+      "environment": {
+        "id": null,
+        "name": "待核對環境",
+        "sif_path": "",
+        "verified": false
+      },
+      "locations": []
+    },
+    "input_manifest": [
+      {
+        "path": "code/README.txt",
+        "size": 116,
+        "sha256": "9f282b22a1962f1e67ea24d42153980592ccc0e4c0d4c9bdad2486751b4c51bd"
+      },
+      {
+        "path": "code/config/settings.json",
+        "size": 19,
+        "sha256": "6ee6cfdc9555f69dd19bcd35373e6742dac54cc1aeee6037f800e2b93b6ba9d7"
+      },
+      {
+        "path": "code/main.py",
+        "size": 304,
+        "sha256": "cc0ab6035b52cff51c8419a4c7fca61ea9441be8ea264e359c7d5d73d0e64161"
+      },
+      {
+        "path": "code/package/__init__.py",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "code/package/calc.py",
+        "size": 42,
+        "sha256": "3251dbf18617cd67c47707cb9bd1611dbac212ff0ee9814a75b8ce1f34b85aad"
+      }
+    ],
+    "package_sha256": "e4f6c9ee98ad598d94c0ef2a654d910db45d5c6bff6a95f0d2443fc5818a40e2",
+    "arguments": [
+      "--epochs",
+      "2"
+    ],
+    "partition": "normal"
+  }
+]

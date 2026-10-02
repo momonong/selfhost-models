@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Nano5 工作室</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳至主要內容</a>
+  <header class="site-header">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">N5</span><div><strong>Nano5 工作室</strong><span>專案準備一次，工作重複使用</span></div></div>
+    <span class="offline-badge">● 國網連線停用</span>
+  </header>
+  <main id="main" class="shell">
+    <section class="intro"><div><p class="eyebrow">LOCAL WORKSPACE</p><h1>從專案出發，掌握每一份工作。</h1><p>登錄完整程式專案，選擇資源與參數，再準備交給 Slurm 的工作。</p></div><aside class="boundary-note"><strong>目前僅在本機準備</strong><p>不登入、不上傳、不提交國網，也不消耗國網額度。環境與資料位置只保存待核對資訊。</p></aside></section>
+    <div id="error-banner" class="error-banner" role="alert" tabindex="-1" hidden></div>
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+    <nav class="workspace-tabs" aria-label="主要工作區"><button id="tab-work" type="button" class="active" aria-current="page">工作 <span id="work-count" class="count">0</span></button><button id="tab-projects" type="button">專案 <span id="project-count" class="count">0</span></button><button id="tab-demo" type="button" class="secondary-tab">離線示範與舊版資料</button></nav>
+
+    <section id="work-pane" aria-labelledby="work-heading">
+      <div class="section-heading"><div><p class="eyebrow">WORK / 工作</p><h2 id="work-heading">工作與結果</h2></div><div class="actions compact"><button id="refresh" type="button" class="button secondary">手動重新整理</button><button id="new-work" type="button" class="button primary">＋ 新建工作</button></div></div>
+      <p class="hint">一份工作使用建立當時的專案版本。修改專案不會改變既有工作；本頁沒有真實排隊或提交。</p>
+      <section id="new-work-panel" class="card new-work-panel" hidden><h3>從哪個專案建立工作？</h3><label for="work-project">專案</label><select id="work-project"></select><div class="actions"><button id="create-work" type="button" class="button primary">使用此專案</button><button id="close-new-work" type="button" class="text-button">取消</button></div><p class="hint">程式、環境與資料位置會保存為這份工作的獨立快照。</p></section>
+      <div id="work-empty" class="empty-state" hidden><span class="empty-symbol" aria-hidden="true">＋</span><h3 id="work-empty-title">先建立第一個專案</h3><p id="work-empty-copy">一次匯入程式資料夾，設定入口與預設參數。之後建立工作就不必再逐檔選取。</p><button id="empty-action" type="button" class="button primary">建立專案</button></div>
+      <div id="work-layout" class="workspace-grid"><aside id="work-list" class="record-list" aria-label="工作及草稿"></aside><div id="work-detail" class="detail-column"></div></div>
+      <form id="work-form" class="card" novalidate hidden>
+        <div class="section-heading"><div><p class="eyebrow">工作草稿</p><h2>設定這次執行</h2></div><span id="work-save-state" class="muted">已保存</span></div>
+        <div id="work-snapshot" class="snapshot-summary"></div>
+        <div class="field-grid"><div><label for="title">工作名稱</label><input id="title" name="title" maxlength="80" required></div><div><label for="resource-preset">資源範本</label><select id="resource-preset"><option value="short">短程測試 · H100 · 20 分鐘</option><option value="training">一般訓練 · H100 · 60 分鐘</option><option value="large">較大 GPU 記憶體 · H200 · 60 分鐘</option><option value="custom">自訂資源</option></select></div></div>
+        <label for="arguments">這次的程式參數 <span class="optional">每行一個</span></label><textarea id="arguments" rows="3" placeholder="--epochs&#10;10"></textarea>
+        <div class="field-grid"><div><label for="gpus">GPU 數量</label><input id="gpus" name="gpus" type="number" min="1" max="8" required></div><div><label for="minutes">時間上限（分鐘）</label><input id="minutes" name="minutes" type="number" min="1" required></div></div>
+        <div id="work-cost" class="resource-strip"></div><p class="hint">單節點、單一程序；多 GPU 協同由程式負責。未查證權限、排隊、額度或 GPU 記憶體容量。</p>
+        <details id="work-advanced"><summary>進階：資源、環境與帳務</summary><div class="field-grid"><div><label for="partition">Partition</label><select id="partition" name="partition"><option value="dev">dev · H100</option><option value="normal">normal · H100</option><option value="normal2">normal2 · H200</option></select></div><div><label for="max_cost_twd">GPU 費用上限（NT$）</label><input id="max_cost_twd" name="max_cost_twd" type="number" min="0.01" max="150000" step="0.01" required></div><div><label for="cpus">CPU 數量</label><input id="cpus" name="cpus" type="number" min="1" max="16" required></div><div><label for="memory_gib">記憶體（GiB）</label><input id="memory_gib" name="memory_gib" type="number" min="1" max="128" required></div></div><label for="project_type">計畫費率類別</label><select id="project_type" name="project_type"><option value="unknown">尚未確認</option><option value="nstc">國科會計畫</option><option value="academic">學術單位</option><option value="government">政府／法人</option><option value="enterprise">企業／個人</option></select><label for="account">計畫 ID（Slurm account）<span class="optional">待核對</span></label><input id="account" name="account" maxlength="64" placeholder="核可的 PROJECT_ID"><label for="email">完成通知 email <span class="optional">選填</span></label><input id="email" name="email" type="email" maxlength="254"><p id="work-environment" class="hint"></p><fieldset><legend>這次的資料位置 <span class="optional">選填，遠端資訊未核對</span></legend><div id="work-locations" class="checkbox-list"></div></fieldset><p class="hint">費率來源日期 2026-10-02，估算不含 HFS 儲存等其他費用。未知類別以最高公開費率檢查上限；不代表你的實際費率。<a href="https://iservice.nchc.org.tw/nchc_service/nchc_service_qa.php?target=54" target="_blank" rel="noopener noreferrer">官方計價來源 ↗</a></p></details>
+        <div class="actions"><button id="prepare-work" type="submit" class="button primary">保存並準備工作</button><button id="save-work" type="button" class="button secondary">保存草稿</button><button id="leave-work" type="button" class="text-button">返回列表</button></div><p class="hint">準備完成仍未提交國網；正式提交在本版停用。</p>
+      </form>
+    </section>
+
+    <section id="projects-pane" aria-labelledby="projects-heading" hidden>
+      <div class="section-heading"><div><p class="eyebrow">PROJECT / 專案</p><h2 id="projects-heading">保存程式，反覆使用</h2></div></div>
+      <div class="workspace-grid"><aside><form id="create-project-form" class="card compact-card" novalidate><h3>建立專案</h3><label for="new-project-name">專案名稱</label><input id="new-project-name" name="new-project-name" maxlength="80" required placeholder="例如：影像分類實驗"><button type="submit" class="button primary wide">建立專案</button></form><div id="project-list" class="record-list" aria-label="專案清單"></div></aside><div>
+        <div id="project-empty" class="empty-state"><h3>你的程式有自己的位置</h3><p>先建立專案，再一次選取完整程式資料夾。新工作會重用專案，不必重複匯入。</p></div>
+        <form id="project-form" class="card" novalidate hidden>
+          <div class="section-heading"><div><p id="project-version" class="eyebrow"></p><h2 id="project-title"></h2></div><span id="project-save-state" class="muted">已保存</span></div>
+          <label for="project-name">專案名稱</label><input id="project-name" name="project-name" maxlength="80" required>
+          <div class="folder-area"><label for="project-folder">選取完整程式資料夾</label><input id="project-folder" type="file" webkitdirectory directory multiple><p class="hint">保留資料夾階層，只移除選取資料夾的最外層名稱。瀏覽器會先排除版本庫、虛擬環境、快取與憑證檔案；排除項目會逐一列出。</p><div id="folder-review" hidden><p id="folder-summary" class="resource-strip"></p><p class="hint">匯入會建立新版本，並以這份選取內容完整替換目前程式快照。未選取的舊檔不會沿用；既有工作與舊版本保持不變。</p><details><summary>檢查即將匯入的檔案</summary><ul id="folder-included" class="file-list"></ul></details><details id="folder-excluded-details"><summary id="folder-excluded-summary">檢查排除項目</summary><ul id="folder-excluded" class="file-list"></ul></details><button id="import-folder" type="button" class="button secondary">確認更新整份程式快照</button></div></div>
+          <div class="file-toolbar"><span id="project-file-summary" class="muted"></span><button id="project-example" type="button" class="text-button">載入可信多檔範例</button></div><details><summary>目前程式快照檔案</summary><ul id="project-files" class="file-list"></ul></details><div id="server-exclusions"></div>
+          <label for="project-entrypoint">程式入口</label><select id="project-entrypoint"><option value="">請先匯入程式資料夾</option></select><p class="hint">入口相對專案根目錄；每份工作會固定使用這個版本的程式。</p>
+          <label for="project-arguments">預設參數 <span class="optional">每行一個</span></label><textarea id="project-arguments" rows="3" placeholder="--epochs&#10;10"></textarea>
+          <details id="project-advanced"><summary>進階：工作目錄、環境與資料位置</summary><label for="project-working-dir">相對工作目錄 <span class="optional">留空為專案根目錄</span></label><input id="project-working-dir" placeholder="例如：experiments"><label for="project-environment">執行環境</label><select id="project-environment"><option value="">待核對環境</option></select><fieldset><legend>預設資料位置 <span class="optional">選填，未核對遠端內容</span></legend><div id="project-locations" class="checkbox-list"></div></fieldset><details><summary>登錄既有遠端環境／資料位置</summary><p class="hint">只保存名稱與路徑，不連線、不讀取或搬移資料。請勿輸入憑證。大型資料與模型不放入這份小型程式快照。</p><label for="metadata-kind">資訊類型</label><select id="metadata-kind"><option value="environment">Singularity 執行環境</option><option value="dataset">資料集位置</option><option value="model">模型位置</option></select><label for="metadata-name">名稱</label><input id="metadata-name" maxlength="80"><label for="metadata-path">既有遠端絕對路徑</label><input id="metadata-path" placeholder="例如：/home/user/envs/training.sif"><button id="register-metadata" type="button" class="button secondary">保存待核對資訊</button></details></details>
+          <div class="actions"><button type="submit" class="button primary">保存專案設定</button><button id="project-create-work" type="button" class="button secondary">從此專案新建工作</button><button id="reload-project" type="button" class="text-button">重新讀取</button></div>
+        </form>
+      </div></div>
+    </section>
+
+    <section id="demo-pane" aria-labelledby="demo-heading" hidden><div class="section-heading"><div><p class="eyebrow">OFFLINE / 次要工作區</p><h2 id="demo-heading">離線示範與舊版資料</h2></div></div><p class="inline-warning">示範模擬傳輸與排程，只執行固定 CPU fixture，不執行匯入的程式。結果不能證明國網、GPU 或訓練品質。示範後的工作會移出主要工作列表。</p><div class="workspace-grid"><aside id="demo-list" class="record-list" aria-label="示範及舊版紀錄"></aside><div id="demo-detail" class="detail-column"></div></div><details><summary>舊版草稿（唯讀）</summary><div id="legacy-drafts"></div><p class="hint">保留原紀錄，未杜撰專案來源。舊工作包可從上方工作紀錄下載。</p></details></section>
+
+    <details class="local-limits"><summary>本機資料限制：每份程式／結果 16 MiB、100 檔</summary><p class="hint">適用小型離線準備。邏輯資料總容量上限 256 MiB，最多各 100 份草稿與工作。匯入資料夾會先列出排除項目；ZIP 結果另檢查解壓後的容量與路徑。大型資料集、模型 checkpoint 使用具名稱的遠端資料位置資訊，實際內容與使用權限仍待真機核對。</p></details>
+    <footer><span>本機資料保留 · 無自動 Slurm 輪詢</span><span id="connection-state">正在載入…</span></footer>
+  </main>
+</body>
+</html>

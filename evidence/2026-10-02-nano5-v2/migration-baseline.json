@@ -1,0 +1,24 @@
+{
+  "backup": "/home/ubuntu/projects/selfhost-models/.state/nano5-v1-backup-20261002-1015",
+  "trial": "/home/ubuntu/projects/selfhost-models/.state/nano5-v2-trial-20261002-1015",
+  "baseline": {
+    "drafts": {
+      "count": 4,
+      "content_sha256": "341908472bfbdb03d6ba3571e9e7172b7594bc6eae4d3c6c742f3dff13519e22"
+    },
+    "draft_files": {
+      "count": 8,
+      "content_sha256": "91a64734f6c6695aa36936b1ea8edcbabeb0b0357522d73c84eba07685ed5c6e"
+    },
+    "jobs": {
+      "count": 3,
+      "content_sha256": "9593fd8e6d3eaac3fb01097c0f564f4f29a59fc66b5a1690601e0e7f34627893"
+    },
+    "result_files": {
+      "count": 9,
+      "content_sha256": "9bd43fd89490ee79cb844ca88906d6027659e4ece7a78ce021d5a6ebe103c8fe"
+    },
+    "integrity": "ok",
+    "foreign_keys": []
+  }
+}
