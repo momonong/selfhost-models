@@ -32,7 +32,17 @@ def exclusion(path):
     if any(p.casefold() in EXCLUDED_DIRS for p in parts):
         return "版本控制、環境、快取或私密設定目錄"
     name = parts[-1].casefold()
-    if any(p.casefold().startswith(".env") for p in parts) or name.split(".")[0] in {"credentials", "secrets", "token", "password", "id_rsa", "id_ed25519", "id_ecdsa"} or name.endswith((".pem", ".key", ".p12", ".pfx", ".jks", ".keystore", ".pyc", ".pyo")):
+    # These are excluded file basenames, not authentication values.
+    excluded_names = {
+        "credentials",
+        "secrets",
+        "token",
+        "id_rsa",
+        "id_ed25519",
+        "id_ecdsa",
+        "password",
+    }
+    if any(p.casefold().startswith(".env") for p in parts) or name.split(".")[0] in excluded_names or name.endswith((".pem", ".key", ".p12", ".pfx", ".jks", ".keystore", ".pyc", ".pyo")):
         return "憑證或秘密設定（不匯入內容）"
     safe_path(path)
     return None

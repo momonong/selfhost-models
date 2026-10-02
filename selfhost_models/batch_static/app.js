@@ -137,7 +137,17 @@ function exclusion(path) {
   if (parts.some((part) => ['.git', '.hg', '.svn', '.venv', 'venv', '__pycache__', '.cache', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'node_modules'].includes(part))) return '版本庫、虛擬環境或快取';
   if (parts.some((part) => ['.ssh', 'keys', '.aws', '.azure', '.gnupg', '.codex', '.agents'].includes(part))) return '憑證或私密設定目錄';
   if (parts.some((part) => part.startsWith('.env')) || /\.(pem|key|p12|pfx|jks|keystore)$/.test(name)) return '環境秘密或金鑰檔案';
-  if (['credentials', 'secrets', 'token', 'password', 'id_rsa', 'id_ed25519', 'id_ecdsa'].includes(name.split('.')[0])) return '可能含認證資訊的檔案';
+  // These are excluded file basenames, not authentication values.
+  const excludedNames = [
+    'credentials',
+    'secrets',
+    'token',
+    'id_rsa',
+    'id_ed25519',
+    'id_ecdsa',
+    'password',
+  ];
+  if (excludedNames.includes(name.split('.')[0])) return '可能含認證資訊的檔案';
   if (name.endsWith('.pyc') || name.endsWith('.pyo')) return 'Python 編譯快取';
   return '';
 }
