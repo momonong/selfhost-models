@@ -1,0 +1,1 @@
+Original preview migrated only after successful trial; all four v1 table row counts and content hashes unchanged. Integrity ok; no foreign key violations. No original rows deleted or rewritten.

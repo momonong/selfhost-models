@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "selfhost-models"
-version = "0.3.0rc1"
+version = "0.3.0rc2"
 requires-python = ">=3.11,<3.14"
 dependencies = [
     "httpx==0.28.1",
@@ -23,6 +23,7 @@ required-version = ">=0.11.21,<0.13"
 
 [project.scripts]
 modelctl = "selfhost_models.cli:main"
+nano5-batch = "selfhost_models.batch_cli:main"
 
 [tool.setuptools.packages.find]
 include = ["selfhost_models*"]
@@ -31,3 +32,6 @@ include = ["selfhost_models*"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 pythonpath = ["."]
+
+[tool.setuptools.package-data]
+selfhost_models = ["batch_static/*.html", "batch_static/*.js", "batch_static/*.css"]

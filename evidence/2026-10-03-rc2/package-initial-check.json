@@ -1,0 +1,59 @@
+{
+  "version": "0.3.0rc2",
+  "python": "3.12.3",
+  "wheel": "selfhost_models-0.3.0rc2-py3-none-any.whl",
+  "wheel_sha256": "dc57fbca1a5a01d960dcab1f560bc398542aeffcc1e20e6d477b9f31e2145cc1",
+  "source_wheel_installed_equal_files": 31,
+  "file_sha256": {
+    "selfhost_models/__init__.py": "18f812eeb829c0f7f644eb09fb9ce621b47f9f2f11d5ce31a5d25ec8636b8b04",
+    "selfhost_models/api.py": "c4b7f1fd9fdd8cb8ca9e59663ccc19ed857b48b3122e2cd1a6fd85457fcf3a40",
+    "selfhost_models/assets.py": "7a45be30dafd115dd67843ef40b324b9d249f5777fcf588790c92eb644df9df8",
+    "selfhost_models/backend.py": "59eb1aca6cd1ee9c78258d3304ee83063f818804c3df43ac1f3f58004a9fbbd1",
+    "selfhost_models/batch.py": "830aac757d1e5cee1f9a6c103a002d793f9d873a84e396aecc9d702da71fb76c",
+    "selfhost_models/batch_app.py": "ceb509cfc4addadccf6afa488932e6cf5bd7953431ba888163f1b73b2fdc75f9",
+    "selfhost_models/batch_cli.py": "206cab87b3bd5d847b88cc4cb3ddeae5aaf9e89afd04fa6755f6228587b302a9",
+    "selfhost_models/batch_projects.py": "2f27b7cd7265a43046c2e52ddbca2fb43856da6508fd3c7ca04729332c090784",
+    "selfhost_models/capabilities.py": "242e9432fcb5ea54020f01e5d9d75b79e7dce374ee1e2a76c09ff6afa6b5c015",
+    "selfhost_models/cli.py": "4c3e08469206c64e706022c8e199d34ac6f3a0857476431c31ec96928e53d748",
+    "selfhost_models/execution_client.py": "0435ec00fc5963bc92320020620e17942eeeaf804d49ce1c585d457ba78c7dc0",
+    "selfhost_models/execution_protocol.py": "9f940370c67bf49c2e4f7676e3cc4150f753748f25898789399a846794565b65",
+    "selfhost_models/execution_retention.py": "8d4a902b035b66e933f7395c606cf7f408a8dd1b38eb25c5494f0ec872fc21df",
+    "selfhost_models/executor.py": "407a8b959415d3aa4a671798cea96f2b34e9f407ee546e94f657d6844c085755",
+    "selfhost_models/fleet_controller.py": "fec8e142b1a29d210e2be04a0bfc785e2d199f6689228baa296fe6e1eebb42ec",
+    "selfhost_models/fleet_store.py": "2ec7334cc037e6e031e089476fc1b4d5e56ba67a5e6e5099c11b325bf7748c16",
+    "selfhost_models/gpu_ownership.py": "dabe3f31e7761e905b0bb4114ed50099258f9057c063f989c10b63df64c052c2",
+    "selfhost_models/scheduler_api.py": "8d6b6022d931ee15f2fdbc58615b19ed8593e268c9f03e553c971908b819e43b",
+    "selfhost_models/scheduler_cli.py": "d10f5850501b83513a5561aff9b7a0a3d03f82b25aa821fc3a0f2dcaf1bec45a",
+    "selfhost_models/scheduler_controller.py": "f236b6931b7bbed562543b5a7438679d14ada4c839c644136ce9f8365f3b75c7",
+    "selfhost_models/scheduler_runtime.py": "bd7471abeb9d6fd0a632cb05dbe75f7fd4ebef9e664168a4670a9c7750f9db0d",
+    "selfhost_models/scheduler_schema.py": "ca09c6717514c407c5905d54eb71b9105e1d613a358b32b908f23d4c637b65e7",
+    "selfhost_models/scheduler_store.py": "e041702f1e1bd3d7e1043d5fd077250f542bea73919e56e3b1b353a8f386a552",
+    "selfhost_models/schema.py": "9f6fea574f955feb236d48cc054f51619d3462099423dcaae510a7dd93f0d277",
+    "selfhost_models/storage.py": "5c4c636b0a6679af45dc9f930e89fddcb5c47a054c50764b6e25e820195823a4",
+    "selfhost_models/video.py": "de3d0384ffe99a62225c7e15a36c20c7ec7918d1e0b51db9c908bb0a55d6b985",
+    "selfhost_models/video_decoder.py": "b343087e2c837b1fc3f55f8ab579be4d39cdeb987511105f5802bf157b1cc699",
+    "selfhost_models/wav.py": "3f08602b11ee6e95be046452c9add6eb4ac6b68d2ed00058c140ca22c55e5687",
+    "selfhost_models/batch_static/app.js": "5c90bc526dce5a2b434dcd8f4abc491ba6f9786bd59dd7b26378d9f3f0a92d8a",
+    "selfhost_models/batch_static/index.html": "cbf4cdfe40fddf9e9d8d134d9b941d53cd631fb82fb34d048522e889305d2626",
+    "selfhost_models/batch_static/style.css": "2ba854f70b4a8511b2c8bbe4102092d8b578fffe163d1447e3cde0e42c72cba3"
+  },
+  "console_entrypoints": {
+    "modelctl": "selfhost_models.cli:main",
+    "nano5-batch": "selfhost_models.batch_cli:main"
+  },
+  "console_help_passed": [
+    "modelctl",
+    "nano5-batch"
+  ],
+  "static_routes_200": [
+    "/",
+    "/app.js",
+    "/style.css"
+  ],
+  "offline_bootstrap": true,
+  "installed_offline_guard_passed": true,
+  "project_snapshot_clone_and_unknown_result_preservation": true,
+  "network_listener_started": false,
+  "nano5_connected": false,
+  "gpu_used": false
+}

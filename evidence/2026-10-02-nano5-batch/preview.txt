@@ -1,0 +1,16 @@
+Observed UTC: 2026-10-02T01:46:10.533807+00:00
+/: HTTP 200, 9730 bytes
+/app.js: HTTP 200, 26896 bytes
+/style.css: HTTP 200, 19091 bytes
+/api/bootstrap: HTTP 200, 1467 bytes
+live_enabled: False
+/api/drafts: HTTP 200, 2621 bytes
+draft count: 4
+/api/jobs: HTTP 200, 11444 bytes
+job count: 3
+persisted job states: [{"id": "batch_863c94717e444d58bac111c568ae3ee4", "work_state": "succeeded", "result_state": "available"}, {"id": "batch_4c41892c886a478bbb027678855d5197", "work_state": "succeeded", "result_state": "available"}, {"id": "batch_c60856c4abb84151a6f78dd3a01c22d7", "work_state": "succeeded", "result_state": "available"}]
+1296418 /home/ubuntu/projects/selfhost-models/.venv/bin/python3 /home/ubuntu/projects/selfhost-models/.venv/bin/nano5-batch --state .state/nano5-batch-preview --port 18771
+LISTEN 0      2048       127.0.0.1:18091      0.0.0.0:*    users:(("python",pid=493128,fd=7))
+LISTEN 0      5          127.0.0.1:18085      0.0.0.0:*    users:(("python3",pid=327581,fd=3))
+LISTEN 0      2048       127.0.0.1:18080      0.0.0.0:*    users:(("python",pid=493831,fd=7))
+LISTEN 0      2048       127.0.0.1:18771      0.0.0.0:*    users:(("nano5-batch",pid=1296418,fd=4))

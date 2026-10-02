@@ -1,0 +1,6 @@
+batch_4c41892c886a478bbb027678855d5197-package.zip bytes 3342 sha256 5ac2e451ec2acb9e0ef33ddeae7505712c1bd3955382be12f079eef41b19c975
+entries ["README.txt", "inputs/code/main.py", "inputs/data/範例.csv", "job.slurm", "manifest.json"]
+batch_863c94717e444d58bac111c568ae3ee4-results.zip bytes 472 sha256 b3b09ec3d4fc5ed09204d5d9ec4b21f7791906124b08e0ddc7af9ca3bc3793ea
+entries ["<svg onload=alert(1)>.txt", "輸出/中文結果.csv", "輸出/展示.html"]
+中文結果.csv bytes 9 sha256 e642f71729782d3a01113233973eacdad72f4ddf49d5e9b9535c28ae82fceef5
+Browser downloads verified; generated package and synthetic imported results only.
