@@ -2,6 +2,8 @@
 
 日常使用本機終端：登入 Nano5、交給 Slurm 執行、查結果，再下載檔案。Ubuntu 終端、macOS Terminal、Windows PowerShell／Terminal 都可以，前提是有 `ssh`／`sftp` 客戶端；尚未具備時先準備客戶端。iService 用於帳號、認證／OTP 與計畫管理。目前以 CLI／手動實測優先，UI 保留為離線原型並停止擴充。
 
+要在其他研究 repo 讓 Codex 準備訓練工作，改用 [跨專案參考指南與可貼指示詞](nchc-codex.md)。本筆記保留個人歷史流程；帳號、資源與研究環境必須當次核對。
+
 ## 已確認的資料
 
 以下來自 2026-10-02 使用者在 Nano5 的查詢，經 main 轉交：

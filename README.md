@@ -1,10 +1,12 @@
 # selfhost-models
 
-來源與 Python package 版本為 **0.3.0rc2**，新增個人國網操作筆記、手動流程紀錄與保留的離線工具，見 [rc2 版本紀錄](docs/releases/0.3.0rc2.md)。既有控制端／多 worker 候選 images 的交付形態與限制仍見 [0.3.0rc1 發布紀錄](docs/releases/0.3.0rc1.md)；本輪不發布或重標 images，既有 0.2.0／latest 保持不變。
+來源與 Python package 版本為 **0.3.0rc3**，新增其他研究專案可讀的國網 Codex 參考指南，見 [rc3 版本紀錄](docs/releases/0.3.0rc3.md)。[rc2 歷史紀錄](docs/releases/0.3.0rc2.md) 與既有控制端／多 worker 候選 images 的 [0.3.0rc1 發布紀錄](docs/releases/0.3.0rc1.md) 保留；本輪不發布或重標 images，既有 0.2.0／latest 保持不變。
 
 共用模型推論與 Docker 部署管理。提供固定 HF revision 的模型管理、vLLM 與 Transformers serving，業務 prompt、工具執行與產品規則留在各產品。
 
 ## 國網個人操作
+
+在其他研究 repo 開 Codex，先看 [跨專案國網參考指南與可貼指示詞](docs/nchc-codex.md)：本 repo 唯讀參考，研究程式／job／收據留在研究 repo，先完成離線準備，再分段授權真機 preflight、短研究 smoke 與訓練。實驗室更新方式亦見該指南；文件不依賴本機 Python／uv 或聊天歷史。
 
 先看 [我的國網操作筆記](docs/nchc-personal.md)：以本機終端／CLI 與手動實測為主，Ubuntu、macOS、Windows 具備 `ssh`／`sftp` 客戶端即可登入與下載；樣本建立及提交命令在已登入 Nano5 的遠端 Bash 終端執行，本機不需要 Python／uv 或安裝這個 repo。從 [55 最小測試](examples/nchc-smoke/README.md) 開始，再依研究需求準備 Slurm job。研究程式留在原研究 repo。2026-10-03 使用者完成 Nano5 手動流程 smoke：Job 369175 成功、結果 55 並下載核對，見 [測試紀錄與證據來源](docs/nchc-personal.md#nano5-手動測試紀錄)。GPU 運算、研究環境、所有 OS 實機與 UI 真實提交仍未驗收。
 
