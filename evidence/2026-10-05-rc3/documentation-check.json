@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-05",
+  "base": "af64c0649152ddc20961cb0211f849923ae1c6f5",
+  "guide": "docs/nchc-codex.md",
+  "lock_dependency_change": false,
+  "unchanged_runtime_files_except_version": 30,
+  "bash_checks": [
+    {
+      "block": 1,
+      "bash_n": true,
+      "unfilled_input_rejected": true,
+      "message": "停止：腳本不存在。"
+    },
+    {
+      "block": 2,
+      "bash_n": true,
+      "unfilled_input_rejected": true,
+      "message": "停止：Job ID 必須是數字。"
+    }
+  ],
+  "placeholder_commands_are_non_executable_text": true,
+  "dry_walkthrough": [
+    "Research repo instructions first; reference remote and HEAD checked; invalid explicit path stops.",
+    "Offline requirements and reviewable plan; dirty/untracked inclusion explicit; code and large assets separated.",
+    "Unfilled commands withheld; reading does not authorize SSH, transfer, installation or paid smoke.",
+    "Existing bounded smoke authorization reused; missing or expanded scope needs approval.",
+    "Unknown submission preserved without retry; main job and steps plus artifacts required.",
+    "Download destination in research run directory; local and remote shells distinguished.",
+    "Lab pull requires clean main/origin/main; dirty or diverged stops without reset or stash."
+  ],
+  "official_web_pages_read": 9,
+  "official_checked_on": "2026-10-05",
+  "nano5_connected": false,
+  "gpu_used": false,
+  "services_started": false,
+  "script_content_guard": {
+    "scope": "Exact documented grep guard plus bash -n and cat; /tmp fixtures only, not the /work path check or a remote job",
+    "cases": [
+      {
+        "case": "placeholder",
+        "expected_pass": false,
+        "exit_code": 1
+      },
+      {
+        "case": "todo",
+        "expected_pass": false,
+        "exit_code": 1
+      },
+      {
+        "case": "reviewable",
+        "expected_pass": true,
+        "exit_code": 0
+      }
+    ],
+    "valid_script_reviewed_without_execution": true
+  },
+  "relative_links_and_anchors": {
+    "checked": 26,
+    "passed": true,
+    "scope": [
+      "docs/nchc-codex.md",
+      "docs/nchc-personal.md",
+      "docs/releases/0.3.0rc3.md",
+      "evidence/2026-10-05-rc3/README.md",
+      "README current version and NCHC entry sections"
+    ]
+  }
+}

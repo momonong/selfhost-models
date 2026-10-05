@@ -1,0 +1,22 @@
+Using CPython 3.12.3 interpreter at: /usr/bin/python3.12
+Creating virtual environment at: /tmp/selfhost-models-rc3-test-env
+   Building selfhost-models @ file:///home/ubuntu/projects/selfhost-models
+Downloading hf-xet (4.3MiB)
+Downloading pygments (1.2MiB)
+Downloading av (38.7MiB)
+Downloading pillow (6.3MiB)
+Downloading pydantic-core (1.9MiB)
+ Downloaded pygments
+      Built selfhost-models @ file:///home/ubuntu/projects/selfhost-models
+ Downloaded pydantic-core
+ Downloaded hf-xet
+ Downloaded pillow
+ Downloaded av
+Installed 31 packages in 10ms
+.....................ss................................................. [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 56%]
+........................................................................ [ 75%]
+........................................................................ [ 94%]
+......................                                                   [100%]
+380 passed, 2 skipped in 71.15s (0:01:11)

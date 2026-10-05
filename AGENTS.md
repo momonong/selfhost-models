@@ -11,3 +11,4 @@
 - 契約測試：`uv run --locked pytest -q`。GPU 驗收入口見 `docs/acceptance.md`；不得將 mock 測試描述成 GPU 驗證。
 - GPU／Docker 故障注入只針對本專案 Compose 容器，執行前盤點共用資源。
 - 文件入口：README；架構與 backend 契約分別在 `docs/architecture.md`、`docs/backend.md`。
+- 其他研究 repo 使用國網成果時，唯讀參考 `docs/nchc-codex.md`；研究 code／job／run receipts 留在原 repo，不將本 repo AGENTS 套用到它，讀指南不授權國網連線或花費。
