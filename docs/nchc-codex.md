@@ -1,14 +1,35 @@
 # 在研究專案使用國網：給 Codex 的參考指南
 
-在**研究 repo** 開 Codex，貼下方指示詞即可先準備工作。研究程式、設定、Slurm 腳本與 run receipts 留在研究 repo；`selfhost-models` 是唯讀參考，不需要為此安裝它的 Python package、Docker 或 UI。讀取本文件不授權登入、傳輸、安裝遠端環境或使用額度。
+這份文件是國網的**文件／CLI 操作介面**。在研究 repo 已載入包含國網路由的新版 Codex instructions 時，一般說「要用國網訓練這個專案」，Codex 就應先讀研究 repo 自身規則，再循 **Codex instructions → `guides/service-integration.md` → 本文件 → [固定樣本](../examples/nchc-smoke/README.md)／必要的 [個人歷史筆記](nchc-personal.md)**，不需每次重貼長指示詞。未載入該路由時，可用下方獨立指示詞。
+
+研究程式、設定、Slurm 腳本與 run receipts 留在研究 repo；`selfhost-models` 是唯讀參考，不需要為此安裝它的 Python package、Docker 或 UI。讀取本文件不授權登入、傳輸、安裝遠端環境或使用額度，也不代表已有自動訓練 CLI 或可用的 UI 真實提交。
 
 ## 可直接貼到研究 repo 的指示詞
 
+此段供未載入國網路由的 Codex 使用；已載入者依上方最短路由即可。
+
 ```text
-請先讀本研究 repo 的 AGENTS.md、README 與訓練入口。定位 selfhost-models：先用我指定或已登錄的位置，再查 PROJECTS_ROOT；未設定時只檢查原生 home 下的 projects/selfhost-models 候選。核對 git remote 是 momonong/selfhost-models、docs/nchc-codex.md 存在，記錄 HEAD；指定位置無效就回報，找不到才問，不掃全磁碟或自行 clone。唯讀參考 docs/nchc-codex.md 與 examples/nchc-smoke/README.md，不將參考 repo 的 AGENTS 套用到本研究 repo。按指南先盤點模型、locked 環境、entry/args、資料/checkpoint、資源及輸出需求，缺必要資訊一次彙整問；在本研究 repo 準備可審查的版本快照方案、傳輸 manifest、Slurm 腳本、分段命令與驗收條件。先完成離線準備；沒有另外授權就不要連線國網、提交工作、花額度或改本參考 repo。
+請先讀本研究 repo 的 AGENTS.md、README 與訓練入口。定位 selfhost-models：先用指定或已登錄的位置，再查 PROJECTS_ROOT；未設定時只檢查原生 home/projects/selfhost-models 候選，核對來源 momonong/selfhost-models。指定或設定位置無效先回報，不換副本、不掃全磁碟或自行 clone。以研究計畫指定的參考 commit 為準，未指定時解析本機 HEAD，從選定 commit 讀 docs/nchc-codex.md 與必要引用的完整已提交文件；無本機副本時從 https://github.com/momonong/selfhost-models/blob/main/docs/nchc-codex.md 唯讀定位，先解析 commit，再讀該版全文。記錄完整 SHA、相對路徑與日期，同一 run 固定；版本或全文不可取得就停止依賴它的操作，不拿 dirty 草稿或摘要補猜，不為查閱 pull 或切分支。依指南在研究 repo 準備可審查的程式／環境／傳輸清單、Slurm 腳本與分段驗收，缺必要資訊一次彙整問。不將參考 repo 的 AGENTS 套到研究 repo；未授權不連線國網、提交、花額度或改參考 repo。
 ```
 
-已安裝 repo 的定位以實際 OS 與主機為準；不要猜 Windows 磁碟、macOS／Linux 使用者名稱，也不要把本機路徑當遠端路徑。核對 `git remote -v`、`git rev-parse HEAD` 與文件內容即可，remote 若嵌有憑證只記安全的 owner/repo。參考文件版本須與已讀 HEAD 一起寫入研究 run 計畫，不需使用者手填 commit。
+## 來源與參考版本
+
+已安裝 repo 的定位以實際 OS 與主機為準；不要猜 Windows 磁碟、macOS／Linux 使用者名稱，也不要把本機路徑當遠端路徑。指定或設定的位置無效就先回報，不默默換副本。核對 `git remote -v` 的來源為 `momonong/selfhost-models`；remote 若嵌有憑證，只記安全的 owner/repo。
+
+研究計畫已指定參考 commit 時優先使用；未指定才解析本機 HEAD。由代理解析為完整 SHA，從該 commit 用 `git show` 或等價唯讀方式取得本指南與必要引用的**完整已提交內容**，包括固定樣本及使用個人歷史時的筆記。以下是由代理填值的本機 Git 命令示意，不需使用者每次手改版本：
+
+```text
+git rev-parse --verify "__REFERENCE_COMMIT_OR_HEAD__^{commit}"
+git show "__FULL_REFERENCE_SHA__:docs/nchc-codex.md"
+git show "__FULL_REFERENCE_SHA__:examples/nchc-smoke/README.md"
+git show "__FULL_REFERENCE_SHA__:docs/nchc-personal.md"
+```
+
+相對引用也從同一 commit 讀，不能主文件固定版、引用卻讀工作樹或 latest。dirty 草稿不可冒充該 commit；唯讀查閱不需 pull、切 branch、stash 或覆寫修改。指定 commit 不在本機或必要文件缺失時，明列缺項；如可用 GitHub 同 commit 全文就唯讀查證，仍不能確認時只停依賴它的操作。
+
+沒有可用本機副本時，從 [GitHub 正式入口](https://github.com/momonong/selfhost-models/blob/main/docs/nchc-codex.md) 唯讀定位。`main` 是可變入口，先以 GitHub commit metadata／ref 解析工具取得所用的完整 commit SHA，再讀 `/blob/該SHA/文件相對路徑` 或等價 GitHub file 工具的全文與必要引用，不把搜尋摘要當全文。不能確認版本或取得必要全文時明說缺口，不自行 clone／安裝或憑聊天記憶補猜。
+
+代理在研究計畫／交接記錄來源 repo、完整參考 SHA、已讀相對路徑與查閱日期；同一 run 固定使用，更新參考版先核對差異及對計畫的影響。playbook 的 `guides-commit` 只固定 playbook，不固定外部 `selfhost-models` commit；不要求使用者每次手改全域指示詞。
 
 ## 目前成果與證據
 
@@ -19,7 +40,7 @@
 | Nano5 手動流程 | 2026-10-03 Job 369175：CPU 加總 55、主 job 與 steps 為 `COMPLETED 0:0` | 申請 GPU 但 `gpu_computation=false`；[65-byte 結果](../evidence/2026-10-03-nano5-smoke/nano5-369175-result.json) SHA256 為 `566774a5a7ebfeb173ee1401abdc257bdcea403bb0613fb7e0ac3d1d5722afa7`；遠端狀態由使用者回報，下載檔本機核對 |
 | `nano5-batch` | 保留的離線 UI／工作快照與手動結果保存 | 真實國網連線／submit 硬性停用，UI 停止擴充；[v2 工程證據](../evidence/2026-10-02-nano5-v2/README.md) 不等於真機驗收 |
 | `modelctl`／模型 API | 本專案既有推論基礎設施 | 不是 Slurm 訓練提交器，不將推論 Docker／CUDA 配套搬去作研究環境 |
-| 本指南與 rc3 | 外部 Codex 可據文件準備研究工作 | 未驗 GPU 訓練、研究依賴、SIF、torchrun／多節點、大型資料搬運或所有 OS 實機 |
+| 本指南與 rc4 | 外部 Codex 可據固定版本文件準備研究工作 | 未驗 GPU 訓練、研究依賴、SIF、torchrun／多節點、大型資料搬運或所有 OS 實機 |
 
 ## 先在研究 repo 完成離線準備
 
@@ -179,7 +200,7 @@ git rev-parse HEAD
 git status --short --branch
 ```
 
-dirty、upstream 錯誤或分歧就停，保留現況；不要 reset、stash、覆寫或強行切分支。成功後檢查 `pyproject.toml`、`selfhost_models/__init__.py`、`uv.lock` 均為 `0.3.0rc3`（若後續版本已發布，依其版本紀錄核對），`docs/nchc-codex.md` 存在，記實際 HEAD 與版本。pull 更新來源，不替你安裝 package、更新 images 或部署服務；離線參考也不需這些操作。
+dirty、upstream 錯誤或分歧就停，保留現況；不要 reset、stash、覆寫或強行切分支。成功後檢查 `pyproject.toml`、`selfhost_models/__init__.py`、`uv.lock` 均為 `0.3.0rc4`（若後續版本已發布，依其版本紀錄核對），`docs/nchc-codex.md` 存在，記實際 HEAD 與版本。這是另獲授權的更新操作，不是唯讀查閱的必要步驟；pull 不替你安裝 package、更新 images 或部署服務。
 
 ## 官方查核與當次限制
 
