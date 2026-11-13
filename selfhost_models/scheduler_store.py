@@ -24,6 +24,11 @@ FINAL = ("succeeded", "failed", "canceled", "expired", "dependency_failed")
 ACTIVE = ("dispatching", "running", "draining", "unknown")
 
 
+def validate_idempotency_key(key):
+    if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", key):
+        raise SchedulerError("invalid_idempotency_key")
+
+
 def require_native_state(path):
     if sys.platform != "linux":
         raise SchedulerError("managed_state_requires_linux", 503)
@@ -545,8 +550,7 @@ class Store:
         return data, row["media"]
 
     def submit(self, spec, key):
-        if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", key):
-            raise SchedulerError("invalid_idempotency_key")
+        validate_idempotency_key(key)
         content = canonical(spec.model_dump())
         if spec.execution_timeout_seconds > self.config.drain_seconds:
             raise SchedulerError("execution_limit_exceeds_drain")
@@ -607,6 +611,15 @@ class Store:
             if not row:
                 raise SchedulerError("job_not_found", 404)
             return dict(row) if private else self.public_job(row)
+
+    def job_by_idempotency(self, key):
+        """Read the original retained job; never create or re-admit work."""
+        validate_idempotency_key(key)
+        with contextlib.closing(self.connect()) as c:
+            row = c.execute("SELECT * FROM jobs WHERE idem=?", (key,)).fetchone()
+            if not row:
+                raise SchedulerError("job_not_found", 404)
+            return self.public_job(row)
 
     def jobs(self, after=0, limit=100):
         if not 0 <= after or not 1 <= limit <= 100:

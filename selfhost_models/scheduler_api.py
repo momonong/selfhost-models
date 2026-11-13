@@ -71,6 +71,8 @@ async def route(gateway, scope, receive, send, headers, rid):
         elif path.startswith("/v1/artifacts/") and method == "GET":
             data, media = store.artifact(path.removeprefix("/v1/artifacts/"))
             result = {"media_type": media, "data_base64": base64.b64encode(data).decode()}
+        elif path.startswith("/v1/jobs/by-idempotency/") and method == "GET":
+            result = store.job_by_idempotency(path.removeprefix("/v1/jobs/by-idempotency/"))
         elif path.startswith("/v1/jobs/"):
             parts = path.split("/")
             jid = parts[3]

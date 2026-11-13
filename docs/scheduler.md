@@ -102,9 +102,20 @@ Job 提交、查詢、取消、catalog、artifact upload 在模型切換時仍�
 | `GET /v1/artifacts/{ref}` | `{media_type,data_base64}` |
 | `POST /v1/jobs` | 必填 `Idempotency-Key`，新 job 201、既有同內容 200、不同內容 409 |
 | `GET /v1/jobs?after=0&limit=100` | 按 sequence 分頁，上限 100 |
+| `GET /v1/jobs/by-idempotency/{key}` | 認證後依唯一 idempotency key 精確查原 job；與 job-ID 查詢使用相同 public projection |
 | `GET /v1/jobs/{id}` | 運算／成果狀態、attempt、error code、result_description；不附敏感輸入 |
 | `POST /v1/jobs/{id}/cancel` | 嚴格空 JSON `{}`，可重複取消 |
 | `GET /v1/jobs/{id}/result` | available 時回 JSON；尚未保存 409 |
+
+首次 POST 回覆遺失而未取得 job ID 時，保留原 `Idempotency-Key`，以
+`GET /v1/jobs/by-idempotency/{key}` 查回，再用回覆的 `id` 查結果。此操作在模型未 ready
+時仍可用；只讀取權威 control store，不建立工作、不派送、不占 lease 或 generation budget。
+key 與提交使用相同規則：1–128 個 ASCII 字元，僅 `[A-Za-z0-9_.:-]`。非法 key 回 400；
+未通過原 public Bearer 認證先回 401，不透露 key 是否存在。
+
+404 只表示目前保留的資料中找不到（例如 key 錯誤或已 GC），**不能證明原工作從未執行，
+也不授權重新 POST**。保留未知結果與原收據，交管理者對帳；不得從分頁列表猜另一筆工作、
+換 key／deployment／endpoint 重做。已有 job ID 時直接查原 ID。
 
 ```json
 {

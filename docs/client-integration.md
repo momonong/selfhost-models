@@ -6,6 +6,10 @@ Linux 或 WSL，Windows 只透過 HTTP；公開 key 與 worker key 分開。先�
 ready/models 取得實際能力；未 ready 時仍可查詢或提交持久工作，但不代表能立即執行。
 下方預設 18080、static Compose 與 Chat route 語義仍適用原服務，不能自行切換它。
 
+managed scheduler 的首次提交回覆遺失時，使用同一認證與原 key 呼叫
+`GET /v1/jobs/by-idempotency/{key}`，再依原 job ID 查詢狀態／結果；這是唯一索引的
+唯讀查回，不是重新提交。404 也不能視為允許重送，完整語義見[精確查回契約](scheduler.md)。
+
 本指南供其他專案的開發者與 coding agent 接入已由 `selfhost-models` 啟動的本機模型服務。它說明接入流程、能力選擇、失敗語義與產品責任；完整欄位限制仍以 [API 0.1 支援範圍](api.md) 為準，部署與維運由服務擁有者依 [本機使用指南](local-use.md) 及 [部署文件](deployment.md) 處理。
 
 Linux 同機 client 的預設位址同樣是 `http://127.0.0.1:18080`；由服務擁有者提供部署 checkout 下 `.state/api-key` 的實際絕對路徑，設定 `SELFHOST_MODEL_API_KEY_FILE`。不要沿用下方 Windows 範例路徑。先確認 ready，再查 models 的 id、backend、revision 與 capabilities；其他容器及遠端接入仍未驗證。
